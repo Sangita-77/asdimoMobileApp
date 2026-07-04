@@ -13,5 +13,5 @@
     "**/*.tsx",
     ".expo/types/**/*.ts",
     "expo-env.d.ts"
-  ]
+, "app/Games/ShapeSorting/puzzlegame12.tsx", "app/Games/ShapeSorting/Backups", "app/Games/PuzzleGame/Backups"  ]
 }

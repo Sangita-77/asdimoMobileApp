@@ -4,7 +4,14 @@
  */
 
 import { Platform } from 'react-native';
+import { themeColors } from "./color";
+import { ThemeFonts } from "./fonts";
 
+
+export const Theme = {
+  color: themeColors,
+  fonts: ThemeFonts,
+};
 const tintColorLight = '#0a7ea4';
 const tintColorDark = '#fff';
 
