@@ -1,12 +1,13 @@
-import CloudFloat from "../../components/AnimationCompo/CloudFloat";
 import LandscapeLock from "@/components/ui/LandscapeLock";
 import Tab from "@/components/ui/Tab";
 import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
 import { useVideoPlayer } from "expo-video";
 import { useEffect, useState } from "react";
-import { Image, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { Image, StyleSheet, View, useWindowDimensions } from "react-native";
+import CloudFloat from "../../components/AnimationCompo/CloudFloat";
 import BackButton from "../../components/ButtonCompo/BackButton";
+// import Form from "../../components/ui/Form";
 import { styles as globalStyle } from "../../constants/globalStyle";
 
 export default function Index() {
@@ -55,8 +56,21 @@ useEffect(() => { Asset.loadAsync([ Rainbow, Cloude, TreeLogin, dimoAnimation ])
                     <View> 
                         <Tab tabs={[ { id: "signin", label: "Sign In" }, { id: "signup", label: "Sign Up" }, ]} activeTab={activeTab} onChange={setActiveTab} />
                         <View style={{ marginTop: 30 }}>
-                          {activeTab === "signin" && <Text> Sign in </Text> }
-                          {activeTab === "signup" && <Text> Sign Up </Text> }
+                          {activeTab === "signin" && 
+                              <>
+                                {/* <Form type="normal">
+                                  <NameField />
+                                  <EmailField />
+                                  <PasswordField />
+                                  <SubmitButton />
+                                </Form> */}
+                              </>
+                           }
+                          {activeTab === "signup" && 
+                              <> 
+                                
+                              </> 
+                          }
                         </View>
                     </View>
            </View> 
