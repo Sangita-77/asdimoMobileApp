@@ -1,11 +1,35 @@
-import React, { ReactNode, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  ReactNode,
+  Children,
+} from "react";
 import { View } from "react-native";
 
-type FormType = "normal" | "step";
+export type FormType = "normal" | "step";
+
+type FormContextType = {
+  currentStep: number;
+  nextStep: () => void;
+  prevStep: () => void;
+};
+
+const FormContext = createContext<FormContextType | null>(null);
+
+export const useForm = () => {
+  const context = useContext(FormContext);
+
+  if (!context) {
+    throw new Error("useForm must be used inside a Form with type='step'");
+  }
+
+  return context;
+};
 
 type FormProps = {
   type?: FormType;
-  children: ReactNode[];
+  children: ReactNode;
   initialStep?: number;
 };
 
@@ -16,11 +40,35 @@ export default function Form({
 }: FormProps) {
   const [currentStep, setCurrentStep] = useState(initialStep);
 
+  // Normal Form
   if (type === "normal") {
     return <View>{children}</View>;
   }
 
-  return <View>{children[currentStep]}</View>;
-}
+  // Step Form
+  const steps = Children.toArray(children);
 
-export { FormType }; 
+  const nextStep = () => {
+    setCurrentStep((prev) =>
+      prev < steps.length - 1 ? prev + 1 : prev
+    );
+  };
+
+  const prevStep = () => {
+    setCurrentStep((prev) =>
+      prev > 0 ? prev - 1 : prev
+    );
+  };
+
+  return (
+    <FormContext.Provider
+      value={{
+        currentStep,
+        nextStep,
+        prevStep,
+      }}
+    >
+      <View>{steps[currentStep]}</View>
+    </FormContext.Provider>
+  );
+}

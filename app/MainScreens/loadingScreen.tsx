@@ -5,7 +5,7 @@ import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Image, ImageBackground, StyleSheet, Text, View, useWindowDimensions } from "react-native";
-
+import { styles as globalStyle } from "../../constants/globalStyle";
 
 // import { pauseGameSound, resumeGameSound } from "../components/SoundCompo/GameSound";
 
@@ -105,7 +105,7 @@ export default function Index() {
       <View style={styles.ContentBox}>
         <Image
           source={LoadingDimo}
-          style={styles.logo}
+          style={globalStyle.LoadingDimo}
           resizeMode="contain"
         />
         <Text style={styles.percentText}>{progress}%</Text>
@@ -119,8 +119,6 @@ export default function Index() {
         </Animated.View>
         </View>
       </View>
-
-      
       </ImageBackground>
       </Animated.View>
     </LinearGradient>
@@ -148,10 +146,10 @@ const styles = StyleSheet.create({
       justifyContent: "center",
       alignItems: "center",
     },
-  logo: {
-    width: 220,
-    height: 220,
-  },
+  // LoadingDimo: {
+  //   width: 350,
+  //   height: 220,
+  // },
   progressWrapper: {
     width: "80%",
     height: 62,
