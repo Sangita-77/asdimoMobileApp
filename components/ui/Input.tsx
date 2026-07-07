@@ -38,4 +38,6 @@ const styles = StyleSheet.create({
   label: { fontSize: 14, fontWeight: "600", color: "#333", marginBottom: 6, },
   input: { height: 58, borderWidth: 1, borderColor: "#D9D9D9", borderRadius: 50, paddingHorizontal: 16, backgroundColor: "#FFFFFF", fontSize: 16, color: "#222", },
   error: { marginTop: 5, color: "#E53935", fontSize: 12, },
-});
+});  
+
+// Swati  
