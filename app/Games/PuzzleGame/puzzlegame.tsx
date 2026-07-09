@@ -97,6 +97,7 @@ export default function PuzzleGame({ game, currentLevel, }: { game: GameData; cu
   const routes = [
     "/Games/PuzzleGame/puzzlegame11",
     "/Games/PuzzleGame/puzzlegame12",
+    "/Games/PuzzleGame/puzzlegame13",
   ] as const;
 
   useEffect(() => {
@@ -113,7 +114,7 @@ export default function PuzzleGame({ game, currentLevel, }: { game: GameData; cu
         } else {
           router.replace(routes[currentLevel]);
         }
-      }, 50000000); // give time for animation
+      }, 5000000); // give time for animation
     }
   }, [placed]);
 
