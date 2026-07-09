@@ -111,7 +111,7 @@ useEffect(() => {
       }
     }, 5000); // give time for animation
   }
-}, [placed]);
+}, [placed]); 
 
 
 return (

@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  Children,
-} from "react";
+import React, { createContext, useContext, useState, ReactNode, Children, } from "react";
 import { View, StyleSheet } from "react-native";
 
 export type FormType = "normal" | "step";
@@ -23,21 +17,18 @@ export type FormData = {
 
 type FormContextType = {
   currentStep: number;
-  nextStep: () => boolean;
+  nextStep: () => void;
   prevStep: () => void;
-
+  errors: Partial<Record<keyof FormData, string>>;
   formData: FormData;
   setFormData: React.Dispatch<React.SetStateAction<FormData>>;
-
-  errors: Partial<Record<keyof FormData, string>>;
-  validateField: (field: keyof FormData) => boolean;
 };
 
 type RowProps = {
   children: ReactNode;
 };
 
-function Row({ children }: RowProps) {
+export function Row({ children }: RowProps) {
   return <View style={styles.row}>{children}</View>;
 }
 
@@ -78,102 +69,45 @@ export default function Form({
     referralCode: "",
   });
 
-  const [errors, setErrors] = useState<
-    Partial<Record<keyof FormData, string>>
-  >({});
-
   if (type === "normal") {
     return <View>{children}</View>;
   }
 
   const steps = Children.toArray(children);
-  const validateField = (field: keyof FormData) => {
-    let error = "";
 
-    const value = formData[field].trim();
+    const nextStep = () => {
+      const newErrors: Partial<Record<keyof FormData, string>> = {};
 
-    // Required
-    if (!value) {
-      error = "This field is required.";
-    }
+      if (currentStep === 0) {
+        if (!formData.fullName.trim()) {
+          newErrors.fullName = "Full name is required";
+        }
 
-    // Email
-    if (field === "email" && value) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-      if (!emailRegex.test(value)) {
-        error = "Enter a valid email.";
+        if (!formData.email.trim()) {
+          newErrors.email = "Email is required";
+        } else if (
+          !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)
+        ) {
+          newErrors.email = "Enter a valid email";
+        }
       }
-    }
 
-    // Phone
-    if (field === "phone" && value) {
-      const phoneRegex = /^[0-9]{10}$/;
+      setErrors(newErrors);
 
-      if (!phoneRegex.test(value)) {
-        error = "Phone must be 10 digits.";
-      }
-    }
+      if (Object.keys(newErrors).length > 0) return;
 
-    // ZIP
-    if (field === "zip" && value) {
-      const zipRegex = /^[0-9]{4,10}$/;
-
-      if (!zipRegex.test(value)) {
-        error = "Invalid ZIP code.";
-      }
-    }
-
-    setErrors((prev) => ({
-      ...prev,
-      [field]: error,
-    }));
-
-    return error === "";
-  };
-
-  const validateCurrentStep = () => {
-    let fields: (keyof FormData)[] = [];
-
-    switch (currentStep) {
-      case 0:
-        fields = ["fullName", "email"];
-        break;
-
-      case 1:
-        fields = ["phone", "address"];
-        break;
-
-      case 2:
-        fields = ["city", "state", "zip", "country"];
-        break;
-
-      case 3:
-        fields = ["referralCode"];
-        break;
-
-      default:
-        fields = [];
-    }
-
-    return fields.every(validateField);
-  };
-
-  const nextStep = () => {
-    const valid = validateCurrentStep();
-
-    if (!valid) return false;
-
-    setCurrentStep((prev) =>
-      prev < steps.length - 1 ? prev + 1 : prev
-    );
-
-    return true;
-  };
+      setCurrentStep((prev) =>
+        prev < steps.length - 1 ? prev + 1 : prev
+      );
+    };
 
   const prevStep = () => {
     setCurrentStep((prev) => (prev > 0 ? prev - 1 : prev));
   };
+
+  const [errors, setErrors] = useState<
+  Partial<Record<keyof FormData, string>>
+>({});
 
   return (
     <FormContext.Provider
@@ -184,7 +118,6 @@ export default function Form({
         formData,
         setFormData,
         errors,
-        validateField,
       }}
     >
       <View>{steps[currentStep]}</View>
@@ -193,9 +126,5 @@ export default function Form({
 }
 
 const styles = StyleSheet.create({
-  row: {
-    flexDirection: "row",
-    gap: 12,
-    marginBottom: 16,
-  },
+  row: { flexDirection: "row", gap: 12, marginBottom: 16, },
 });

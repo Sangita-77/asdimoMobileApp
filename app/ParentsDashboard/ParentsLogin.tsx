@@ -15,30 +15,30 @@ import Select from "@/components/ui/Select";
 
 
 function StepOne() {
-  const { nextStep, formData, setFormData } = useForm();
+const { nextStep, formData, setFormData, errors, } = useForm();
   return (
     <View>
       <View style={globalStyle.Dflex}>
-
         <Input
-          placeholder="Full Name"
           variant="half"
+          placeholder="Full Name"
           value={formData.fullName}
           onChangeText={(text) =>
             setFormData((prev) => ({ ...prev, fullName: text }))
           }
+          error={errors.fullName}
         />
+
         <Input
-          placeholder="Email Address"
           variant="half"
+          placeholder="Email Address"
           value={formData.email}
           onChangeText={(text) =>
             setFormData((prev) => ({ ...prev, email: text }))
           }
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoCorrect={false}
+          error={errors.email}
         />
+
       </View>
 
       <Button text="Next Step" textSize="lg" onPress={nextStep} />
@@ -99,6 +99,7 @@ function StepThree() {
           variant="half"
           keyboardType="phone-pad"
           value={formData.phone}
+          error=""
           onChangeText={(text) =>
             setFormData((prev) => ({ ...prev, phone: text }))
           }

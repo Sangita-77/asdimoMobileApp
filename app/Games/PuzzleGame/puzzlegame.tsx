@@ -272,7 +272,6 @@ export default function PuzzleGame({ game, currentLevel, }: { game: GameData; cu
                     <View
                       key={fullpiece.id}
                       style={[
-                        styles.fullpiece,
                         {
                           position: "absolute",
                           left: fullpiece.x,
