@@ -31,7 +31,7 @@ export type GameData = { slots: Slot[]; pieces: Piece[]; };
 
 
 // Game Logic
-export default function PuzzleGame({ game, currentLevel, }: { game: GameData; currentLevel: number; }) {
+export default function ShapeSorting({ game, currentLevel, }: { game: GameData; currentLevel: number; }) {
   const { width, height } = useWindowDimensions();
   const router = useRouter(); 
   const { slots, pieces: piecesData } = game;
@@ -91,8 +91,8 @@ const playWrong = async () => {
 
   
 const routes = [
-  "/Games/ShapeSorting/puzzlegame11",
-  "/Games/ShapeSorting/puzzlegame12",
+  "/Games/ShapeSorting/shapesorting11",
+  "/Games/ShapeSorting/shapesorting12",
 ] as const;
 
 useEffect(() => {

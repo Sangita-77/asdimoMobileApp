@@ -26,14 +26,27 @@ export default function PuzzleGame1() {
   if (!ready) return null;
 
 const level1Data = {
+
+  // Old --------
+//   slots: [
+//     { id: 1, width: width * 0.2502, height: (width * 0.25) / 1.980,  x: width * 0.100, y: width * 0.190, image: BananaSlotOne, },
+//     { id: 2, width: width * 0.127, height: (width * 0.25) / 1.460,  x: width * 0.225, y: width * 0.094, image: BananaSlotTwo, },
+//   ],
+
+//   pieces: [
+//     { id: 1, width: width * 0.2502, height: (width * 0.25) / 1.980, startX: width * 0.008, startY: height * 0.01, image: BananaOne, },
+//     { id: 2, width: width * 0.127, height: (width * 0.25) / 1.460, startX: width * 0.088, startY: height * 0.34, image: BananaTwo, },
+//   ],
+// };
+
   slots: [
-    { id: 1, width: width * 0.2502, height: (width * 0.25) / 1.980,  x: width * 0.100, y: width * 0.190, image: BananaSlotOne, },
-    { id: 2, width: width * 0.127, height: (width * 0.25) / 1.460,  x: width * 0.225, y: width * 0.094, image: BananaSlotTwo, },
+    { id: 1, width: 169, height: 126,  x: 84, y: 186, image: BananaSlotOne, },
+    { id: 2, width: 131, height: 246,  x: width * 0.25, y: width * 0.070, image: BananaSlotTwo, },
   ],
 
   pieces: [
-    { id: 1, width: width * 0.2502, height: (width * 0.25) / 1.980, startX: width * 0.008, startY: height * 0.01, image: BananaOne, },
-    { id: 2, width: width * 0.127, height: (width * 0.25) / 1.460, startX: width * 0.088, startY: height * 0.34, image: BananaTwo, },
+    { id: 1, width: 169, height: 126, startX: width * 0.08, startY: height * 0.01, image: BananaOne, },
+    { id: 2, width: 131, height: 246, startX: width * 0.088, startY: height * 0.34, image: BananaTwo, },
   ],
 };
 

@@ -1,28 +1,22 @@
 import { Asset } from "expo-asset";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Animated,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
   View,
+  Text,
+  StyleSheet,
+  useWindowDimensions,
+  Animated,
 } from "react-native";
 
-import PuzzleGame from "./puzzlegame";
+import ShapeSorting from "./shapesorting";
 
 // LOAD ONCE (outside component)
-const Triangle = require("@/assets/images/GameElements/Triangle.png");
-const TriangleSlot = require("@/assets/images/GameElements/TriangleSlot.png");
-const Square = require("@/assets/images/GameElements/Square.png");
-const SquareSlot = require("@/assets/images/GameElements/SquareSlot.png");
-const Hexagon = require("@/assets/images/GameElements/Hexagon.png");
-const HexagonSlot = require("@/assets/images/GameElements/HexagonSlot.png");
-const Round = require("@/assets/images/GameElements/Round.png");
-const RoundSlot = require("@/assets/images/GameElements/RoundSlot.png");
+const Star = require("@/assets/images/GameElements/Star.png");
+const StarSlot = require("@/assets/images/GameElements/StarSlot.png");
+const Tiles = require("@/assets/images/GameElements/Tiles.png");
+const TilesSlot = require("@/assets/images/GameElements/TilesSlot.png");
 
-
-
-export default function PuzzleGame1() {
+export default function ShapeSorting1() {
   const [ready, setReady] = useState(false);
   const [showLevelOverlay, setShowLevelOverlay] = useState(true);
 
@@ -34,7 +28,13 @@ export default function PuzzleGame1() {
 
   useEffect(() => {
     async function preload() {
-      await Asset.loadAsync([ Triangle, TriangleSlot, Square, SquareSlot, Hexagon, HexagonSlot, Round, RoundSlot ]);
+      await Asset.loadAsync([
+        Star,
+        StarSlot,
+        Tiles,
+        TilesSlot,
+      ]);
+
       setReady(true);
     }
 
@@ -67,27 +67,23 @@ export default function PuzzleGame1() {
 
   if (!ready) return null;
 
-  const leve2Data = {
+  const level1Data = {
     slots: [
-      { id: 1, x: width * 0.26, y: height * 0.48, size: width * 0.114, image: TriangleSlot, },
-      { id: 2, x: width * 0.10, y: height * 0.50, size: width * 0.102, image: SquareSlot, },
-      { id: 3, x: width * 0.26, y: height * 0.15, size: width * 0.114, image: HexagonSlot, },
-      { id: 4, x: width * 0.10, y: height * 0.15, size: width * 0.114, image: RoundSlot, },
+      { id: 1, x: width * 0.09, y: height * 0.3, size: width * 0.14, image: StarSlot, },
+      { id: 2, x: width * 0.25, y: height * 0.3, size: width * 0.158, image: TilesSlot, },
     ],
 
     pieces: [
-      { id: 1, size: width * 0.114, startX: width * 0.02, startY: height * 0.03, image: Triangle, },
-      { id: 2, size: width * 0.102, startX: width * 0.16, startY: height * 0.05, image: Square, },
-      { id: 3, size: width * 0.114, startX: width * 0.02, startY: height * 0.33, image: Hexagon, },
-      { id: 4, size: width * 0.114, startX: width * 0.16, startY: height * 0.33, image: Round, },
+      { id: 1, size: width * 0.14, startX: width * 0.08, startY: height * 0.01, image: Star, },
+      { id: 2, size: width * 0.158, startX: width * 0.068, startY: height * 0.3, image: Tiles, },
     ],
   };
 
   return (
     <View style={{ flex: 1 }}>
-      <PuzzleGame
-        game={leve2Data}
-        currentLevel={2}
+      <ShapeSorting
+        game={level1Data}
+        currentLevel={1}
       />
 
       {showLevelOverlay && (
@@ -101,7 +97,7 @@ export default function PuzzleGame1() {
               },
             ]}
           >
-            <Text style={styles.levelText}>LEVEL 2</Text>
+            <Text style={styles.levelText}>LEVEL 1</Text>
           </Animated.View>
         </View>
       )}
