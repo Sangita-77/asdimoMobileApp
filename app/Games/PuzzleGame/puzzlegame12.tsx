@@ -5,10 +5,10 @@ import PuzzleGame from "./puzzlegame";
 
 
 // LOAD ONCE (outside component)
-const Triangle = require("@/assets/images/GameElements/Triangle.png");
-const TriangleSlot = require("@/assets/images/GameElements/TriangleSlot.png");
-const Square = require("@/assets/images/GameElements/Square.png");
-const SquareSlot = require("@/assets/images/GameElements/SquareSlot.png");
+const BananaOne = require("@/assets/images/GameElements/BananaOne.png");
+const BananaSlotOne = require("@/assets/images/GameElements/BananaSlotOne.png");
+const BananaTwo = require("@/assets/images/GameElements/BananaTwo.png");
+const BananaSlotTwo = require("@/assets/images/GameElements/BananaSlotTwo.png");
 
 export default function PuzzleGame1() {
   const [ready, setReady] = useState(false);
@@ -16,7 +16,7 @@ export default function PuzzleGame1() {
 
   useEffect(() => {
     async function preload() {
-      await Asset.loadAsync([ Triangle, TriangleSlot, Square, SquareSlot, ]);
+      await Asset.loadAsync([ BananaOne, BananaSlotOne, BananaTwo, BananaSlotTwo, ]);
       setReady(true);
     }
 
@@ -25,20 +25,22 @@ export default function PuzzleGame1() {
 
   if (!ready) return null;
 
-  const leve2Data = {
-    slots: [
-      { id: 1, x: width * 0.11, y: height * 0.3, size: width * 0.114, image: TriangleSlot },
-      { id: 2, x: width * 0.26, y: height * 0.32, size: width * 0.102, image: SquareSlot },
-    ],
-    pieces: [
-      { id: 1, size: width * 0.114, startX: width * 0.15, startY: height * 0.2, image: Triangle},
-      { id: 2, size: width * 0.102, startX: width * 0.04, startY: height * 0.22, image: Square},
-    ],
-  };
+const level2Data = {
+  slots: [
+    { id: 1, width: width * 0.2502, height: (width * 0.25) / 1.980,  x: width * 0.100, y: width * 0.190, image: BananaSlotOne, },
+    { id: 2, width: width * 0.127, height: (width * 0.25) / 1.460,  x: width * 0.225, y: width * 0.094, image: BananaSlotTwo, },
+  ],
+
+  pieces: [
+    { id: 1, width: width * 0.2502, height: (width * 0.25) / 1.980, startX: width * 0.008, startY: height * 0.01, image: BananaOne, },
+    { id: 2, width: width * 0.127, height: (width * 0.25) / 1.460, startX: width * 0.088, startY: height * 0.34, image: BananaTwo, },
+  ],
+};
+
 
   return (
     <PuzzleGame
-      game={leve2Data}
+      game={level2Data}
       currentLevel={2}
     />
   );

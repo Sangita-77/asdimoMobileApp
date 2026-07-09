@@ -212,7 +212,6 @@ useEffect(() => { Asset.loadAsync([ Rainbow, Cloude, TreeLogin, dimoAnimation, L
   );
 }
 
-
 const styles = StyleSheet.create({
   formStyles:{marginTop: 20,},
   FormWrap:{zIndex: 100, marginLeft: 180,},
