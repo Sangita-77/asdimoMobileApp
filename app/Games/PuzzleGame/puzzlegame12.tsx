@@ -9,6 +9,7 @@ const BananaOne = require("@/assets/images/GameElements/BananaOne.png");
 const BananaSlotOne = require("@/assets/images/GameElements/BananaSlotOne.png");
 const BananaTwo = require("@/assets/images/GameElements/BananaTwo.png");
 const BananaSlotTwo = require("@/assets/images/GameElements/BananaSlotTwo.png");
+const BananaFull = require("@/assets/images/bananafull.png");
 
 export default function PuzzleGame1() {
   const [ready, setReady] = useState(false);
@@ -16,7 +17,7 @@ export default function PuzzleGame1() {
 
   useEffect(() => {
     async function preload() {
-      await Asset.loadAsync([ BananaOne, BananaSlotOne, BananaTwo, BananaSlotTwo, ]);
+      await Asset.loadAsync([ BananaOne, BananaSlotOne, BananaTwo, BananaSlotTwo, BananaFull, ]);
       setReady(true);
     }
 
@@ -34,6 +35,10 @@ const level2Data = {
   pieces: [
     { id: 1, width: width * 0.2502, height: (width * 0.25) / 1.980, startX: width * 0.008, startY: height * 0.01, image: BananaOne, },
     { id: 2, width: width * 0.127, height: (width * 0.25) / 1.460, startX: width * 0.088, startY: height * 0.34, image: BananaTwo, },
+  ],
+
+  fullpieces: [
+    { id: 1, width: 124, height: 110,  x: 0, y: 0, image: BananaFull, },
   ],
 };
 
