@@ -6,6 +6,8 @@ export const styles = StyleSheet.create({
   // Global Styles Start
   LoadingDimo: { width: 350, height: 220, },
   Dflex:{flexDirection: "row", justifyContent: "space-between", gap: 10, width: "auto",},
+  Dblock:{flexDirection: "column", justifyContent: "space-between", width: "auto",},
+  smallText:{textAlign: "center", paddingBottom: 10, fontWeight: 500, color: "#393B3E", fontSize: 15},
   // Global Styles End
 
 

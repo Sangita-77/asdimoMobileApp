@@ -2,8 +2,7 @@ import LandscapeLock from "@/components/ui/LandscapeLock";
 import Tab from "@/components/ui/Tab";
 import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
-import { useVideoPlayer } from "expo-video";
-import { useEffect, useState } from "react";
+import React,{ useEffect, useState } from "react";
 import { Image, StyleSheet, View, useWindowDimensions, Text } from "react-native";
 import CloudFloat from "../../components/AnimationCompo/CloudFloat";
 import BackButton from "../../components/ButtonCompo/BackButton";
@@ -16,84 +15,212 @@ import Select from "@/components/ui/Select";
 
 
 function StepOne() {
-  const { nextStep } = useForm();
-
+  const { nextStep, formData, setFormData } = useForm();
   return (
     <View>
-        <View style={globalStyle.Dflex}>
-          <Input placeholder="First Name" variant="half" />
-          <Input placeholder="Last Name" variant="half" />
-        </View>
-        <Button text="Next Step" textSize="lg" onPress={nextStep} />
+      <View style={globalStyle.Dflex}>
+
+        <Input
+          placeholder="Full Name"
+          variant="half"
+          value={formData.fullName}
+          onChangeText={(text) =>
+            setFormData((prev) => ({ ...prev, fullName: text }))
+          }
+        />
+        <Input
+          placeholder="Email Address"
+          variant="half"
+          value={formData.email}
+          onChangeText={(text) =>
+            setFormData((prev) => ({ ...prev, email: text }))
+          }
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoCorrect={false}
+        />
+      </View>
+
+      <Button text="Next Step" textSize="lg" onPress={nextStep} />
     </View>
   );
 }
+
 
 function StepTwo() {
-  const { nextStep } = useForm();
+  const { nextStep, formData } = useForm();
+  const [timer, setTimer] = useState(30);
+
+  useEffect(() => {
+    if (timer === 0) return;
+
+    const interval = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const handleResend = () => {
+    setTimer(30);
+  };
+
   return (
     <View>
-        <View style={globalStyle.Dflex}>
-          <Input placeholder="City" variant="half" />
-          <Input placeholder="Address" variant="half" />
-        </View>
-        <Button text="Next Step" textSize="lg" onPress={nextStep} />
+      <Text style={globalStyle.smallText}>
+        Verification code sent to <Text>{formData.email}</Text>
+      </Text>
+      <View style={globalStyle.Dflex}>
+        <Input
+          variant="otp"
+          placeholder="12345"
+          keyboardType="number-pad"
+          maxLength={5}
+          timer={timer}
+          onResend={handleResend}
+        />
+      </View>
+
+      <Button text="Continue" textSize="lg" onPress={nextStep} />
     </View>
   );
 }
+
 
 
 function StepThree() {
-  const { nextStep } = useForm();
-
-const cities = [
-  { label: "Kolkata", value: "Kolkata" },
-  { label: "Mumbai", value: "Mumbai" },
-  { label: "Delhi", value: "Delhi" },
-  { label: "Bengaluru", value: "Bengaluru" },
-  { label: "Chennai", value: "Chennai" },
-  { label: "Hyderabad", value: "Hyderabad" },
-  { label: "Pune", value: "Pune" },
-  { label: "Ahmedabad", value: "Ahmedabad" },
-  { label: "Jaipur", value: "Jaipur" },
-  { label: "Lucknow", value: "Lucknow" },
-];
-
-
-
-
-  const [phoneCode, setPhoneCode] = useState("");
+  const { nextStep, formData, setFormData } = useForm();
 
   return (
     <View>
       <View style={globalStyle.Dflex}>
-        <Select placeholder="City" data={cities} value={phoneCode} onChange={setPhoneCode} variant="half" />
-        <Input placeholder="State" keyboardType="phone-pad" variant="half" />
+        <Input
+          placeholder="Phone"
+          variant="half"
+          keyboardType="phone-pad"
+          value={formData.phone}
+          onChangeText={(text) =>
+            setFormData((prev) => ({ ...prev, phone: text }))
+          }
+        />
+        <Input
+          placeholder="Address"
+          variant="half"
+          value={formData.address}
+          onChangeText={(text) =>
+            setFormData((prev) => ({ ...prev, address: text }))
+          }
+        />
       </View>
-      <Button text="Next Step" onPress={nextStep} textSize="lg"/>
+
+      <Button text="Next Step" textSize="lg" onPress={nextStep} />
     </View>
   );
 }
 
 
 function StepFour() {
+  const { nextStep, formData, setFormData } = useForm();
+
+  const cities = [
+    { label: "DemiCity1", value: "democity1" },
+    { label: "DemiCity2", value: "democity2" },
+    { label: "DemiCity3", value: "democity3" },
+    { label: "DemiCity4", value: "democity4" },
+    { label: "DemiCity5", value: "democity5" },
+  ];
+
   return (
     <View>
       <View style={globalStyle.Dflex}>
-        <Input placeholder="Zip"  variant="half" />
-        <Input placeholder="Country" variant="half" />
+        <Select
+          placeholder="City"
+          data={cities}
+          value={formData.city}
+          onChange={(value) =>
+            setFormData((prev) => ({ ...prev, city: value }))
+          }
+          variant="half"
+        />
+        <Input
+          placeholder="State"
+          variant="half"
+          value={formData.state}
+          onChangeText={(text) =>
+            setFormData((prev) => ({ ...prev, state: text }))
+          }
+        />
       </View>
-      <Button text="Submit" textSize="lg"/>
+
+      <Button text="Next Step" onPress={nextStep} textSize="lg" />
     </View>
   );
 }
+
+
+function StepFive() {
+  const { nextStep, formData, setFormData } = useForm();
+
+  return (
+    <View>
+      <View style={globalStyle.Dflex}>
+        <Input
+          placeholder="Zip"
+          keyboardType="number-pad"
+          variant="half"
+          value={formData.zip}
+          onChangeText={(text) =>
+            setFormData((prev) => ({ ...prev, zip: text }))
+          }
+        />
+        <Input
+          placeholder="Country"
+          variant="half"
+          value={formData.country}
+          onChangeText={(text) =>
+            setFormData((prev) => ({ ...prev, country: text }))
+          }
+        />
+      </View>
+
+      <Button text="Next Step" onPress={nextStep} textSize="lg" />
+    </View>
+  );
+}
+
+function StepSix() {
+  const { formData, setFormData } = useForm();
+
+  const handleSubmit = () => {
+    console.log(formData);
+  };
+
+  return (
+    <View>
+      <View style={globalStyle.Dblock}>
+        <Input
+          placeholder="ORG. / Therapist Referral Code"
+          variant="full"
+          value={formData.referralCode}
+          onChangeText={(text) =>
+            setFormData((prev) => ({
+              ...prev,
+              referralCode: text,
+            }))
+          }
+        />
+       <Button text="Submit" textSize="lg" width="full" onPress={handleSubmit} />
+      </View>
+    </View>
+  );
+}
+
 
 export default function Index() {
   const [activeTab, setActiveTab] = useState("signin"); 
   const Rainbow = require("../../assets/images/Rainbow.png");
   const Cloude = require("../../assets/images/Cloude.png");
   const TreeLogin = require("../../assets/images/TreeLogin.png");
-  const dimoAnimation = require("../../assets/images/dimoAnimation.mp4");
   const LoadingDimo = require("../../assets/images/LoadingDimo.png");
   const GoogleIcon = require("../../assets/images/GoogleIcon.png");
   const FacebookIcon = require("../../assets/images/FacebookIcon.png");
@@ -108,7 +235,13 @@ const handleSubmit = () => {
 };
 
 
-useEffect(() => { Asset.loadAsync([ Rainbow, Cloude, TreeLogin, dimoAnimation, LoadingDimo, GoogleIcon, FacebookIcon]); }, []);
+useEffect(() => {
+    async function loadAssets() {
+        await Asset.loadAsync([ Rainbow, Cloude, TreeLogin, LoadingDimo, GoogleIcon, FacebookIcon, ]);
+    }
+    loadAssets();
+}, []);
+
   return (
     
     <> 
@@ -164,7 +297,7 @@ useEffect(() => { Asset.loadAsync([ Rainbow, Cloude, TreeLogin, dimoAnimation, L
                       </View>
                       <View>
                         <Form type="normal">
-                            <Input label="" placeholder="Enter Phone/Email ID" keyboardType="email-address" autoCapitalize="none" />
+                            <Input label="" placeholder="Enter Phone/Email ID" autoCapitalize="none" />
                             <Input label="" placeholder="Enter Password" secureTextEntry autoCapitalize="none" autoCorrect={false} textContentType="password" autoComplete="password" />                                 
                             <Button text="Continue" onPress={handleSubmit} width="full" textSize="lg" />
                         </Form>
@@ -181,6 +314,8 @@ useEffect(() => { Asset.loadAsync([ Rainbow, Cloude, TreeLogin, dimoAnimation, L
                         <StepTwo />
                         <StepThree/>
                         <StepFour/>
+                        <StepFive/>
+                        <StepSix/>
                       </Form>
                     <View style={globalStyle.Dflex}>
                         <Button
@@ -220,4 +355,5 @@ const styles = StyleSheet.create({
   AnimDino:{width: 320, height: 300, position: "absolute", left: -60, bottom: -20, zIndex: 99,},
   signinText:{color: "#000", textAlign: "center", fontWeight: 500, fontSize: 24, marginBottom: 15}, 
   socialConnection:{borderRightWidth: 1, paddingRight: 20, borderColor: "#AFEBEE",},
+  varText:{textAlign: "center",}
 });

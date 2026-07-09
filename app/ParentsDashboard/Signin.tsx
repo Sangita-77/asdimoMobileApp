@@ -2,7 +2,6 @@ import LandscapeLock from "@/components/ui/LandscapeLock";
 import Tab from "@/components/ui/Tab";
 import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
-import { useVideoPlayer } from "expo-video";
 import { useEffect, useState } from "react";
 import { Image, StyleSheet, View, useWindowDimensions, Text } from "react-native";
 import CloudFloat from "../../components/AnimationCompo/CloudFloat";
