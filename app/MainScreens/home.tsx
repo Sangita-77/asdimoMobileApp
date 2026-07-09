@@ -95,7 +95,7 @@ useEffect(() => {
                 </View> 
                     <View style={styles.PlayButton}>
                       <Pressable
-                         onPress={() => router.push("/ParentsDashboard/Signin")}
+                         onPress={() => router.push("/ParentsDashboard/ParentsLogin")}
                       >
                         <Animated.Image
                           source={playImg}

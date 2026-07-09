@@ -1,11 +1,5 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  ReactNode,
-  Children,
-} from "react";
-import { View } from "react-native";
+import React, { createContext, useContext, useState, ReactNode, Children, } from "react";
+import { View, StyleSheet } from "react-native";
 
 export type FormType = "normal" | "step";
 
@@ -14,6 +8,16 @@ type FormContextType = {
   nextStep: () => void;
   prevStep: () => void;
 };
+
+type RowProps = {
+  children: ReactNode;
+};
+
+function Row({ children }: RowProps) {
+  return <View style={styles.row}>{children}</View>;
+}
+
+Form.Row = Row;
 
 const FormContext = createContext<FormContextType | null>(null);
 
@@ -72,3 +76,7 @@ export default function Form({
     </FormContext.Provider>
   );
 }
+
+const styles = StyleSheet.create({
+  row:{ flexDirection: "row", gap: 12, marginBottom: 16, },
+});

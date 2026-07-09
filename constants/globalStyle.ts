@@ -5,6 +5,7 @@ export const styles = StyleSheet.create({
 
   // Global Styles Start
   LoadingDimo: { width: 350, height: 220, },
+  Dflex:{flexDirection: "row", justifyContent: "space-between", gap: 10, width: "auto",},
   // Global Styles End
 
 
