@@ -1,10 +1,10 @@
 import React, { useEffect } from "react";
 import { StyleSheet, useWindowDimensions } from "react-native";
 import Animated, {
-  runOnJS,
-  useAnimatedProps,
-  useSharedValue,
-  withTiming,
+    runOnJS,
+    useAnimatedProps,
+    useSharedValue,
+    withTiming,
 } from "react-native-reanimated";
 import Svg, { Circle, Defs, Mask, Rect } from "react-native-svg";
 
@@ -52,10 +52,9 @@ export default function GlobalCircleTransition({
 
   return (
     <Svg
-      pointerEvents="none"
       width={width}
       height={height}
-      style={styles.overlay}
+      style={[styles.overlay, { pointerEvents: "none" }]}
     >
       <Defs>
         <Mask id="mask">
@@ -70,12 +69,7 @@ export default function GlobalCircleTransition({
       </Defs>
 
       {/* Frame layer */}
-      <Rect
-        width="100%"
-        height="100%"
-        fill={color}
-        mask="url(#mask)"
-      />
+      <Rect width="100%" height="100%" fill={color} mask="url(#mask)" />
     </Svg>
   );
 }

@@ -15,7 +15,7 @@ import {
   Platform,
   StyleSheet,
   Text,
-  View
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -28,111 +28,109 @@ const SettingController = require("@/assets/images/SettingController.png");
 const DashBoardButton = require("@/assets/images/DashBoardButton.png");
 
 export default function SettingsScreen() {
-
-const [loaded] = useFonts({
+  const [loaded] = useFonts({
     GROBOLD: require("../../assets/fonts/GROBOLD.ttf"),
-});
+  });
 
-
-const [close, setClose] = useState(false);
-const [targetRoute, setTargetRoute] = useState("");
+  const [close, setClose] = useState(false);
+  const [targetRoute, setTargetRoute] = useState("");
 
   useEffect(() => {
-    Asset.loadAsync([bgImg, BackButtonIcon, CloseButton, SettingBoard, SettingController, DashBoardButton]);
+    Asset.loadAsync([
+      bgImg,
+      BackButtonIcon,
+      CloseButton,
+      SettingBoard,
+      SettingController,
+      DashBoardButton,
+    ]);
   }, []);
-  
 
-useEffect(() => {
-  ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+  useEffect(() => {
+    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
 
-  return () => {
-    ScreenOrientation.unlockAsync();
-  };
-}, []);
+    return () => {
+      ScreenOrientation.unlockAsync();
+    };
+  }, []);
 
-if (!loaded) return null;
+  if (!loaded) return null;
 
   return (
-    
     <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
-    <LandscapeLock />
-      <View pointerEvents={close ? "auto" : "none"} style={StyleSheet.absoluteFill}>
-          <GlobalCircleTransition
+      <LandscapeLock />
+      <View
+        style={[
+          StyleSheet.absoluteFill,
+          { pointerEvents: close ? "auto" : "none" },
+        ]}
+      >
+        <GlobalCircleTransition
           trigger={close}
           mode="close"
           startX={40}
           startY={60}
           color="white"
-            onFinish={() => {
+          onFinish={() => {
             if (targetRoute) {
               router.push(targetRoute as any);
             }
           }}
-          />
+        />
+      </View>
+
+      <ImageBackground
+        source={bgImg}
+        style={StyleSheet.absoluteFillObject}
+        resizeMode="cover"
+      >
+        <View style={StyleSheet.absoluteFillObject}>
+          <BackButton icon={BackButtonIcon} />
+
+          {Platform.OS === "android" && <QuitButton icon={CloseButton} />}
+
+          <View style={[styles.SettingBoardWrap]}>
+            <ImageBackground
+              source={SettingBoard}
+              style={[styles.SettingBoard]}
+              resizeMode="contain"
+            >
+              <View style={[styles.SettingcontrollerWrap]}>
+                <ImageBackground
+                  source={SettingController}
+                  style={[styles.SettingController]}
+                  resizeMode="contain"
+                >
+                  <View style={styles.SoundWrap}>
+                    <View style={styles.FlexBox}>
+                      <Text style={styles.fontStyle}>MUSIC</Text>
+                      <VolumeControl />
+                    </View>
+                    <View style={styles.FlexBox}>
+                      <Text style={styles.fontStyle}>SOUND</Text>
+                      <ButtonSoundController />
+                    </View>
+                  </View>
+                </ImageBackground>
+
+                <View>
+                  <Image
+                    source={DashBoardButton}
+                    style={styles.DashBoardButton}
+                    resizeMode="cover"
+                  />
+                </View>
+              </View>
+            </ImageBackground>
           </View>
-
-        <ImageBackground
-            source={bgImg}
-            style={StyleSheet.absoluteFillObject}
-            resizeMode="cover"
-        >
-            <View style={StyleSheet.absoluteFillObject}>
-
-                <BackButton icon={BackButtonIcon} />
-
-                {Platform.OS === "android" && (
-                  <QuitButton icon={CloseButton} />
-                )}
-                
-                <View
-                style={[styles.SettingBoardWrap]}>
-
-                    <ImageBackground 
-                      source={SettingBoard}
-                      style={[styles.SettingBoard]}
-                      resizeMode="contain"
-                    >
-                      <View style={[styles.SettingcontrollerWrap]}>
-
-                       <ImageBackground
-                          source={SettingController}
-                          style={[styles.SettingController]}
-                          resizeMode="contain">
-                          <View style={styles.SoundWrap}> 
-
-
-                              <View style={styles.FlexBox}>
-                                <Text style={styles.fontStyle}>MUSIC</Text>
-                                <VolumeControl/>
-                              </View>   
-                              <View style={styles.FlexBox}>
-                                <Text style={styles.fontStyle}>SOUND</Text>
-                                <ButtonSoundController/>
-                              </View> 
-                                
-                          </View>
-                       </ImageBackground>
-                       
-                        <View>
-                          <Image
-                            source={DashBoardButton}
-                            style={styles.DashBoardButton}
-                            resizeMode="cover"
-                          />
-                        </View>
-
-                      </View>
-                      </ImageBackground>
-                </View> 
-
-            </View>
-        </ImageBackground>
+        </View>
+      </ImageBackground>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  SettingcontrollerWrap:{
+  SettingcontrollerWrap: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
@@ -141,51 +139,51 @@ const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
   },
-  SettingBoard:{
+  SettingBoard: {
     height: 421,
     width: 379,
   },
-  SettingBoardWrap:{
+  SettingBoardWrap: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  SettingController:{
+  SettingController: {
     height: 108,
     width: 315,
     justifyContent: "center",
     alignItems: "center",
   },
-  RightIcon:{
+  RightIcon: {
     marginRight: 20,
   },
-  WrongIcon:{
+  WrongIcon: {
     marginLeft: 20,
   },
-  FlexWrap:{
+  FlexWrap: {
     flexDirection: "row",
     flexWrap: "wrap",
     marginBottom: -100,
   },
-  FlexBox:{
+  FlexBox: {
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
   },
-  DashBoardButton:{
-   marginTop: 30,
-   marginBottom: 15,
-  },  
-  SoundWrap:{
+  DashBoardButton: {
+    marginTop: 30,
+    marginBottom: 15,
+  },
+  SoundWrap: {
     paddingTop: 20,
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
   },
-  fontStyle:{
+  fontStyle: {
     fontFamily: "GROBOLD",
     color: "#542514",
     fontSize: 26,
     width: 105,
-  }
+  },
 });
