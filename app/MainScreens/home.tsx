@@ -19,6 +19,8 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { loadGameSound } from "../../components/SoundCompo/GameSound";
+import { ROUTES } from "@/constants/routes";
+
 
 // PRELOAD IMAGES
 const bgImg = require("@/assets/images/background.png");
@@ -112,7 +114,7 @@ export default function HomeScreen() {
                   <View style={styles.PlayButton}>
                     <Pressable
                       onPress={() =>
-                        router.push("/ParentsDashboard/ParentsLogin")
+                        router.push(ROUTES.APP.CATEGORY)
                       }
                     >
                       <Animated.Image
@@ -127,7 +129,7 @@ export default function HomeScreen() {
                   <Image source={RingImage} />
                 </View>
               </View>
-              <SettingsButton icon={settingsImg} />
+              <SettingsButton/>
             </View>
           </ImageBackground>
         </SafeAreaView>

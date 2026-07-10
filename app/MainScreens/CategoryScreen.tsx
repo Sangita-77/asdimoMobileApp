@@ -3,7 +3,7 @@ import { playClickSound } from "@/components/SoundCompo/ButtonSound";
 import LandscapeLock from "@/components/ui/LandscapeLock";
 import { Asset } from "expo-asset";
 import React, { useEffect, useRef } from "react";
-import { Animated, ImageBackground, Platform, StyleSheet, View,  Image, Text, TouchableOpacity, ScrollView } from "react-native";
+import { Animated, ImageBackground, Platform, StyleSheet, View,  Image, Text, TouchableOpacity, ScrollView, Dimensions } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { loadGameSound } from "../../components/SoundCompo/GameSound";
 const CloseButton = require("@/assets/images/CloseButton.png");
@@ -11,16 +11,19 @@ import BackButton from "@/components/ButtonCompo/BackButton";
 import { router } from "expo-router";
 import { Theme } from "../../constants/theme";
 import { useFonts } from "expo-font";
+import { ROUTES } from "@/constants/routes";
+import SettingsButton from "@/components/ButtonCompo/SettingsButton";
 
 const images = {
   bgImg: require("@/assets/images/background.png"),
-  communication: require("@/assets/images/CommunicationIcon.png"),
-  attention: require("@/assets/images/AttentionIcon.png"),
-  emotions: require("@/assets/images/EmotionsIcon.png"),
-  motorSkill: require("@/assets/images/MotorSkillIcon.png"),
-  sequencing: require("@/assets/images/SequencingIcon.png"),
+  PuzzleIcon: require("@/assets/images/PuzzleIcon.png"),
+  ShapeMatchingIcon: require("@/assets/images/ShapeMatchingIcon.png"),
+  // emotions: require("@/assets/images/EmotionsIcon.png"),
+  // motorSkill: require("@/assets/images/MotorSkillIcon.png"),
+  // sequencing: require("@/assets/images/SequencingIcon.png"),
 };
 
+const { width } = Dimensions.get("window");
 
 interface Category {
   id: number;
@@ -30,18 +33,21 @@ interface Category {
 }
 
 const categories = [
-  { id: 1, title: "Communication", icon: images.communication, route: "/communication", },
-  { id: 2, title: "Attention", icon: images.attention, route: "/attention", },
-  { id: 3, title: "Emotions", icon: images.emotions, route: "/emotions", },
-  { id: 4, title: "Motor Skill", icon: images.motorSkill, route: "/motor-skill", },
-  { id: 5, title: "Sequencing", icon: images.sequencing, route: "/motor-skill", },
+  { id: 1, title: "Puzzle", icon: images.PuzzleIcon, route: ROUTES.PUZZLE.PUZZLE_1, },
+  { id: 2, title: "Shape Matching", icon: images.ShapeMatchingIcon, route: ROUTES.SHAPESORTING.SHAPESORTING_1, },
+  // { id: 3, title: "Emotions", icon: images.emotions, route: "/emotions", },
+  // { id: 4, title: "Motor Skill", icon: images.motorSkill, route: "/motor-skill", },
+  // { id: 5, title: "Sequencing", icon: images.sequencing, route: "/motor-skill", },
 ];
+
+
 
 export default function HomeScreen() {
 const [fontsLoaded] = useFonts({
   GROBOLD: require("../../assets/fonts/GROBOLD.ttf"),
 });
 console.log("fontsLoaded:", fontsLoaded);
+
 
 // const scaleAnim = useRef(new Animated.Value(1)).current;
 const AnimatedTouchable = Animated.createAnimatedComponent(TouchableOpacity);
@@ -135,21 +141,22 @@ animations.forEach((anim, index) => {
                       onPressIn={() => { Animated.spring(anim.scale, { toValue: 0.5, useNativeDriver: true, }).start(); }}
                       onPressOut={() => { Animated.spring(anim.scale, { toValue: 1, friction: 3, useNativeDriver: true, }).start(); }}
                       onPress={() => { playClickSound(); 
-                        // router.push(item.route); 
+                        router.push(item.route); 
                       }}
                     >
                       <Image source={item.icon} style={styles.categoryIcon} />
 
                         <View style={styles.categoryBg}>
-                          <Text style={{ color: Theme.color.GameText, fontFamily: "GROBOLD",}} >
-                            {item.title}
-                          </Text>
+                            <Text style={[styles.categoryText, { color: Theme.color.GameText }]}>
+                              {item.title}
+                            </Text>
                         </View>
                         
                     </AnimatedTouchable>
                   );
                 })}
               </ScrollView>
+            <SettingsButton/>
         </View>
       </ImageBackground>
     </SafeAreaView>
@@ -157,12 +164,13 @@ animations.forEach((anim, index) => {
   );
 }
 
+
 const styles = StyleSheet.create({
-  containerWrap: { flexDirection: "row", justifyContent: "center", gap: 5, alignItems: "center", marginLeft: 50, marginTop: 50,},
-  categoryCard: { width: 170, height: 180, justifyContent: "center", alignItems: "center", margin: 12, },
-  categoryIcon: { width: 140, height: 121, resizeMode: "contain", elevation: 12, },
-  categoryText: { marginTop: 14, fontSize: 16, fontWeight: "800", color: "#542514", },
+  containerWrap: { flexDirection: "row", justifyContent: "center", gap: 20, alignItems: "center", marginLeft: 50, marginTop: 50,},
+  categoryCard: { width: 200, height: 200, justifyContent: "center", alignItems: "center", margin: 12, },
+  categoryIcon: { width: 149, height: 129, resizeMode: "contain", elevation: 12, },
+  categoryText: { fontSize: 18, fontWeight: "800", color: "#542514", },
   safeArea: { flex: 1, },
   container: { flex: 1, justifyContent: "center", alignItems: "center", },
-  categoryBg: { alignSelf: "center", paddingHorizontal: 20, paddingVertical: 9, backgroundColor: "#F6D6A8", borderEndEndRadius: 20, borderTopEndRadius: 13, borderTopLeftRadius: 13, borderBottomLeftRadius: 20, borderWidth: 4, borderColor: "#FD9C00", marginTop: 10, },
+  categoryBg: { alignSelf: "center", paddingHorizontal: width * 0.019, paddingVertical: width * 0.012 , backgroundColor: "#F6D6A8", borderEndEndRadius: 20, borderTopEndRadius: 13, borderTopLeftRadius: 13, borderBottomLeftRadius: 20, borderWidth: 4, borderColor: "#FD9C00", marginTop: 10, },
 });
