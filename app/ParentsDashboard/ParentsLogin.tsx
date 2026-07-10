@@ -227,6 +227,11 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState("signin");
   const [signInEmail, setSignInEmail] = useState("");
   const [signInPassword, setSignInPassword] = useState("");
+  const [signInErrors, setSignInErrors] = useState({
+    email: "",
+    password: "",
+    loginError: "",
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const Rainbow = require("../../assets/images/Rainbow.png");
   const Cloude = require("../../assets/images/Cloude.png");
@@ -238,21 +243,47 @@ export default function Index() {
   const { width, height } = useWindowDimensions();
 
   const handleSubmit = async () => {
-    if (!signInEmail.trim() || !signInPassword.trim()) {
-      Alert.alert("Validation", "Please enter your email and password.");
+    const email = signInEmail.trim();
+    const errors = {
+      email: !email
+        ? "Email is required."
+        : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+          ? "Enter a valid email address."
+          : "",
+      password: !signInPassword
+        ? "Password is required."
+        : signInPassword.length < 6
+          ? "Password must be at least 6 characters."
+          : "",
+
+      // loginError: "Login failed. Please check your credentials.",
+      loginError: "",
+    };
+
+    setSignInErrors(errors);
+
+    if (errors.email || errors.password) {
       return;
     }
 
     try {
       setIsSubmitting(true);
-      await loginUser(signInEmail, signInPassword);
+      await loginUser(email, signInPassword);
       // router.replace("/MainScreens/home");
       router.replace(ROUTES.APP.HOME);
     } catch (error) {
-      Alert.alert(
-        "Login failed",
-        error instanceof Error ? error.message : "Unable to log in",
-      );
+      // Alert.alert(
+      //   "Login failed",
+      //   error instanceof Error ? error.message : "Unable to log in",
+      // );
+      setSignInErrors((prev) => ({
+        ...prev,
+        loginError:
+          error instanceof Error
+            ? error.message
+            : "Login failed. Please check your credentials.",
+      }));
+
     } finally {
       setIsSubmitting(false);
     }
@@ -409,7 +440,19 @@ export default function Index() {
                           placeholder="Enter Phone/Email ID"
                           autoCapitalize="none"
                           value={signInEmail}
-                          onChangeText={setSignInEmail}
+                          keyboardType="email-address"
+                          autoComplete="email"
+                          textContentType="username"
+                          error={signInErrors.email}
+                          onChangeText={(text) => {
+                            setSignInEmail(text);
+                            if (signInErrors.email) {
+                              setSignInErrors((current) => ({
+                                ...current,
+                                email: "",
+                              }));
+                            }
+                          }}
                         />
                         <Input
                           label=""
@@ -420,7 +463,16 @@ export default function Index() {
                           textContentType="password"
                           autoComplete="password"
                           value={signInPassword}
-                          onChangeText={setSignInPassword}
+                          error={signInErrors.password || signInErrors.loginError}
+                          onChangeText={(text) => {
+                            setSignInPassword(text);
+                            if (signInErrors.password) {
+                              setSignInErrors((current) => ({
+                                ...current,
+                                password: "",
+                              }));
+                            }
+                          }}
                         />
                         <Button
                           text={isSubmitting ? "Please wait..." : "Continue"}
