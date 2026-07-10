@@ -21,8 +21,8 @@ export const ROUTES = {
   },
 
   SHAPESORTING: {
-    SHAPESORTING_1: "/Games/PuzzleGame/shapesorting11",
-    SHAPESORTING_2: "/Games/PuzzleGame/shapesorting12",
+    SHAPESORTING_1: "/Games/ShapeSorting/shapesorting11",
+    SHAPESORTING_2: "/Games/ShapeSorting/shapesorting12",
   },
 
 } as const;

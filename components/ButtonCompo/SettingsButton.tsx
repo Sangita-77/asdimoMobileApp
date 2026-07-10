@@ -1,8 +1,9 @@
 import { router, Href } from "expo-router";
 import React from "react";
-import { Image, Pressable, StyleSheet, } from "react-native"; 
+import { Image, Pressable, StyleSheet } from "react-native";
+import { ROUTES } from "@/constants/routes";
 
-interface BackButtonProps {
+interface SettingsButtonProps {
   size?: number;
   bottom?: number;
   right?: number;
@@ -10,31 +11,43 @@ interface BackButtonProps {
   route?: Href;
 }
 
-// DEFAULT BACK ICON
 const settingsImg = require("@/assets/images/settingButton.png");
 
 export default function SettingsButton({
   size = 76,
   bottom = 10,
   right = 10,
-  icon = settingsImg, 
-  route = "/MainScreens/settings",
-}: BackButtonProps) {
+  icon = settingsImg,
+  route = ROUTES.APP.SETTINGS,
+}: SettingsButtonProps) {
   return (
     <Pressable
-      onPress={() => {
-        if (router.canGoBack()) {
-          router.back();
-        } else {
-          router.replace(route);
-        }
-      }}
-      style={[ styles.container, { bottom, right, width: size, height: size, }, ]} >
-      <Image source={icon} style={{ width: size, height: size, resizeMode: "contain", }} />
+      onPress={() => router.push(route)}
+      style={[
+        styles.container,
+        {
+          bottom,
+          right,
+          width: size,
+          height: size,
+        },
+      ]}
+    >
+      <Image
+        source={icon}
+        style={{
+          width: size,
+          height: size,
+          resizeMode: "contain",
+        }}
+      />
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { position: "absolute", zIndex: 100, },
+  container: {
+    position: "absolute",
+    zIndex: 100,
+  },
 });
