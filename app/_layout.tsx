@@ -58,7 +58,8 @@ function RouteGuard() {
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [authenticated, setAuthenticated] = useState(false);
   const [checkedPath, setCheckedPath] = useState<string | null>(null);
-  const isLoginRoute = pathname === ROUTES.AUTH.LOGIN;
+  const isPublicRoute =
+    pathname === ROUTES.LANDING.LOADING || pathname === ROUTES.AUTH.LOGIN;
 
   useEffect(() => {
     let mounted = true;
@@ -76,20 +77,21 @@ function RouteGuard() {
     };
   }, [pathname]);
 
-  if (checkingAuth || checkedPath !== pathname) {
-    return null;
-  }
-
-  if (!authenticated && !isLoginRoute) {
-    return <Redirect href={ROUTES.AUTH.LOGIN} />;
-  }
+  const shouldRedirect =
+    !isPublicRoute &&
+    !checkingAuth &&
+    checkedPath === pathname &&
+    !authenticated;
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        animation: "none",
-      }}
-    />
+    <>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: "none",
+        }}
+      />
+      {shouldRedirect && <Redirect href={ROUTES.AUTH.LOGIN} />}
+    </>
   );
 }

@@ -1,4 +1,9 @@
 export const ROUTES = {
+
+  LANDING: {
+    LOADING: "/",
+  },
+
   AUTH: {
     LOGIN: "/ParentsDashboard/ParentsLogin",
   },
