@@ -11,11 +11,13 @@ import PuzzleGame from "./puzzlegame";
 
 
 // LOAD ONCE (outside component)
-const RabbitOne = require("@/assets/images/puzzleGameElements/rabbitOne.png");
-const RabbitSlotOne = require("@/assets/images/puzzleGameElements/rabbitSlotOne.png");
-const RabbitTwo = require("@/assets/images/puzzleGameElements/rabbitTwo.png");
-const RabbitSlotTwo = require("@/assets/images/puzzleGameElements/rabbitSlotTwo.png");
-const RabbitFull = require("@/assets/images/puzzleGameElements/rabbitfull.png");
+const CarrotOne = require("@/assets/images/puzzleGameElements/carrotOne.png");
+const CarrotSlotOne = require("@/assets/images/puzzleGameElements/carrotSlotOne.png");
+const CarrotTwo = require("@/assets/images/puzzleGameElements/carrotTwo.png");
+const CarrotSlotTwo = require("@/assets/images/puzzleGameElements/carrotSlotTwo.png");
+const CarrotThree = require("@/assets/images/puzzleGameElements/carrotTwo.png");
+const CarrotSlotThree = require("@/assets/images/puzzleGameElements/carrotSlotTwo.png");
+const CarrotFull = require("@/assets/images/puzzleGameElements/carrotfull.png");
 
 export default function PuzzleGame1() {
   const [ready, setReady] = useState(false);
@@ -28,7 +30,7 @@ export default function PuzzleGame1() {
 
   useEffect(() => {
     async function preload() {
-      await Asset.loadAsync([RabbitOne, RabbitSlotOne, RabbitTwo, RabbitSlotTwo, RabbitFull,]);
+      await Asset.loadAsync([CarrotOne, CarrotSlotOne, CarrotTwo, CarrotSlotTwo, CarrotThree, CarrotSlotThree, CarrotFull]);
       setReady(true);
     }
 
@@ -61,28 +63,29 @@ export default function PuzzleGame1() {
 
   if (!ready) return null;
 
-  const level2Data = {
+  const level6Data = {
     slots: [
-      { id: 1, width: 121, height: 180, x: 141, y: 67, image: RabbitSlotOne, },
-      { id: 2, width: 148, height: 143, x: 135, y: 171, image: RabbitSlotTwo, },
+      { id: 1, width: 55, height: 195, x: 165, y: 116, image: CarrotSlotOne, },
+      { id: 2, width: 65, height: 184, x: 180, y: 56, image: CarrotSlotTwo, },
+      { id: 2, width: 65, height: 184, x: 0, y: 0, image: CarrotSlotThree, },
     ],
-
+    
     pieces: [
-      { id: 1, width: 122, height: 181, startX: 68, startY: 150, image: RabbitOne, },
-      { id: 2, width: 150, height: 143, startX: -20.984, startY: 4.2, image: RabbitTwo, },
+      { id: 1, width: 60, height: 196, startX: 105.98, startY: 0, image: CarrotOne, },
+      { id: 2, width: 68, height: 185, startX: 45, startY: 112, image: CarrotTwo, },
+      { id: 2, width: 68, height: 185, startX: 0, startY: 0, image: CarrotThree, },
     ],
 
     fullpieces: [
-      { id: 1, width: 65, height: 102, x: 74, y: 4, image: RabbitFull, },
+      { id: 1, width: 97, height: 108, x: 58, y: 3, image: CarrotFull, },
     ],
   };
-
 
   return (
     <View style={{ flex: 1 }}>
       <PuzzleGame
-        game={level2Data}
-        currentLevel={2}
+        game={level6Data}
+        currentLevel={6}
       />
       {showLevelOverlay && (
         <View style={styles.overlay}>
@@ -95,7 +98,7 @@ export default function PuzzleGame1() {
               },
             ]}
           >
-            <Text style={styles.levelText}>LEVEL 2</Text>
+            <Text style={styles.levelText}>LEVEL 6</Text>
           </Animated.View>
         </View>
       )}

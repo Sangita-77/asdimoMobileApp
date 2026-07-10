@@ -98,6 +98,9 @@ export default function PuzzleGame({ game, currentLevel, }: { game: GameData; cu
     "/Games/PuzzleGame/puzzlegame11",
     "/Games/PuzzleGame/puzzlegame12",
     "/Games/PuzzleGame/puzzlegame13",
+    "/Games/PuzzleGame/puzzlegame14",
+    "/Games/PuzzleGame/puzzlegame15",
+    "/Games/PuzzleGame/puzzlegame16",
   ] as const;
 
   useEffect(() => {
@@ -114,7 +117,7 @@ export default function PuzzleGame({ game, currentLevel, }: { game: GameData; cu
         } else {
           router.replace(routes[currentLevel]);
         }
-      }, 5000000); // give time for animation
+      }, 500000); // give time for animation
     }
   }, [placed]);
 
@@ -273,7 +276,6 @@ export default function PuzzleGame({ game, currentLevel, }: { game: GameData; cu
                     <View
                       key={fullpiece.id}
                       style={[
-                        styles.fullpiece,
                         {
                           position: "absolute",
                           left: fullpiece.x,
