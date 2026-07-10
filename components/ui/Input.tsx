@@ -74,12 +74,12 @@ const styles = StyleSheet.create({
   },
 
   halfContainer: {
-    flex: 1,
     minWidth: 220,
   },
 
   otpContainer: {
     alignItems: "center",
+    width: "100%",
   },
 
   label: {
@@ -117,7 +117,6 @@ const styles = StyleSheet.create({
   },
 
   otpInput: {
-    width: "100%",
     height: 60,
     borderRadius: 16,
     textAlign: "center",

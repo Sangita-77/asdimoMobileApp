@@ -48,7 +48,7 @@ export default function Index() {
       if (count >= 100) {
         clearInterval(interval);
         setTimeout(() => {
-          router.replace("/MainScreens/home");
+          router.replace("/ParentsDashboard/ParentsLogin");
         });
       }
     }, 70

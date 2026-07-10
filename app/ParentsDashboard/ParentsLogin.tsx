@@ -1,16 +1,16 @@
+import Button from "@/components/ButtonCompo/Button";
+import Input from "@/components/ui/Input";
 import LandscapeLock from "@/components/ui/LandscapeLock";
+import Select from "@/components/ui/Select";
 import Tab from "@/components/ui/Tab";
 import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
-import React,{ useEffect, useState } from "react";
-import { Image, StyleSheet, View, useWindowDimensions, Text } from "react-native";
+import React, { useEffect, useState } from "react";
+import { Image, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import CloudFloat from "../../components/AnimationCompo/CloudFloat";
 import BackButton from "../../components/ButtonCompo/BackButton";
 import Form, { useForm } from "../../components/ui/Form";
-import Input from "@/components/ui/Input";
-import Button from "@/components/ButtonCompo/Button";
 import { styles as globalStyle } from "../../constants/globalStyle";
-import Select from "@/components/ui/Select";
 
 
 
@@ -45,6 +45,7 @@ const { nextStep, formData, setFormData, errors, } = useForm();
     </View>
   );
 }
+
 
 
 function StepTwo() {
