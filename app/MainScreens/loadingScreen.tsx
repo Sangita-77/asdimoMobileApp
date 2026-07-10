@@ -1,5 +1,7 @@
 import CloudFloat from "@/components/AnimationCompo/CloudFloat";
 import LandscapeLock from "@/components/ui/LandscapeLock";
+import { ROUTES } from "@/constants/routes";
+import { isAuthenticated } from "@/services/authService";
 import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
@@ -47,8 +49,10 @@ export default function Index() {
 
       if (count >= 100) {
         clearInterval(interval);
-        setTimeout(() => {
-          router.replace("/ParentsDashboard/ParentsLogin");
+        void isAuthenticated().then((authenticated) => {
+          router.replace(
+            authenticated ? ROUTES.APP.HOME : ROUTES.AUTH.LOGIN,
+          );
         });
       }
     }, 70

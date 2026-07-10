@@ -35,9 +35,6 @@ const categories = [
   { id: 3, title: "Emotions", icon: images.emotions, route: "/emotions", },
   { id: 4, title: "Motor Skill", icon: images.motorSkill, route: "/motor-skill", },
   { id: 5, title: "Sequencing", icon: images.sequencing, route: "/motor-skill", },
-  // { id: 6, title: "Motor Skill", icon: images.motorSkill, route: "/motor-skill", },
-  // { id: 7, title: "Motor Skill", icon: images.motorSkill, route: "/motor-skill", },
-  // { id: 8, title: "Motor Skill", icon: images.motorSkill, route: "/motor-skill", },
 ];
 
 export default function HomeScreen() {
@@ -142,9 +139,13 @@ animations.forEach((anim, index) => {
                       }}
                     >
                       <Image source={item.icon} style={styles.categoryIcon} />
-                        <Text style={[styles.categoryText, {color: Theme.color.GameText, fontFamily: "GROBOLD"}]}>
-                          {item.title}
-                        </Text>
+
+                        <View style={styles.categoryBg}>
+                          <Text style={{ color: Theme.color.GameText, fontFamily: "GROBOLD",}} >
+                            {item.title}
+                          </Text>
+                        </View>
+                        
                     </AnimatedTouchable>
                   );
                 })}
@@ -157,10 +158,11 @@ animations.forEach((anim, index) => {
 }
 
 const styles = StyleSheet.create({
-  containerWrap: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 20, alignItems: "center",},
+  containerWrap: { flexDirection: "row", justifyContent: "center", gap: 5, alignItems: "center", marginLeft: 50, marginTop: 50,},
   categoryCard: { width: 170, height: 180, justifyContent: "center", alignItems: "center", margin: 12, },
   categoryIcon: { width: 140, height: 121, resizeMode: "contain", elevation: 12, },
-  categoryText: { marginTop: 14, fontSize: 20, fontWeight: "800", color: "#542514", },
+  categoryText: { marginTop: 14, fontSize: 16, fontWeight: "800", color: "#542514", },
   safeArea: { flex: 1, },
   container: { flex: 1, justifyContent: "center", alignItems: "center", },
+  categoryBg: { alignSelf: "center", paddingHorizontal: 20, paddingVertical: 9, backgroundColor: "#F6D6A8", borderEndEndRadius: 20, borderTopEndRadius: 13, borderTopLeftRadius: 13, borderBottomLeftRadius: 20, borderWidth: 4, borderColor: "#FD9C00", marginTop: 10, },
 });

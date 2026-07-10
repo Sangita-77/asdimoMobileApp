@@ -1,5 +1,5 @@
 import * as NavigationBar from "expo-navigation-bar";
-import { Stack } from "expo-router";
+import { Redirect, Stack, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
@@ -7,6 +7,8 @@ import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
+import { ROUTES } from "@/constants/routes";
+import { isAuthenticated } from "@/services/authService";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -45,13 +47,51 @@ export default function RootLayout() {
     <SafeAreaProvider>
       <View style={{ flex: 1, backgroundColor: "#1e1e1e" }}>
         <StatusBar hidden={true} />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            animation: "none",
-          }}
-        />
+        <RouteGuard />
       </View>
     </SafeAreaProvider>
+  );
+}
+
+function RouteGuard() {
+  const pathname = usePathname();
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [authenticated, setAuthenticated] = useState(false);
+  const [checkedPath, setCheckedPath] = useState<string | null>(null);
+  const isPublicRoute =
+    pathname === ROUTES.LANDING.LOADING || pathname === ROUTES.AUTH.LOGIN;
+
+  useEffect(() => {
+    let mounted = true;
+
+    isAuthenticated().then((auth) => {
+      if (mounted) {
+        setAuthenticated(auth);
+        setCheckedPath(pathname);
+        setCheckingAuth(false);
+      }
+    });
+
+    return () => {
+      mounted = false;
+    };
+  }, [pathname]);
+
+  const shouldRedirect =
+    !isPublicRoute &&
+    !checkingAuth &&
+    checkedPath === pathname &&
+    !authenticated;
+
+  return (
+    <>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: "none",
+        }}
+      />
+      {shouldRedirect && <Redirect href={ROUTES.AUTH.LOGIN} />}
+    </>
   );
 }
