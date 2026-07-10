@@ -1,6 +1,7 @@
 import { router, Href } from "expo-router";
 import React from "react";
 import { Image, Pressable, StyleSheet, } from "react-native"; 
+
 interface BackButtonProps {
   size?: number;
   bottom?: number;
@@ -10,13 +11,13 @@ interface BackButtonProps {
 }
 
 // DEFAULT BACK ICON
-const DefaultSettingIcon = require("@/assets/images/BackButton.png");
+const settingsImg = require("@/assets/images/settingButton.png");
 
 export default function SettingsButton({
   size = 76,
   bottom = 10,
   right = 10,
-  icon = DefaultSettingIcon, 
+  icon = settingsImg, 
   route = "/MainScreens/settings",
 }: BackButtonProps) {
   return (
