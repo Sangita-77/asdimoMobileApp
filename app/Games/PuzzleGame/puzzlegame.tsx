@@ -117,7 +117,7 @@ export default function PuzzleGame({ game, currentLevel, }: { game: GameData; cu
         } else {
           router.replace(routes[currentLevel]);
         }
-      }, 500000); // give time for animation
+      }, 5000); // give time for animation
     }
   }, [placed]);
 
