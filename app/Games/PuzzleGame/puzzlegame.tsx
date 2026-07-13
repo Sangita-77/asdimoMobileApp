@@ -1,6 +1,7 @@
 import BackButton from "@/components/ButtonCompo/BackButton";
 import SettingsButton from "@/components/ButtonCompo/SettingsButton";
 import LandscapeLock from "@/components/ui/LandscapeLock";
+import { ROUTES } from "@/constants/routes";
 import { Asset } from "expo-asset";
 import { Audio } from "expo-av";
 import { useRouter } from "expo-router";
@@ -13,7 +14,6 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ChalkCircle from "../../../components/AnimationCompo/Hinthand";
 import { Theme } from "../../../constants/theme";
 import DraggablePiece from "./DraggablePiece";
-import { ROUTES } from "@/constants/routes";
 
 // PRELOAD IMAGES
 const bgImg = require("@/assets/images/GameElements/PuzzleGameBG.png");
@@ -101,6 +101,7 @@ export default function PuzzleGame({ game, currentLevel, }: { game: GameData; cu
     ROUTES.PUZZLE.PUZZLE_3,
     ROUTES.PUZZLE.PUZZLE_4,
     ROUTES.PUZZLE.PUZZLE_5,
+    ROUTES.PUZZLE.PUZZLE_6,
   ] as const;
 
   useEffect(() => {
