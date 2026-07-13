@@ -11,13 +11,13 @@ import PuzzleGame from "./puzzlegame";
 
 
 // LOAD ONCE (outside component)
-const CarrotOne = require("@/assets/images/puzzleGameElements/carrotOne.png");
-const CarrotSlotOne = require("@/assets/images/puzzleGameElements/carrotSlotOne.png");
-const CarrotTwo = require("@/assets/images/puzzleGameElements/carrotTwo.png");
-const CarrotSlotTwo = require("@/assets/images/puzzleGameElements/carrotSlotTwo.png");
-const CarrotThree = require("@/assets/images/puzzleGameElements/carrotTwo.png");
-const CarrotSlotThree = require("@/assets/images/puzzleGameElements/carrotSlotTwo.png");
-const CarrotFull = require("@/assets/images/puzzleGameElements/carrotfull.png");
+const GiraffeOne = require("@/assets/images/puzzleGameElements/giraffeOne.png");
+const GiraffeSlotOne = require("@/assets/images/puzzleGameElements/giraffeSlotOne.png");
+const GiraffeTwo = require("@/assets/images/puzzleGameElements/giraffeTwo.png");
+const GiraffeSlotTwo = require("@/assets/images/puzzleGameElements/giraffeSlotTwo.png");
+const GiraffeThree = require("@/assets/images/puzzleGameElements/giraffeThree.png");
+const GiraffeSlotThree = require("@/assets/images/puzzleGameElements/giraffeSlotThree.png");
+const GiraffeFull = require("@/assets/images/puzzleGameElements/giraffefull.png");
 
 export default function PuzzleGame1() {
   const [ready, setReady] = useState(false);
@@ -30,7 +30,7 @@ export default function PuzzleGame1() {
 
   useEffect(() => {
     async function preload() {
-      await Asset.loadAsync([CarrotOne, CarrotSlotOne, CarrotTwo, CarrotSlotTwo, CarrotThree, CarrotSlotThree, CarrotFull]);
+      await Asset.loadAsync([GiraffeOne, GiraffeSlotOne, GiraffeTwo, GiraffeSlotTwo, GiraffeThree, GiraffeSlotThree, GiraffeFull]);
       setReady(true);
     }
 
@@ -65,19 +65,19 @@ export default function PuzzleGame1() {
 
   const level6Data = {
     slots: [
-      { id: 1, width: 55, height: 195, x: 165, y: 116, image: CarrotSlotOne, },
-      { id: 2, width: 65, height: 184, x: 180, y: 56, image: CarrotSlotTwo, },
-      { id: 2, width: 65, height: 184, x: 0, y: 0, image: CarrotSlotThree, },
+      { id: 1, width: 158, height: 171, x: 56, y: 53, image: GiraffeSlotOne, },
+      { id: 2, width: 101, height: 83, x: 180, y: 121, image: GiraffeSlotTwo, },
+      { id: 3, width: 208, height: 139, x: 128, y: 179, image: GiraffeSlotThree, },
     ],
     
     pieces: [
-      { id: 1, width: 60, height: 196, startX: 105.98, startY: 0, image: CarrotOne, },
-      { id: 2, width: 68, height: 185, startX: 45, startY: 112, image: CarrotTwo, },
-      { id: 2, width: 68, height: 185, startX: 0, startY: 0, image: CarrotThree, },
+      { id: 1, width: 160, height: 171, startX: 47, startY: 135, image: GiraffeOne, },
+      { id: 2, width: 103, height: 85, startX: -4, startY: 178, image: GiraffeTwo, },
+      { id: 3, width: 208, height: 139, startX: -14, startY: -12, image: GiraffeThree, },
     ],
 
     fullpieces: [
-      { id: 1, width: 97, height: 108, x: 58, y: 3, image: CarrotFull, },
+      { id: 1, width: 97, height: 108, x: 58, y: 3, image: GiraffeFull, },
     ],
   };
 
