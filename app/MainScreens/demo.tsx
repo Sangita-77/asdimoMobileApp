@@ -1,4 +1,4 @@
-// import CircularReveal from "@/components/AnimationCompo/CircularReveal";
+import CircularReveal from "@/components/AnimationCompo/CircularReveal";
 // import GlobalCircleTransition from "../components/GlobalCircleTransition";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import QuitButton from "@/components/ButtonCompo/CloseButton";
@@ -72,20 +72,12 @@ export default function HomeScreen() {
     animation.start();
   }, []);
 
+
+  
   return (
     <ProtectedRoute>
       <>
         <LandscapeLock />
-
-        {/* <CircularReveal
-    triggerClose={close}
-    backgroundImage={bgImg}
-    onCloseComplete={() => {
-      if (targetRoute) {
-        router.push(targetRoute as any);
-      }
-    }}
-  > */}
         <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
           <ImageBackground
             source={bgImg}
@@ -95,26 +87,10 @@ export default function HomeScreen() {
             <View style={styles.container}>
               {Platform.OS === "android" && <QuitButton icon={CloseButton} />}
               <View style={styles.containerWrap}>
-                <View style={styles.gridItem}>
-                  <View style={styles.mainDemo}>
-                    <Image
-                      source={demoImg}
-                      style={styles.imageLogo}
-                      resizeMode="cover"
-                    />
-                  </View>
-                </View>
-
-                <View style={styles.gridItem}>
-                  <View>
-                    <View style={styles.logo}>
-                      <Image source={logoImg} />
-                    </View>
-                  </View>
                   <View style={styles.PlayButton}>
                     <Pressable
-                        onPress={() => {
-                        playClickSound();
+                onPress={() => {
+                    playClickSound();
                         router.push(ROUTES.APP.CATEGORY)
                        }}
                     >
@@ -124,17 +100,11 @@ export default function HomeScreen() {
                       />
                     </Pressable>
                   </View>
-                </View>
-
-                <View style={styles.gridItemLast}>
-                  <Image source={RingImage} />
-                </View>
               </View>
               <SettingsButton/>
             </View>
           </ImageBackground>
         </SafeAreaView>
-        {/* </CircularReveal> */}
       </>
     </ProtectedRoute>
   );

@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ChalkCircle from "../../../components/AnimationCompo/Hinthand";
 import { Theme } from "../../../constants/theme";
 import DraggablePiece from "./DraggablePiece";
+import { ROUTES } from "@/constants/routes";
 
 // PRELOAD IMAGES
 const bgImg = require("@/assets/images/GameElements/PuzzleGameBG.png");
@@ -95,12 +96,11 @@ export default function PuzzleGame({ game, currentLevel, }: { game: GameData; cu
 
 
   const routes = [
-    "/Games/PuzzleGame/puzzlegame11",
-    "/Games/PuzzleGame/puzzlegame12",
-    "/Games/PuzzleGame/puzzlegame13",
-    "/Games/PuzzleGame/puzzlegame14",
-    "/Games/PuzzleGame/puzzlegame15",
-    "/Games/PuzzleGame/puzzlegame16",
+    ROUTES.PUZZLE.PUZZLE_1,
+    ROUTES.PUZZLE.PUZZLE_2,
+    ROUTES.PUZZLE.PUZZLE_3,
+    ROUTES.PUZZLE.PUZZLE_4,
+    ROUTES.PUZZLE.PUZZLE_5,
   ] as const;
 
   useEffect(() => {
@@ -113,11 +113,11 @@ export default function PuzzleGame({ game, currentLevel, }: { game: GameData; cu
         setShowCelebration(false); // stop it
 
         if (currentLevel >= routes.length) {
-          router.replace("/Games/PuzzleGame/GameComplete");
+          router.replace(ROUTES.SHAPESORTING.SHAPESORTING_1);
         } else {
           router.replace(routes[currentLevel]);
         }
-      }, 500000); // give time for animation
+      }, 5000); // give time for animation
     }
   }, [placed]);
 
