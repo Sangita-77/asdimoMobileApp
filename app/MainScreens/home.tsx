@@ -1,5 +1,4 @@
-// import CircularReveal from "@/components/AnimationCompo/CircularReveal";
-// import GlobalCircleTransition from "../components/GlobalCircleTransition";
+import { useTransition } from "@/components/AnimationCompo/TransitionProvider";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import QuitButton from "@/components/ButtonCompo/CloseButton";
 import SettingsButton from "@/components/ButtonCompo/SettingsButton";
@@ -24,7 +23,7 @@ import { ROUTES } from "@/constants/routes";
 
 // PRELOAD IMAGES
 const bgImg = require("@/assets/images/background.png");
-const demoImg = require("@/assets/images/demo.png");
+const demoImg = require("@/assets/images/Diano.gif");
 const logoImg = require("@/assets/images/Logo.png");
 const playImg = require("@/assets/images/PlayButton.png");
 const settingsImg = require("@/assets/images/settingButton.png");
@@ -32,9 +31,7 @@ const CloseButton = require("@/assets/images/CloseButton.png");
 const RingImage = require("@/assets/images/RingImage.png");
 
 export default function HomeScreen() {
-  const handlePress = () => {
-    playClickSound(); // no await (faster UI)
-  };
+  const transition = useTransition();
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const [close, setClose] = useState(false);
   const [targetRoute, setTargetRoute] = useState("");
@@ -112,12 +109,15 @@ export default function HomeScreen() {
                     </View>
                   </View>
                   <View style={styles.PlayButton}>
-                    <Pressable
+                      <Pressable
                         onPress={() => {
-                        playClickSound();
-                        router.push(ROUTES.APP.CATEGORY)
-                       }}
-                    >
+                          playClickSound();
+
+                          transition.current?.cover(() => {
+                              router.push(ROUTES.APP.CATEGORY);
+                          });
+                        }}
+                      >
                       <Animated.Image
                         source={playImg}
                         style={{ transform: [{ scale: scaleAnim }] }}
@@ -179,7 +179,8 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   imageLogo: {
-    width: 169,
+    width: 170,
+    height: 220,
   },
   settingsButton: {
     position: "absolute",

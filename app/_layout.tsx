@@ -9,6 +9,7 @@ import { StatusBar } from "expo-status-bar";
 import { useFonts } from "expo-font";
 import { ROUTES } from "@/constants/routes";
 import { isAuthenticated } from "@/services/authService";
+import  TransitionProvider  from "@/components/AnimationCompo/TransitionProvider";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -43,14 +44,17 @@ export default function RootLayout() {
     return null;
   }
 
-  return (
-    <SafeAreaProvider>
-      <View style={{ flex: 1, backgroundColor: "#1e1e1e" }}>
-        <StatusBar hidden={true} />
+return (
+  <SafeAreaProvider>
+    <TransitionProvider>
+      <View style={{ flex: 1, backgroundColor: "#1e1e1e", overflow: "visible", }}>
+        <StatusBar hidden />
         <RouteGuard />
       </View>
-    </SafeAreaProvider>
-  );
+    </TransitionProvider>
+  </SafeAreaProvider>
+);
+
 }
 
 function RouteGuard() {
@@ -89,6 +93,9 @@ function RouteGuard() {
         screenOptions={{
           headerShown: false,
           animation: "none",
+          contentStyle: {
+            backgroundColor: "transparent",
+          },
         }}
       />
       {shouldRedirect && <Redirect href={ROUTES.AUTH.LOGIN} />}

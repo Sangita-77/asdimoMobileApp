@@ -236,7 +236,7 @@ export default function Index() {
   const Rainbow = require("../../assets/images/Rainbow.png");
   const Cloude = require("../../assets/images/Cloude.png");
   const TreeLogin = require("../../assets/images/TreeLogin.png");
-  const LoadingDimo = require("../../assets/images/LoadingDimo.png");
+  const LoadingDimo = require("../../assets/images/Diano_Run.gif");
   const GoogleIcon = require("../../assets/images/GoogleIcon.png");
   const FacebookIcon = require("../../assets/images/FacebookIcon.png");
 

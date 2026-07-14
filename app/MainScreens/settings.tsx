@@ -1,14 +1,12 @@
 import QuitButton from "@/components//ButtonCompo/CloseButton";
-import GlobalCircleTransition from "@/components/AnimationCompo/GlobalCircleTransition";
 import BackButton from "@/components/ButtonCompo/BackButton";
 import ButtonSoundController from "@/components/ui/ButtonSoundStages";
 import LandscapeLock from "@/components/ui/LandscapeLock";
 import VolumeControl from "@/components/ui/SoundSlider";
 import { Asset } from "expo-asset";
 import { useFonts } from "expo-font";
-import { router } from "expo-router";
 import * as ScreenOrientation from "expo-screen-orientation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import {
   Image,
   ImageBackground,
@@ -31,10 +29,6 @@ export default function SettingsScreen() {
   const [loaded] = useFonts({
     GROBOLD: require("../../assets/fonts/GROBOLD.ttf"),
   });
-
-  const [close, setClose] = useState(false);
-  const [targetRoute, setTargetRoute] = useState("");
-
   useEffect(() => {
     Asset.loadAsync([
       bgImg,
@@ -57,44 +51,19 @@ export default function SettingsScreen() {
   if (!loaded) return null;
 
   return (
+    <>
+    <LandscapeLock />
     <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
-      <LandscapeLock />
-      <View
-        style={[
-          StyleSheet.absoluteFill,
-          { pointerEvents: close ? "auto" : "none" },
-        ]}
-      >
-        <GlobalCircleTransition
-          trigger={close}
-          mode="close"
-          startX={40}
-          startY={60}
-          color="white"
-          onFinish={() => {
-            if (targetRoute) {
-              router.push(targetRoute as any);
-            }
-          }}
-        />
-      </View>
-
-      <ImageBackground
-        source={bgImg}
-        style={StyleSheet.absoluteFillObject}
-        resizeMode="cover"
-      >
+        <ImageBackground source={bgImg} style={StyleSheet.absoluteFillObject} resizeMode="cover" >
         <View style={StyleSheet.absoluteFillObject}>
-          <BackButton icon={BackButtonIcon} />
-
-          {Platform.OS === "android" && <QuitButton icon={CloseButton} />}
-
-          <View style={[styles.SettingBoardWrap]}>
-            <ImageBackground
-              source={SettingBoard}
-              style={[styles.SettingBoard]}
-              resizeMode="contain"
-            >
+           <BackButton icon={BackButtonIcon} />
+             {Platform.OS === "android" && <QuitButton icon={CloseButton} />}
+               <View style={[styles.SettingBoardWrap]}>
+                  <ImageBackground
+                    source={SettingBoard}
+                    style={[styles.SettingBoard]}
+                    resizeMode="contain"
+                  >
               <View style={[styles.SettingcontrollerWrap]}>
                 <ImageBackground
                   source={SettingController}
@@ -112,7 +81,6 @@ export default function SettingsScreen() {
                     </View>
                   </View>
                 </ImageBackground>
-
                 <View>
                   <Image
                     source={DashBoardButton}
@@ -126,6 +94,7 @@ export default function SettingsScreen() {
         </View>
       </ImageBackground>
     </SafeAreaView>
+  </>
   );
 }
 

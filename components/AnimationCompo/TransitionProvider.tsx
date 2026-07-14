@@ -1,8 +1,8 @@
 import React, {
   createContext,
   useContext,
-  useRef,
   useEffect,
+  useRef,
 } from "react";
 
 import { usePathname } from "expo-router";
@@ -10,6 +10,7 @@ import { usePathname } from "expo-router";
 import CircularTransition, {
   TransitionRef,
 } from "./CircularTransition";
+
 
 const TransitionContext = createContext<
   React.MutableRefObject<TransitionRef | null> | null
@@ -20,8 +21,7 @@ export default function TransitionProvider({
 }: {
   children: React.ReactNode;
 }) {
-  const transition =
-    useRef<TransitionRef>(null);
+  const transition = useRef<TransitionRef | null>(null);
 
   const pathname = usePathname();
 
@@ -38,5 +38,13 @@ export default function TransitionProvider({
 }
 
 export const useTransition = () => {
-  return useContext(TransitionContext)!;
+  const context = useContext(TransitionContext);
+
+  if (!context) {
+    throw new Error(
+      "useTransition must be used inside TransitionProvider"
+    );
+  }
+
+  return context;
 };
