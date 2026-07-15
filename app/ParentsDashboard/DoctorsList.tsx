@@ -9,6 +9,8 @@ import {
   Therapist,
 } from "@/services/authService";
 import { API_BASE_URL } from "@/constants/config";
+import { ROUTES } from "@/constants/routes";
+import { router } from "expo-router";
 import React, { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
@@ -16,7 +18,6 @@ import {
   StyleSheet,
   Text,
   View,
-  Pressable
 } from "react-native";
 
 export default function DoctorList() {
@@ -73,7 +74,16 @@ export default function DoctorList() {
             onBookNow={(slot) =>
               console.log(`Book ${item.name} on ${slot.date} at ${slot.time}`)
             }
-            appointmentBooking={() => console.log(`Book ${item.name}`) }
+            appointmentBooking={() =>
+              router.push({
+                pathname: ROUTES.AUTH.BOOKDOCTOR,
+                params: {
+                  therapistId: String(item.userId),
+                  therapistName: item.name,
+                  profileImg: item.profileImg || "",
+                },
+              })
+            }
           />
         )}
         ListEmptyComponent={

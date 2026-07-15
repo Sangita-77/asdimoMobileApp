@@ -1,9 +1,6 @@
 import { AvailabilitySlot } from "@/services/authService";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useState } from "react";
-import { useTransition } from "@/components/AnimationCompo/TransitionProvider";
-import { router } from "expo-router";
-import { ROUTES } from "@/constants/routes";
 import {
   Image,
   ImageSourcePropType,
@@ -66,7 +63,6 @@ export default function DoctorListCard({
   );
   const displayedSlots = showAllSlots ? slotsForDate : slotsForDate.slice(0, 3);
   const hasMoreSlots = slotsForDate.length > 3;
-  const transition = useTransition();
   const selectNextDate = () => {
     const currentIndex = dates.indexOf(selectedDate);
     setSelectedDate(dates[(currentIndex + 1) % dates.length]);
@@ -134,13 +130,7 @@ export default function DoctorListCard({
             <View>
                   <Pressable
                     style={styles.button}
-                    onPress={() => {
-                      appointmentBooking();
-
-                      transition.current?.cover(() => {
-                        router.push(ROUTES.AUTH.BOOKDOCTOR);
-                      });
-                    }}
+                    onPress={appointmentBooking}
                   >
                 <Text style={styles.buttonText}>Book Now</Text>
               </Pressable>
