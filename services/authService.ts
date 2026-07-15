@@ -53,6 +53,26 @@ type CreateAppointmentResponse = {
   data?: { _id: string; status: string };
 };
 
+export type Appointment = {
+  _id: string;
+  parentId: number;
+  teacherId: number;
+  date: string;
+  time: string;
+  status: string;
+  zoomLink?: string;
+  teacherUser?: {
+    name?: string;
+    profileImg?: string | null;
+  };
+};
+
+type GetAppointmentsResponse = {
+  success: boolean;
+  message?: string;
+  data: Appointment[];
+};
+
 export type ParentRegistrationPayload = {
   name: string;
   email: string;
@@ -336,6 +356,16 @@ export function createAppointment(payload: {
     payload,
     true,
   );
+}
+
+export async function getParentAppointments(parentId: number) {
+  const response = await postAuthEndpoint<GetAppointmentsResponse>(
+    AUTH_ENDPOINTS.getAppointmentsById,
+    { parentId },
+    true,
+  );
+
+  return response.data || [];
 }
 
 export async function refreshToken() {

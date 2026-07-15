@@ -10,4 +10,5 @@ export const AUTH_ENDPOINTS = {
   getAllUsers: "/auth/getAllUsers",
   getTherapistAvailability: "/therapists/get_availability",
   appointments: "/appointments",
+  getAppointmentsById: "/appointments/getAppointmentsById",
 } as const;
