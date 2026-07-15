@@ -37,7 +37,7 @@ export default function CircularReveal({
   onCloseComplete,
   triggerClose = false,
 }: Props) {
-  const { width, height } = useWindowDimensions(); // ✅ inside component
+  const { width, height } = useWindowDimensions();
   const maxRadius = Math.sqrt(width * width + height * height);
 
   /* ---------------- IOS SVG REVEAL ---------------- */

@@ -8,7 +8,6 @@ import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Image, ImageBackground, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { styles as globalStyle } from "../../constants/globalStyle";
-
 // import { pauseGameSound, resumeGameSound } from "../components/SoundCompo/GameSound";
 
 export default function Index() {
@@ -18,7 +17,7 @@ export default function Index() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const { width, height } = useWindowDimensions();
 
-  const LoadingDimo = require("../../assets/images/LoadingDimo.png");
+  const LoadingDimo = require("../../assets/images/Diano_Run.gif");
   const LoaderImage = require("../../assets/images/LoaderImage.png");
   const Rainbow = require("../../assets/images/Rainbow.png");
   const Cloude = require("../../assets/images/Cloude.png");
@@ -87,7 +86,7 @@ export default function Index() {
        source={Rainbow}
         style={styles.rainbowImage}
         resizeMode="contain"        
-      >    
+      >   
    <View style={StyleSheet.absoluteFillObject}>
     {/* Small cloudes */}
     <CloudFloat source={Cloude} top={height * 0.1} size={width * 0.2} left={width * 0.8} duration={8000} loop={false} />
@@ -150,10 +149,6 @@ const styles = StyleSheet.create({
       justifyContent: "center",
       alignItems: "center",
     },
-  // LoadingDimo: {
-  //   width: 350,
-  //   height: 220,
-  // },
   progressWrapper: {
     width: "80%",
     height: 62,

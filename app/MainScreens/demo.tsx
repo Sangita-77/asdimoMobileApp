@@ -1,5 +1,4 @@
-import CircularReveal from "@/components/AnimationCompo/CircularReveal";
-// import GlobalCircleTransition from "../components/GlobalCircleTransition";
+import { useTransition } from "@/components/AnimationCompo/TransitionProvider";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import QuitButton from "@/components/ButtonCompo/CloseButton";
 import SettingsButton from "@/components/ButtonCompo/SettingsButton";
@@ -32,9 +31,7 @@ const CloseButton = require("@/assets/images/CloseButton.png");
 const RingImage = require("@/assets/images/RingImage.png");
 
 export default function HomeScreen() {
-  const handlePress = () => {
-    playClickSound(); // no await (faster UI)
-  };
+  const transition = useTransition();
   const scaleAnim = useRef(new Animated.Value(1)).current;
   const [close, setClose] = useState(false);
   const [targetRoute, setTargetRoute] = useState("");
@@ -88,12 +85,15 @@ export default function HomeScreen() {
               {Platform.OS === "android" && <QuitButton icon={CloseButton} />}
               <View style={styles.containerWrap}>
                   <View style={styles.PlayButton}>
-                    <Pressable
-                onPress={() => {
-                    playClickSound();
-                        router.push(ROUTES.APP.CATEGORY)
-                       }}
-                    >
+                      <Pressable
+                        onPress={() => {
+                          playClickSound();
+
+                          transition.current?.cover(() => {
+                            router.push(ROUTES.APP.CATEGORY);
+                          });
+                        }}
+                      >
                       <Animated.Image
                         source={playImg}
                         style={{ transform: [{ scale: scaleAnim }] }}
