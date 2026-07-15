@@ -10,5 +10,5 @@ export const styles = StyleSheet.create({
   smallText:{textAlign: "center", paddingBottom: 10, fontWeight: 500, color: "#393B3E", fontSize: 15},
   // Global Styles End
 
-
+  listContent:{ flexGrow: 1, padding: 16,}
 });

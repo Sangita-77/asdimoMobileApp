@@ -8,6 +8,7 @@ export const ROUTES = {
     LOGIN: "/ParentsDashboard/ParentsLogin",
     DOCTORSLIST: "/ParentsDashboard/DoctorsList",
     BOOKDOCTOR: "/ParentsDashboard/BookDoctor",
+    BOOKINGS: "/ParentsDashboard/Bookings",
   },
 
   APP: {
