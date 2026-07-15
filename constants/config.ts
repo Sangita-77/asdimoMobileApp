@@ -7,4 +7,6 @@ export const AUTH_ENDPOINTS = {
   verifyEmail: "/auth/send-email-otp",
   validateOtp: "/auth/validate-email-otp",
   register: "/auth/register",
+  getAllUsers: "/auth/getAllUsers",
+  getTherapistAvailability: "/therapists/get_availability",
 } as const;

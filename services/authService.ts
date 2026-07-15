@@ -4,12 +4,45 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
 const AUTH_STATE_KEY = "isAuthenticated";
+const USER_FLAG_KEY = "userFlag";
 
 export type LoginResponse = {
   accessToken?: string;
   refreshToken?: string;
   token?: string;
   user?: Record<string, unknown>;
+  message?: string;
+};
+
+export type Therapist = {
+  _id: string;
+  userId: number;
+  name: string;
+  email?: string;
+  flag: number;
+  profileImg?: string | null;
+  phone?: string;
+};
+
+export type AvailabilitySlot = {
+  _id: string;
+  userId: number;
+  date: string;
+  time: string;
+  isBooked: boolean;
+  zoomLink?: string;
+};
+
+type GetUsersResponse = {
+  success: boolean;
+  count: number;
+  data: Therapist[];
+  message?: string;
+};
+
+type GetAvailabilityResponse = {
+  success: boolean;
+  data: AvailabilitySlot[];
   message?: string;
 };
 
@@ -65,6 +98,7 @@ export async function clearAuthTokens() {
   await AsyncStorage.removeItem(ACCESS_TOKEN_KEY);
   await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
   await AsyncStorage.removeItem(AUTH_STATE_KEY);
+  await AsyncStorage.removeItem(USER_FLAG_KEY);
 }
 
 export async function getAccessToken() {
@@ -73,6 +107,12 @@ export async function getAccessToken() {
 
 export async function getRefreshToken() {
   return getStoredToken(REFRESH_TOKEN_KEY);
+}
+
+export async function getLoggedInUserFlag() {
+  const storedFlag = await AsyncStorage.getItem(USER_FLAG_KEY);
+  const flag = Number(storedFlag);
+  return Number.isFinite(flag) ? flag : null;
 }
 
 export async function isAuthenticated() {
@@ -124,6 +164,20 @@ export async function loginUser(email: string, password: string) {
     await saveAuthTokens(accessToken || "", refreshToken || "");
   }
 
+  const userFlag = [
+    data?.user?.flag,
+    data?.data?.user?.flag,
+    data?.data?.flag,
+    data?.flag,
+    data?.result?.user?.flag,
+  ]
+    .map((flag) => (typeof flag === "string" ? Number(flag) : flag))
+    .find((flag) => typeof flag === "number" && Number.isFinite(flag));
+
+  if (typeof userFlag === "number") {
+    await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
+  }
+
   return data as LoginResponse;
 }
 
@@ -167,6 +221,44 @@ export function registerParent(payload: ParentRegistrationPayload) {
     payload,
     true,
   );
+}
+
+export async function getTherapists() {
+  const loggedInUserFlag = await getLoggedInUserFlag();
+
+  if (loggedInUserFlag !== 4 && loggedInUserFlag !== 2) {
+    throw new Error("Only parent accounts can view therapists.");
+  }
+
+  if(loggedInUserFlag === 2){
+    const response = await postAuthEndpoint<GetUsersResponse>(
+      AUTH_ENDPOINTS.getAllUsers,
+      { flag: 3 },
+      true,
+    );
+
+    return response.data || [];
+  }else{
+    const response = await postAuthEndpoint<GetUsersResponse>(
+      AUTH_ENDPOINTS.getAllUsers,
+      { flag: 5 },
+      true,
+    );
+
+    return response.data || [];
+  }
+
+
+}
+
+export async function getTherapistAvailability(therapistId: number) {
+  const response = await postAuthEndpoint<GetAvailabilityResponse>(
+    AUTH_ENDPOINTS.getTherapistAvailability,
+    { therapistId },
+    true,
+  );
+
+  return response.data || [];
 }
 
 export async function refreshToken() {
