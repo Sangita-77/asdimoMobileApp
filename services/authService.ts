@@ -13,6 +13,19 @@ export type LoginResponse = {
   message?: string;
 };
 
+export type ParentRegistrationPayload = {
+  name: string;
+  email: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
+  flag: 2 | 4;
+  referralCode?: string;
+};
+
 async function getStoredToken(key: string) {
   return AsyncStorage.getItem(key);
 }
@@ -112,6 +125,48 @@ export async function loginUser(email: string, password: string) {
   }
 
   return data as LoginResponse;
+}
+
+async function postAuthEndpoint<T>(
+  endpoint: string,
+  body: Record<string, unknown>,
+  includeAccessToken = false,
+) {
+  const accessToken = includeAccessToken ? await getAccessToken() : null;
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Request failed. Please try again.");
+  }
+
+  return data as T;
+}
+
+export function verifySignupEmail(email: string) {
+  return postAuthEndpoint<{ message?: string }>(AUTH_ENDPOINTS.verifyEmail, { email });
+}
+
+export function validateSignupOtp(email: string, otp: string) {
+  return postAuthEndpoint<{ message?: string; data?: { userId?: string } }>(
+    AUTH_ENDPOINTS.validateOtp,
+    { email, otp },
+  );
+}
+
+export function registerParent(payload: ParentRegistrationPayload) {
+  return postAuthEndpoint<{ message?: string }>(
+    AUTH_ENDPOINTS.register,
+    payload,
+    true,
+  );
 }
 
 export async function refreshToken() {

@@ -3,14 +3,18 @@ import Input from "@/components/ui/Input";
 import LandscapeLock from "@/components/ui/LandscapeLock";
 import Select from "@/components/ui/Select";
 import Tab from "@/components/ui/Tab";
-import { loginUser } from "@/services/authService";
+import {
+  loginUser,
+  registerParent,
+  validateSignupOtp,
+  verifySignupEmail,
+} from "@/services/authService";
 import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ROUTES } from "@/constants/routes";
 import {
-  Alert,
   Image,
   StyleSheet,
   Text,
@@ -24,6 +28,31 @@ import { styles as globalStyle } from "../../constants/globalStyle";
 
 function StepOne() {
   const { nextStep, formData, setFormData, errors } = useForm();
+  const [requestError, setRequestError] = useState("");
+  const [isSendingOtp, setIsSendingOtp] = useState(false);
+
+  const handleNext = async () => {
+    const name = formData.fullName.trim();
+    const email = formData.email.trim().toLowerCase();
+
+    if (!name || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      nextStep();
+      return;
+    }
+
+    try {
+      setRequestError("");
+      setIsSendingOtp(true);
+      await verifySignupEmail(email);
+      setFormData((previous) => ({ ...previous, fullName: name, email }));
+      nextStep();
+    } catch (error) {
+      setRequestError(error instanceof Error ? error.message : "Unable to send OTP.");
+    } finally {
+      setIsSendingOtp(false);
+    }
+  };
+
   return (
     <View>
       <View style={globalStyle.Dflex}>
@@ -48,14 +77,23 @@ function StepOne() {
         />
       </View>
 
-      <Button text="Next Step" textSize="lg" onPress={nextStep} />
+      {requestError ? <Text style={styles.formError}>{requestError}</Text> : null}
+      <Button
+        text={isSendingOtp ? "Sending OTP..." : "Next Step"}
+        textSize="lg"
+        onPress={handleNext}
+        disabled={isSendingOtp}
+      />
     </View>
   );
 }
 
 function StepTwo() {
-  const { nextStep, formData } = useForm();
+  const { nextStep, formData, setFormData } = useForm();
   const [timer, setTimer] = useState(30);
+  const [otp, setOtp] = useState("");
+  const [requestError, setRequestError] = useState("");
+  const [isValidating, setIsValidating] = useState(false);
 
   useEffect(() => {
     if (timer === 0) return;
@@ -67,8 +105,33 @@ function StepTwo() {
     return () => clearInterval(interval);
   }, [timer]);
 
-  const handleResend = () => {
-    setTimer(30);
+  const handleResend = async () => {
+    try {
+      setRequestError("");
+      await verifySignupEmail(formData.email);
+      setTimer(30);
+    } catch (error) {
+      setRequestError(error instanceof Error ? error.message : "Unable to resend OTP.");
+    }
+  };
+
+  const handleContinue = async () => {
+    if (otp.length !== 6) {
+      setRequestError("Enter the 6-digit OTP.");
+      return;
+    }
+
+    try {
+      setRequestError("");
+      setIsValidating(true);
+      await validateSignupOtp(formData.email, otp);
+      setFormData((previous) => ({ ...previous, otp }));
+      nextStep();
+    } catch (error) {
+      setRequestError(error instanceof Error ? error.message : "Invalid OTP.");
+    } finally {
+      setIsValidating(false);
+    }
   };
 
   return (
@@ -79,21 +142,29 @@ function StepTwo() {
       <View style={globalStyle.Dflex}>
         <Input
           variant="otp"
-          placeholder="12345"
+          placeholder="123456"
           keyboardType="number-pad"
-          maxLength={5}
+          maxLength={6}
           timer={timer}
           onResend={handleResend}
+          value={otp}
+          onChangeText={(text) => setOtp(text.replace(/[^0-9]/g, ""))}
+          error={requestError}
         />
       </View>
 
-      <Button text="Continue" textSize="lg" onPress={nextStep} />
+      <Button
+        text={isValidating ? "Verifying..." : "Continue"}
+        textSize="lg"
+        onPress={handleContinue}
+        disabled={isValidating}
+      />
     </View>
   );
 }
 
 function StepThree() {
-  const { nextStep, formData, setFormData } = useForm();
+  const { nextStep, formData, setFormData, errors } = useForm();
 
   return (
     <View>
@@ -103,7 +174,7 @@ function StepThree() {
           variant="half"
           keyboardType="phone-pad"
           value={formData.phone}
-          error=""
+          error={errors.phone}
           onChangeText={(text) =>
             setFormData((prev) => ({ ...prev, phone: text }))
           }
@@ -112,6 +183,7 @@ function StepThree() {
           placeholder="Address"
           variant="half"
           value={formData.address}
+          error={errors.address}
           onChangeText={(text) =>
             setFormData((prev) => ({ ...prev, address: text }))
           }
@@ -124,7 +196,7 @@ function StepThree() {
 }
 
 function StepFour() {
-  const { nextStep, formData, setFormData } = useForm();
+  const { nextStep, formData, setFormData, errors } = useForm();
 
   const cities = [
     { label: "DemiCity1", value: "democity1" },
@@ -141,6 +213,7 @@ function StepFour() {
           placeholder="City"
           data={cities}
           value={formData.city}
+          error={errors.city}
           onChange={(value) =>
             setFormData((prev) => ({ ...prev, city: value }))
           }
@@ -150,6 +223,7 @@ function StepFour() {
           placeholder="State"
           variant="half"
           value={formData.state}
+          error={errors.state}
           onChangeText={(text) =>
             setFormData((prev) => ({ ...prev, state: text }))
           }
@@ -162,7 +236,7 @@ function StepFour() {
 }
 
 function StepFive() {
-  const { nextStep, formData, setFormData } = useForm();
+  const { nextStep, formData, setFormData, errors } = useForm();
 
   return (
     <View>
@@ -172,6 +246,7 @@ function StepFive() {
           keyboardType="number-pad"
           variant="half"
           value={formData.zip}
+          error={errors.zip}
           onChangeText={(text) =>
             setFormData((prev) => ({ ...prev, zip: text }))
           }
@@ -180,6 +255,7 @@ function StepFive() {
           placeholder="Country"
           variant="half"
           value={formData.country}
+          error={errors.country}
           onChangeText={(text) =>
             setFormData((prev) => ({ ...prev, country: text }))
           }
@@ -193,9 +269,41 @@ function StepFive() {
 
 function StepSix() {
   const { formData, setFormData } = useForm();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [registrationMessage, setRegistrationMessage] = useState("");
+  const [isRegistrationSuccess, setIsRegistrationSuccess] = useState(false);
 
-  const handleSubmit = () => {
-    console.log(formData);
+  const handleSubmit = async () => {
+    try {
+      setIsSubmitting(true);
+      setRegistrationMessage("");
+      setIsRegistrationSuccess(false);
+      const referralCode = formData.referralCode.trim();
+      const response = await registerParent({
+        name: formData.fullName.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim(),
+        address: formData.address.trim(),
+        city: formData.city.trim(),
+        state: formData.state.trim(),
+        pincode: formData.zip.trim(),
+        country: formData.country.trim(),
+        flag: referralCode ? 2 : 4,
+        ...(referralCode ? { referralCode } : {}),
+      });
+      setIsRegistrationSuccess(true);
+      setRegistrationMessage(response.message || "Your account has been created.");
+      router.replace(ROUTES.AUTH.LOGIN);
+    } catch (error) {
+      setIsRegistrationSuccess(false);
+      setRegistrationMessage(
+        error instanceof Error
+          ? error.message
+          : "Unable to create your account.",
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -211,12 +319,17 @@ function StepSix() {
               referralCode: text,
             }))
           }
+          error={isRegistrationSuccess ? "" : registrationMessage}
         />
+        {isRegistrationSuccess && registrationMessage ? (
+          <Text style={styles.formSuccess}>{registrationMessage}</Text>
+        ) : null}
         <Button
-          text="Submit"
+          text={isSubmitting ? "Submitting..." : "Submit"}
           textSize="lg"
           width="full"
           onPress={handleSubmit}
+          disabled={isSubmitting}
         />
       </View>
     </View>
@@ -538,6 +651,8 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
+  formError: { color: "#E53935", fontSize: 12, marginBottom: 10 },
+  formSuccess: { color: "#2E7D32", fontSize: 12, marginBottom: 10 },
   formStyles: { marginTop: 20 },
   FormWrap: { zIndex: 100, marginLeft: 180 },
   ContentBox: {
