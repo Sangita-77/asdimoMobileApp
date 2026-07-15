@@ -13,6 +13,7 @@ export type FormData = {
   zip: string;
   country: string;
   referralCode: string;
+  otp: string;
 };
 
 type FormContextType = {
@@ -67,7 +68,12 @@ export default function Form({
     zip: "",
     country: "",
     referralCode: "",
+    otp: "",
   });
+
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof FormData, string>>
+  >({});
 
   if (type === "normal") {
     return <View>{children}</View>;
@@ -90,6 +96,36 @@ export default function Form({
         ) {
           newErrors.email = "Enter a valid email";
         }
+      } else if (currentStep === 2) {
+        const phoneDigits = formData.phone.replace(/\D/g, "");
+
+        if (!formData.phone.trim()) {
+          newErrors.phone = "Phone number is required";
+        } else if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+          newErrors.phone = "Enter a valid phone number";
+        }
+
+        if (!formData.address.trim()) {
+          newErrors.address = "Address is required";
+        }
+      } else if (currentStep === 3) {
+        if (!formData.city.trim()) {
+          newErrors.city = "City is required";
+        }
+
+        if (!formData.state.trim()) {
+          newErrors.state = "State is required";
+        }
+      } else if (currentStep === 4) {
+        if (!formData.zip.trim()) {
+          newErrors.zip = "PIN code is required";
+        } else if (!/^\d{6}$/.test(formData.zip.trim())) {
+          newErrors.zip = "Enter a valid 6-digit PIN code";
+        }
+
+        if (!formData.country.trim()) {
+          newErrors.country = "Country is required";
+        }
       }
 
       setErrors(newErrors);
@@ -104,10 +140,6 @@ export default function Form({
   const prevStep = () => {
     setCurrentStep((prev) => (prev > 0 ? prev - 1 : prev));
   };
-
-  const [errors, setErrors] = useState<
-  Partial<Record<keyof FormData, string>>
->({});
 
   return (
     <FormContext.Provider

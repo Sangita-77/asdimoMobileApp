@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
 type Option = {
@@ -13,6 +13,7 @@ type SelectProps = {
   onChange: (value: string) => void;
   placeholder?: string;
   variant?: "full" | "half";
+  error?: string;
 };
 
 export default function Select({
@@ -21,26 +22,27 @@ export default function Select({
   onChange,
   placeholder = "Select",
   variant = "full",
+  error,
 }: SelectProps) {
   return (
-    <Dropdown
-      style={[
-        styles.dropdown,
-        variant === "half" ? styles.half : styles.full,
-      ]}
-      placeholderStyle={styles.placeholder}
-      selectedTextStyle={styles.selectedText}
-      inputSearchStyle={styles.search}
-      data={data}
-      search
-      maxHeight={300}
-      labelField="label"
-      valueField="value"
-      placeholder={placeholder}
-      searchPlaceholder="Search..."
-      value={value}
-      onChange={(item) => onChange(item.value)}
-    />
+    <View style={[variant === "half" ? styles.half : styles.full, styles.container]}>
+      <Dropdown
+        style={[styles.dropdown, error ? styles.dropdownError : undefined]}
+        placeholderStyle={styles.placeholder}
+        selectedTextStyle={styles.selectedText}
+        inputSearchStyle={styles.search}
+        data={data}
+        search
+        maxHeight={300}
+        labelField="label"
+        valueField="value"
+        placeholder={placeholder}
+        searchPlaceholder="Search..."
+        value={value}
+        onChange={(item) => onChange(item.value)}
+      />
+      {error ? <Text style={styles.error}>{error}</Text> : null}
+    </View>
   );
 }
 
@@ -61,7 +63,22 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     paddingHorizontal: 16,
     backgroundColor: "#FFF",
+    marginBottom: 0,
+  },
+
+  container: {
     marginBottom: 18,
+  },
+
+  dropdownError: {
+    borderColor: "#E53935",
+  },
+
+  error: {
+    marginTop: 6,
+    marginLeft: 16,
+    color: "#E53935",
+    fontSize: 12,
   },
 
   placeholder: {
