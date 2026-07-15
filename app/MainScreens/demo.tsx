@@ -3,22 +3,21 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import QuitButton from "@/components/ButtonCompo/CloseButton";
 import SettingsButton from "@/components/ButtonCompo/SettingsButton";
 import { playClickSound } from "@/components/SoundCompo/ButtonSound";
-import LandscapeLock from "@/components/ui/LandscapeLock";
+import LandscapeLock from "@/components/ui/ScreenOrientation";
+import { ROUTES } from "@/constants/routes";
 import { Asset } from "expo-asset";
 import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
 import {
-  Animated,
-  Image,
-  ImageBackground,
-  Platform,
-  Pressable,
-  StyleSheet,
-  View,
+    Animated,
+    ImageBackground,
+    Platform,
+    Pressable,
+    StyleSheet,
+    View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { loadGameSound } from "../../components/SoundCompo/GameSound";
-import { ROUTES } from "@/constants/routes";
 
 
 // PRELOAD IMAGES

@@ -1,5 +1,5 @@
 import CloudFloat from "@/components/AnimationCompo/CloudFloat";
-import LandscapeLock from "@/components/ui/LandscapeLock";
+import LandscapeLock from "@/components/ui/ScreenOrientation";
 import { ROUTES } from "@/constants/routes";
 import { isAuthenticated } from "@/services/authService";
 import { Asset } from "expo-asset";

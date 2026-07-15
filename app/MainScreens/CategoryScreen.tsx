@@ -1,18 +1,18 @@
+import BackButton from "@/components/ButtonCompo/BackButton";
 import QuitButton from "@/components/ButtonCompo/CloseButton";
+import SettingsButton from "@/components/ButtonCompo/SettingsButton";
 import { playClickSound } from "@/components/SoundCompo/ButtonSound";
-import LandscapeLock from "@/components/ui/LandscapeLock";
+import LandscapeLock from "@/components/ui/ScreenOrientation";
+import { ROUTES } from "@/constants/routes";
 import { Asset } from "expo-asset";
+import { useFonts } from "expo-font";
+import { router } from "expo-router";
 import React, { useEffect, useRef } from "react";
-import { Animated, ImageBackground, Platform, StyleSheet, View,  Image, Text, TouchableOpacity, ScrollView, Dimensions } from "react-native";
+import { Animated, Dimensions, Image, ImageBackground, Platform, ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { loadGameSound } from "../../components/SoundCompo/GameSound";
-const CloseButton = require("@/assets/images/CloseButton.png");
-import BackButton from "@/components/ButtonCompo/BackButton";
-import { router } from "expo-router";
 import { Theme } from "../../constants/theme";
-import { useFonts } from "expo-font";
-import { ROUTES } from "@/constants/routes";
-import SettingsButton from "@/components/ButtonCompo/SettingsButton";
+const CloseButton = require("@/assets/images/CloseButton.png");
 
 const images = {
   bgImg: require("@/assets/images/background.png"),

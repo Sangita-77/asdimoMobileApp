@@ -1,19 +1,24 @@
 import QuitButton from "@/components//ButtonCompo/CloseButton";
+import { useTransition } from "@/components/AnimationCompo/TransitionProvider";
 import BackButton from "@/components/ButtonCompo/BackButton";
+import { playClickSound } from "@/components/SoundCompo/ButtonSound";
 import ButtonSoundController from "@/components/ui/ButtonSoundStages";
-import LandscapeLock from "@/components/ui/LandscapeLock";
+import LandscapeLock from "@/components/ui/ScreenOrientation";
 import VolumeControl from "@/components/ui/SoundSlider";
+import { ROUTES } from "@/constants/routes";
 import { Asset } from "expo-asset";
 import { useFonts } from "expo-font";
+import { router } from "expo-router";
 import * as ScreenOrientation from "expo-screen-orientation";
 import React, { useEffect } from "react";
 import {
   Image,
   ImageBackground,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -26,6 +31,7 @@ const SettingController = require("@/assets/images/SettingController.png");
 const DashBoardButton = require("@/assets/images/DashBoardButton.png");
 
 export default function SettingsScreen() {
+  const transition = useTransition();
   const [loaded] = useFonts({
     GROBOLD: require("../../assets/fonts/GROBOLD.ttf"),
   });
@@ -81,13 +87,16 @@ export default function SettingsScreen() {
                     </View>
                   </View>
                 </ImageBackground>
-                <View>
-                  <Image
-                    source={DashBoardButton}
-                    style={styles.DashBoardButton}
-                    resizeMode="cover"
-                  />
-                </View>
+                  <Pressable
+                    onPress={() => {
+                      playClickSound();
+                      transition.current?.cover(() => {
+                          router.push(ROUTES.AUTH.DOCTORSLIST);
+                      });
+                    }}
+                  >
+                    <Image source={DashBoardButton} style={styles.DashBoardButton} resizeMode="cover" />
+                </Pressable>
               </View>
             </ImageBackground>
           </View>

@@ -1,9 +1,11 @@
+// import CircularReveal from "@/components/AnimationCompo/CircularReveal";
 import { useTransition } from "@/components/AnimationCompo/TransitionProvider";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import QuitButton from "@/components/ButtonCompo/CloseButton";
 import SettingsButton from "@/components/ButtonCompo/SettingsButton";
 import { playClickSound } from "@/components/SoundCompo/ButtonSound";
-import LandscapeLock from "@/components/ui/LandscapeLock";
+import LandscapeLock from "@/components/ui/ScreenOrientation";
+import { ROUTES } from "@/constants/routes";
 import { Asset } from "expo-asset";
 import { router } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
@@ -18,7 +20,6 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { loadGameSound } from "../../components/SoundCompo/GameSound";
-import { ROUTES } from "@/constants/routes";
 
 
 // PRELOAD IMAGES
@@ -28,7 +29,7 @@ const logoImg = require("@/assets/images/Logo.png");
 const playImg = require("@/assets/images/PlayButton.png");
 const settingsImg = require("@/assets/images/settingButton.png");
 const CloseButton = require("@/assets/images/CloseButton.png");
-const RingImage = require("@/assets/images/RingImage.png");
+const RingImage = require("@/assets/images/RingImage.gif");
 
 export default function HomeScreen() {
   const transition = useTransition();
@@ -74,15 +75,13 @@ export default function HomeScreen() {
       <>
         <LandscapeLock />
 
-        {/* <CircularReveal
-    triggerClose={close}
-    backgroundImage={bgImg}
-    onCloseComplete={() => {
-      if (targetRoute) {
-        router.push(targetRoute as any);
-      }
-    }}
-  > */}
+       {/* <CircularReveal 
+       triggerClose={close}
+        backgroundImage={bgImg}
+         onCloseComplete={() =>
+          { if (targetRoute)
+          {router.push(targetRoute as any);} 
+          }} >  */}
         <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
           <ImageBackground
             source={bgImg}
@@ -127,7 +126,7 @@ export default function HomeScreen() {
                 </View>
 
                 <View style={styles.gridItemLast}>
-                  <Image source={RingImage} />
+                  <Image source={RingImage} style={styles.ringImage} />
                 </View>
               </View>
               <SettingsButton/>
@@ -186,5 +185,10 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: 20,
     bottom: 20,
+  },
+  ringImage: {
+    width: 120,
+    height: 160,
+    resizeMode: "contain",
   },
 });

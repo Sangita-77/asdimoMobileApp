@@ -1,24 +1,22 @@
 import Button from "@/components/ButtonCompo/Button";
 import Input from "@/components/ui/Input";
-import LandscapeLock from "@/components/ui/LandscapeLock";
-import Select from "@/components/ui/Select";
+import LandscapeLock from "@/components/ui/ScreenOrientation";
+import { ROUTES } from "@/constants/routes";
 import { loginUser } from "@/services/authService";
 import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
-import { ROUTES } from "@/constants/routes";
 import {
-  Alert,
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  useWindowDimensions,
+    Alert,
+    Image,
+    StyleSheet,
+    View,
+    useWindowDimensions
 } from "react-native";
 import CloudFloat from "../../components/AnimationCompo/CloudFloat";
 import BackButton from "../../components/ButtonCompo/BackButton";
-import Form, { useForm } from "../../components/ui/Form";
+import Form from "../../components/ui/Form";
 import { styles as globalStyle } from "../../constants/globalStyle";
 
 

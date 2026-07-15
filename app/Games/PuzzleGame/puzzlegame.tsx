@@ -1,6 +1,6 @@
 import BackButton from "@/components/ButtonCompo/BackButton";
 import SettingsButton from "@/components/ButtonCompo/SettingsButton";
-import LandscapeLock from "@/components/ui/LandscapeLock";
+import LandscapeLock from "@/components/ui/ScreenOrientation";
 import { ROUTES } from "@/constants/routes";
 import { Asset } from "expo-asset";
 import { Audio } from "expo-av";

@@ -1,15 +1,15 @@
+import TransitionProvider from "@/components/AnimationCompo/TransitionProvider";
+import { ROUTES } from "@/constants/routes";
+import { isAuthenticated } from "@/services/authService";
+import { useFonts } from "expo-font";
 import * as NavigationBar from "expo-navigation-bar";
 import { Redirect, Stack, usePathname } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
+import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { StatusBar } from "expo-status-bar";
-import { useFonts } from "expo-font";
-import { ROUTES } from "@/constants/routes";
-import { isAuthenticated } from "@/services/authService";
-import  TransitionProvider  from "@/components/AnimationCompo/TransitionProvider";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -63,7 +63,7 @@ function RouteGuard() {
   const [authenticated, setAuthenticated] = useState(false);
   const [checkedPath, setCheckedPath] = useState<string | null>(null);
   const isPublicRoute =
-    pathname === ROUTES.LANDING.LOADING || pathname === ROUTES.AUTH.LOGIN;
+  pathname === ROUTES.LANDING.LOADING || pathname === ROUTES.AUTH.LOGIN;
 
   useEffect(() => {
     let mounted = true;

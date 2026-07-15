@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  ImageBackground,
+    ImageBackground,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 
 import { Asset } from "expo-asset";
 
-import LandscapeLock from "@/components/ui/LandscapeLock";
 import BackButton from "@/components/ButtonCompo/BackButton";
+import LandscapeLock from "@/components/ui/ScreenOrientation";
 
 // BACKGROUND IMAGE
 const GameCompleteBG = require("@/assets/images/LevelComplete.png");
