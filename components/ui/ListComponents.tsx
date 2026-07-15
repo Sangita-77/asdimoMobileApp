@@ -1,6 +1,9 @@
 import { AvailabilitySlot } from "@/services/authService";
 import { Ionicons } from "@expo/vector-icons";
 import React, { useEffect, useMemo, useState } from "react";
+import { useTransition } from "@/components/AnimationCompo/TransitionProvider";
+import { router } from "expo-router";
+import { ROUTES } from "@/constants/routes";
 import {
   Image,
   ImageSourcePropType,
@@ -15,6 +18,7 @@ interface DoctorListCardProps {
   name: string;
   availability: AvailabilitySlot[];
   onBookNow: (slot: AvailabilitySlot) => void;
+  appointmentBooking: () => void;
 }
 
 function formatDate(date: string) {
@@ -39,6 +43,7 @@ export default function DoctorListCard({
   name,
   availability,
   onBookNow,
+  appointmentBooking,
 }: DoctorListCardProps) {
   const availableSlots = useMemo(
     () => availability.filter((slot) => !slot.isBooked),
@@ -61,7 +66,7 @@ export default function DoctorListCard({
   );
   const displayedSlots = showAllSlots ? slotsForDate : slotsForDate.slice(0, 3);
   const hasMoreSlots = slotsForDate.length > 3;
-
+  const transition = useTransition();
   const selectNextDate = () => {
     const currentIndex = dates.indexOf(selectedDate);
     setSelectedDate(dates[(currentIndex + 1) % dates.length]);
@@ -126,6 +131,20 @@ export default function DoctorListCard({
                 />
               </Pressable>
             ) : null}
+            <View>
+                  <Pressable
+                    style={styles.button}
+                    onPress={() => {
+                      appointmentBooking();
+
+                      transition.current?.cover(() => {
+                        router.push(ROUTES.AUTH.BOOKDOCTOR);
+                      });
+                    }}
+                  >
+                <Text style={styles.buttonText}>Book Now</Text>
+              </Pressable>
+            </View>
           </View>
         </>
       ) : (
@@ -136,6 +155,18 @@ export default function DoctorListCard({
 }
 
 const styles = StyleSheet.create({
+    button: {
+    backgroundColor: "#2563EB",
+    paddingHorizontal: 18,
+    paddingVertical: 12,
+    borderRadius: 10,
+  },
+
+  buttonText: {
+    color: "#FFF",
+    fontWeight: "600",
+    fontSize: 18,
+  },
   card: {
     backgroundColor: "#FFF",
     borderRadius: 28,

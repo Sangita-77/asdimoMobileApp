@@ -16,6 +16,7 @@ import {
   StyleSheet,
   Text,
   View,
+  Pressable
 } from "react-native";
 
 export default function DoctorList() {
@@ -72,6 +73,7 @@ export default function DoctorList() {
             onBookNow={(slot) =>
               console.log(`Book ${item.name} on ${slot.date} at ${slot.time}`)
             }
+            appointmentBooking={() => console.log(`Book ${item.name}`) }
           />
         )}
         ListEmptyComponent={

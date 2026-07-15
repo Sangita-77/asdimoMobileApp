@@ -8,6 +8,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Image, ImageBackground, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { styles as globalStyle } from "../../constants/globalStyle";
+import LottieView from "lottie-react-native";
 // import { pauseGameSound, resumeGameSound } from "../components/SoundCompo/GameSound";
 
 export default function Index() {
@@ -56,8 +57,8 @@ export default function Index() {
       }
     }, 70
   );
+  return () => clearInterval(interval);
 
-    return () => clearInterval(interval);
   }, []);
 
   const widthInterpolated = animatedWidth.interpolate({
@@ -76,17 +77,17 @@ export default function Index() {
   return (
     
     <> 
-    <LandscapeLock />
-    <LinearGradient 
-      colors={["#35FFFF", "#E45FAA"]}
-      style={styles.container}>
-      <Animated.View style={[{ opacity: fadeAnim }]}>  
-      
-      <ImageBackground
-       source={Rainbow}
-        style={styles.rainbowImage}
-        resizeMode="contain"        
-      >   
+  <LandscapeLock />
+  <LinearGradient 
+    colors={["#35FFFF", "#E45FAA"]}
+    style={styles.container}>
+    <Animated.View style={[{ opacity: fadeAnim }]}>  
+    
+    <ImageBackground
+      source={Rainbow}
+      style={styles.rainbowImage}
+      resizeMode="contain"        
+    >   
    <View style={StyleSheet.absoluteFillObject}>
     {/* Small cloudes */}
     <CloudFloat source={Cloude} top={height * 0.1} size={width * 0.2} left={width * 0.8} duration={8000} loop={false} />
@@ -111,6 +112,19 @@ export default function Index() {
           style={globalStyle.LoadingDimo}
           resizeMode="contain"
         />
+    {/* <View
+      style={{
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+      }}
+    >
+      <LottieView
+        source={require("../../assets/images/LoadingDimo.json")}
+        autoPlay
+        loop
+      />
+    </View> */}
         <Text style={styles.percentText}>{progress}%</Text>
         <View style={styles.progressWrapper}>
           <Animated.View style={[styles.progressFill, { width: widthInterpolated }]}>

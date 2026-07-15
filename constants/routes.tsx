@@ -7,6 +7,7 @@ export const ROUTES = {
   AUTH: {
     LOGIN: "/ParentsDashboard/ParentsLogin",
     DOCTORSLIST: "/ParentsDashboard/DoctorsList",
+    BOOKDOCTOR: "/ParentsDashboard/BookDoctor",
   },
 
   APP: {
