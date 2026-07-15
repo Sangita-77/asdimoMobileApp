@@ -5,6 +5,7 @@ const ACCESS_TOKEN_KEY = "accessToken";
 const REFRESH_TOKEN_KEY = "refreshToken";
 const AUTH_STATE_KEY = "isAuthenticated";
 const USER_FLAG_KEY = "userFlag";
+const USER_ID_KEY = "userId";
 
 export type LoginResponse = {
   accessToken?: string;
@@ -46,6 +47,12 @@ type GetAvailabilityResponse = {
   message?: string;
 };
 
+type CreateAppointmentResponse = {
+  success: boolean;
+  message: string;
+  data?: { _id: string; status: string };
+};
+
 export type ParentRegistrationPayload = {
   name: string;
   email: string;
@@ -79,6 +86,31 @@ function extractValue(
   return null;
 }
 
+function toFiniteNumber(value: unknown) {
+  const numberValue = typeof value === "string" ? Number(value) : value;
+  return typeof numberValue === "number" && Number.isFinite(numberValue)
+    ? numberValue
+    : null;
+}
+
+function getUserIdFromToken(token: string | null) {
+  if (!token) return null;
+
+  try {
+    const encodedPayload = token.split(".")[1];
+    if (!encodedPayload || typeof atob !== "function") return null;
+
+    const payload = JSON.parse(
+      atob(encodedPayload.replace(/-/g, "+").replace(/_/g, "/")),
+    ) as Record<string, unknown>;
+    return [payload.userId, payload.parentId, payload.id, payload.sub]
+      .map(toFiniteNumber)
+      .find((value): value is number => value !== null) || null;
+  } catch {
+    return null;
+  }
+}
+
 export async function saveAuthTokens(
   accessToken: string,
   refreshToken: string,
@@ -99,6 +131,7 @@ export async function clearAuthTokens() {
   await AsyncStorage.removeItem(REFRESH_TOKEN_KEY);
   await AsyncStorage.removeItem(AUTH_STATE_KEY);
   await AsyncStorage.removeItem(USER_FLAG_KEY);
+  await AsyncStorage.removeItem(USER_ID_KEY);
 }
 
 export async function getAccessToken() {
@@ -178,6 +211,24 @@ export async function loginUser(email: string, password: string) {
     await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
   }
 
+  const userId = [
+    data?.user?.userId,
+    data?.user?.id,
+    data?.data?.user?.userId,
+    data?.data?.user?.id,
+    data?.data?.parent?.userId,
+    data?.data?.parentId,
+    data?.data?.userId,
+    data?.userId,
+    data?.result?.user?.userId,
+  ]
+    .map(toFiniteNumber)
+    .find((value): value is number => value !== null);
+
+  if (typeof userId === "number") {
+    await AsyncStorage.setItem(USER_ID_KEY, String(userId));
+  }
+
   return data as LoginResponse;
 }
 
@@ -251,6 +302,19 @@ export async function getTherapists() {
 
 }
 
+export async function getLoggedInUserId() {
+  const storedUserId = await AsyncStorage.getItem(USER_ID_KEY);
+  const userId = toFiniteNumber(storedUserId);
+  if (userId !== null) return userId;
+
+  const tokenUserId = getUserIdFromToken(await getAccessToken());
+  if (tokenUserId !== null) {
+    await AsyncStorage.setItem(USER_ID_KEY, String(tokenUserId));
+  }
+
+  return tokenUserId;
+}
+
 export async function getTherapistAvailability(therapistId: number) {
   const response = await postAuthEndpoint<GetAvailabilityResponse>(
     AUTH_ENDPOINTS.getTherapistAvailability,
@@ -259,6 +323,19 @@ export async function getTherapistAvailability(therapistId: number) {
   );
 
   return response.data || [];
+}
+
+export function createAppointment(payload: {
+  teacherId: number;
+  date: string;
+  time: string;
+  parentId: number;
+}) {
+  return postAuthEndpoint<CreateAppointmentResponse>(
+    AUTH_ENDPOINTS.appointments,
+    payload,
+    true,
+  );
 }
 
 export async function refreshToken() {

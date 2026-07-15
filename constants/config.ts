@@ -9,4 +9,5 @@ export const AUTH_ENDPOINTS = {
   register: "/auth/register",
   getAllUsers: "/auth/getAllUsers",
   getTherapistAvailability: "/therapists/get_availability",
+  appointments: "/appointments",
 } as const;

@@ -1,140 +1,269 @@
+import Button from "@/components/ButtonCompo/Button";
 import Footer from "@/components/ui/Footer";
 import Header from "@/components/ui/Header";
-import OrientationLock from "@/components/ui/ScreenOrientation";
 import Calender from "@/components/ui/Calender";
-import { Text, View, Image, StyleSheet, Pressable } from "react-native";
-import React, {useState} from "react";
-// import { styles as globalStyle } from "../../constants/globalStyle";
-import Button from "@/components/ButtonCompo/Button";
+import OrientationLock from "@/components/ui/ScreenOrientation";
+import { API_BASE_URL } from "@/constants/config";
+import {
+  AvailabilitySlot,
+  createAppointment,
+  getLoggedInUserId,
+  getTherapistAvailability,
+} from "@/services/authService";
+import { useLocalSearchParams } from "expo-router";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+} from "react-native";
 
-const availableTimes = [
-  "09:00 AM",
-  "09:30 AM",
-  "10:00 AM",
-  "10:30 AM",
-  "11:00 AM",
-  "11:30 AM",
-];
+function toDateValue(date: string) {
+  const [day, month, year] = date.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
 
-const doctorName = "Dr. Shreya Dutta";
-const doctorImage = null; 
+function isPastDate(date: string) {
+  const selectedDate = toDateValue(date);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return selectedDate < today;
+}
 
+function isPastTime(slot: AvailabilitySlot) {
+  const selectedDate = toDateValue(slot.date);
+  const now = new Date();
+  if (selectedDate.toDateString() !== now.toDateString()) return false;
 
-export default function DoctorList() {
-  const [selectedTime, setSelectedTime] = useState("");
+  const [hours, minutes] = slot.time.split(":").map(Number);
+  selectedDate.setHours(hours, minutes, 0, 0);
+  return selectedDate <= now;
+}
+
+export default function BookDoctor() {
+  const { therapistId: therapistIdParam, therapistName, profileImg } =
+    useLocalSearchParams<{
+      therapistId?: string;
+      therapistName?: string;
+      profileImg?: string;
+    }>();
+  const therapistId = Number(therapistIdParam);
+  const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isBooking, setIsBooking] = useState(false);
+  const [error, setError] = useState("");
+  const [bookingMessage, setBookingMessage] = useState("");
+  const [isBookingError, setIsBookingError] = useState(false);
+
+  const loadAvailability = useCallback(async () => {
+    if (!Number.isFinite(therapistId)) {
+      setError("Therapist details are missing.");
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError("");
+      const slots = await getTherapistAvailability(therapistId);
+      setAvailability(slots);
+      const firstAvailableDate = [...new Set(slots.map((slot) => slot.date))]
+        .sort((a, b) => toDateValue(a).getTime() - toDateValue(b).getTime())
+        .find((date) => !isPastDate(date));
+      setSelectedDate(firstAvailableDate || "");
+    } catch (loadError) {
+      setError(
+        loadError instanceof Error
+          ? loadError.message
+          : "Unable to load availability.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  }, [therapistId]);
+
+  useEffect(() => {
+    void loadAvailability();
+  }, [loadAvailability]);
+
+  const dates = useMemo(
+    () =>
+      [...new Set(availability.map((slot) => slot.date))].sort(
+        (a, b) => toDateValue(a).getTime() - toDateValue(b).getTime(),
+      ),
+    [availability],
+  );
+  const slotsForSelectedDate = availability.filter(
+    (slot) => slot.date === selectedDate && !slot.isBooked,
+  );
+
+  const handleBookAppointment = async () => {
+    if (!selectedSlot) {
+      setIsBookingError(true);
+      setBookingMessage("Please choose an available time slot.");
+      return;
+    }
+
+    const parentId = await getLoggedInUserId();
+    if (!parentId) {
+      setIsBookingError(true);
+      setBookingMessage("Unable to identify your account. Please sign in again.");
+      return;
+    }
+
+    try {
+      setIsBooking(true);
+      setBookingMessage("");
+      const response = await createAppointment({
+        teacherId: therapistId,
+        date: selectedSlot.date,
+        time: selectedSlot.time,
+        parentId,
+      });
+      setAvailability((current) =>
+        current.map((slot) =>
+          slot._id === selectedSlot._id ? { ...slot, isBooked: true } : slot,
+        ),
+      );
+      setSelectedSlot(null);
+      setIsBookingError(false);
+      setBookingMessage(response.message || "Appointment booked successfully.");
+    } catch (bookingError) {
+      setIsBookingError(true);
+      setBookingMessage(
+        bookingError instanceof Error
+          ? bookingError.message
+          : "Unable to book appointment. Please try again.",
+      );
+    } finally {
+      setIsBooking(false);
+    }
+  };
+
+  const imageUri = profileImg
+    ? `${API_BASE_URL.replace(/\/api$/, "")}${profileImg}`
+    : "";
+  const name = therapistName || "Therapist";
+
   return (
     <>
-    <OrientationLock variant="portrait" />
-    <Header/>
-      <View style={styles.BookContainer}>
+      <OrientationLock variant="portrait" />
+      <Header />
+      <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.profileContainer}>
-          {doctorImage ? (
-            <Image
-              source={doctorImage}
-              style={styles.avatar}
-              resizeMode="cover"
-            />
+          {imageUri ? (
+            <Image source={{ uri: imageUri }} style={styles.avatar} />
           ) : (
             <View style={styles.placeholder}>
               <Text style={styles.placeholderText}>
-                {doctorName.replace(/^Dr\.?\s*/i, "").charAt(0).toUpperCase()}
+                {name.charAt(0).toUpperCase()}
               </Text>
             </View>
           )}
-          <Text>{doctorName}</Text>
+          <Text style={styles.doctorName}>{name}</Text>
         </View>
-        <View>
-          <Text style={styles.TextHaeding}>Select Date</Text>
-          <Calender/>
-        </View>
-        <View>
-          <Text style={styles.TextHaeding}>Select Time</Text>
-          <View style={styles.timeContainer}>
-              {availableTimes.map((time) => (
-                <Pressable
-                  key={time}
-                  onPress={() => setSelectedTime(time)}
-                  style={[
-                    styles.timeButton,
-                    selectedTime === time && styles.selectedTime,
-                  ]}
-                >
-                  <Text
+
+        {isLoading ? (
+          <View style={styles.statusContainer}>
+            <ActivityIndicator size="large" color="#2563EB" />
+          </View>
+        ) : error ? (
+          <Text style={styles.errorText}>{error}</Text>
+        ) : (
+          <>
+            <Text style={styles.heading}>Select Date</Text>
+            <Calender
+              selectedDate={selectedDate}
+              availableDates={dates}
+              onDateChange={(date) => {
+                setSelectedDate(date);
+                setSelectedSlot(null);
+              }}
+            />
+
+            <Text style={styles.heading}>Select Time</Text>
+            <View style={styles.timeContainer}>
+              {slotsForSelectedDate.map((slot) => {
+                const disabled = isPastTime(slot);
+                const isSelected = selectedSlot?._id === slot._id;
+                return (
+                  <Pressable
+                    key={slot._id}
+                    disabled={disabled}
+                    onPress={() => setSelectedSlot(slot)}
                     style={[
-                      styles.timeText,
-                      selectedTime === time && styles.selectedTimeText,
+                      styles.timeButton,
+                      isSelected && styles.selectedTime,
+                      disabled && styles.disabledTime,
                     ]}
                   >
-                    {time}
-                  </Text>
-                </Pressable>
-              ))}
-          </View>
-          <Button text="Book Appointment" textSize="lg"/>
-        </View>
-      </View>
-    <Footer/>
+                    <Text
+                      style={[
+                        styles.timeText,
+                        isSelected && styles.selectedTimeText,
+                        disabled && styles.disabledTimeText,
+                      ]}
+                    >
+                      {slot.time}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
+            {!slotsForSelectedDate.length ? (
+              <Text style={styles.noSlots}>No available time slots for this date.</Text>
+            ) : null}
+
+            {bookingMessage ? (
+              <Text
+                style={[
+                  styles.bookingMessage,
+                  isBookingError ? styles.bookingError : styles.bookingSuccess,
+                ]}
+              >
+                {bookingMessage}
+              </Text>
+            ) : null}
+            <Button
+              text={isBooking ? "Booking..." : "Book Appointment"}
+              textSize="lg"
+              width="full"
+              disabled={!selectedSlot || isBooking}
+              onPress={handleBookAppointment}
+            />
+          </>
+        )}
+      </ScrollView>
+      <Footer />
     </>
   );
 }
 
 const styles = StyleSheet.create({
-    timeContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-    marginTop: 20,
-    paddingBottom: 20,
-  },
-
-  timeButton: {
-    paddingVertical: 10,
-    paddingHorizontal: 18,
-    borderRadius: 10,
-    borderWidth: 1,
-    borderColor: "#D1D5DB",
-    backgroundColor: "#FFF",
-  },
-
-  selectedTime: {
-    backgroundColor: "#4F46E5",
-    borderColor: "#4F46E5",
-  },
-
-  timeText: {
-    color: "#374151",
-    fontWeight: "600",
-  },
-
-  selectedTimeText: {
-    color: "#FFF",
-  },
-  TextHaeding:{
-    fontSize: 18,
-    paddingBottom: 10,
-  },
-  BookContainer:{
-  padding: 20,
-  },
-  profileContainer: {
-    alignItems: "center",
-  },
-  avatar: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
-  placeholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: "#4F46E5",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  placeholderText: {
-    color: "#fff",
-    fontSize: 32,
-    fontWeight: "bold",
-  },
+  container: { padding: 20, flexGrow: 1 },
+  profileContainer: { alignItems: "center", marginBottom: 24 },
+  avatar: { width: 88, height: 88, borderRadius: 44 },
+  placeholder: { width: 88, height: 88, borderRadius: 44, backgroundColor: "#2563EB", justifyContent: "center", alignItems: "center" },
+  placeholderText: { color: "#FFF", fontSize: 34, fontWeight: "700" },
+  doctorName: { color: "#111827", fontSize: 21, fontWeight: "700", marginTop: 10 },
+  heading: { color: "#1F2937", fontSize: 18, fontWeight: "700", marginBottom: 10, marginTop: 14 },
+  timeContainer: { flexDirection: "row", flexWrap: "wrap", gap: 12, paddingBottom: 20 },
+  timeButton: { paddingVertical: 10, paddingHorizontal: 18, borderRadius: 10, borderWidth: 1, borderColor: "#93C5FD", backgroundColor: "#FFF" },
+  selectedTime: { backgroundColor: "#2563EB", borderColor: "#2563EB" },
+  disabledTime: { backgroundColor: "#F3F4F6", borderColor: "#E5E7EB" },
+  timeText: { color: "#1D4ED8", fontWeight: "600" },
+  selectedTimeText: { color: "#FFF" },
+  disabledTimeText: { color: "#9CA3AF" },
+  noSlots: { color: "#6B7280", marginBottom: 20 },
+  statusContainer: { flex: 1, alignItems: "center", justifyContent: "center", padding: 36 },
+  errorText: { color: "#DC2626", textAlign: "center", fontSize: 16 },
+  bookingMessage: { textAlign: "center", fontSize: 15, marginBottom: 12 },
+  bookingError: { color: "#DC2626" },
+  bookingSuccess: { color: "#16A34A" },
 });
