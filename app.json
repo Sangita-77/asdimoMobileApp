@@ -3,7 +3,7 @@
     "name": "asdimo",
     "slug": "asdimo",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "asdimo",
     "userInterfaceStyle": "automatic",
@@ -47,7 +47,8 @@
       "expo-font",
       "expo-video",
       "expo-web-browser",
-      "expo-asset"
+      "expo-asset",
+      "expo-screen-orientation"
     ],
     "experiments": {
       "typedRoutes": true,

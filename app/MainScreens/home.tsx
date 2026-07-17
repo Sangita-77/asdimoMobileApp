@@ -20,7 +20,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { loadGameSound } from "../../components/SoundCompo/GameSound";
-
+import { styles as globalStyle } from "../../constants/globalStyle";
 
 // PRELOAD IMAGES
 const bgImg = require("@/assets/images/background.png");
@@ -73,7 +73,7 @@ export default function HomeScreen() {
   return (
     <ProtectedRoute>
       <>
-        <LandscapeLock />
+        <LandscapeLock variant="landscape"/>
 
        {/* <CircularReveal 
        triggerClose={close}
@@ -82,7 +82,7 @@ export default function HomeScreen() {
           { if (targetRoute)
           {router.push(targetRoute as any);} 
           }} >  */}
-        <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
+        <SafeAreaView style={globalStyle.safeArea} edges={["left", "right"]}>
           <ImageBackground
             source={bgImg}
             style={StyleSheet.absoluteFillObject}
@@ -143,9 +143,6 @@ const styles = StyleSheet.create({
   containerWrap: {
     flexDirection: "row",
     flexWrap: "wrap",
-  },
-  safeArea: {
-    flex: 1,
   },
   container: {
     flex: 1,

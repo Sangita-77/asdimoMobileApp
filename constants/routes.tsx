@@ -6,6 +6,7 @@ export const ROUTES = {
 
   AUTH: {
     LOGIN: "/ParentsDashboard/ParentsLogin",
+    CHILDFORM: "/ParentsDashboard/ChildForm",
     DOCTORSLIST: "/ParentsDashboard/DoctorsList",
     BOOKDOCTOR: "/ParentsDashboard/BookDoctor",
     BOOKINGS: "/ParentsDashboard/Bookings",

@@ -4,6 +4,10 @@ import Header from "@/components/ui/Header";
 import Calender from "@/components/ui/Calender";
 import OrientationLock from "@/components/ui/ScreenOrientation";
 import { API_BASE_URL } from "@/constants/config";
+import { LinearGradient } from "expo-linear-gradient";
+import { styles as globalStyle } from "../../constants/globalStyle";
+import { ROUTES } from "@/constants/routes";
+import { router } from "expo-router";
 import {
   AvailabilitySlot,
   createAppointment,
@@ -154,7 +158,8 @@ export default function BookDoctor() {
   return (
     <>
       <OrientationLock variant="portrait" />
-      <Header />
+      <View style={globalStyle.container}>
+      <Header title="Book Appointment"/>
       <ScrollView contentContainerStyle={styles.container}>
         <View style={styles.profileContainer}>
           {imageUri ? (
@@ -239,13 +244,25 @@ export default function BookDoctor() {
             />
           </>
         )}
+        <Button
+         style={styles.PastbookingBtn}
+          text="Bookings"
+          textSize="lg"
+          width="full"
+          onPress={() => {
+            router.push(ROUTES.AUTH.BOOKINGS);
+          }}
+        />
       </ScrollView>
+
       <Footer />
+      </View>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  PastbookingBtn:{marginTop: 20},
   container: { padding: 20, flexGrow: 1 },
   profileContainer: { alignItems: "center", marginBottom: 24 },
   avatar: { width: 88, height: 88, borderRadius: 44 },
@@ -256,11 +273,11 @@ const styles = StyleSheet.create({
   timeContainer: { flexDirection: "row", flexWrap: "wrap", gap: 12, paddingBottom: 20 },
   timeButton: { paddingVertical: 10, paddingHorizontal: 18, borderRadius: 10, borderWidth: 1, borderColor: "#93C5FD", backgroundColor: "#FFF" },
   selectedTime: { backgroundColor: "#2563EB", borderColor: "#2563EB" },
-  disabledTime: { backgroundColor: "#F3F4F6", borderColor: "#E5E7EB" },
+  disabledTime: { backgroundColor: "#d8d5d5", borderColor: "#E5E7EB" },
   timeText: { color: "#1D4ED8", fontWeight: "600" },
   selectedTimeText: { color: "#FFF" },
-  disabledTimeText: { color: "#9CA3AF" },
-  noSlots: { color: "#6B7280", marginBottom: 20 },
+  disabledTimeText: { color: "#95a0b6" },
+  noSlots: { color: "#888e99", marginBottom: 20 },
   statusContainer: { flex: 1, alignItems: "center", justifyContent: "center", padding: 36 },
   errorText: { color: "#DC2626", textAlign: "center", fontSize: 16 },
   bookingMessage: { textAlign: "center", fontSize: 15, marginBottom: 12 },

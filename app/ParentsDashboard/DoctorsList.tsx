@@ -2,6 +2,8 @@ import Footer from "@/components/ui/Footer";
 import Header from "@/components/ui/Header";
 import DoctorListCard from "@/components/ui/ListComponents";
 import OrientationLock from "@/components/ui/ScreenOrientation";
+import { LinearGradient } from "expo-linear-gradient";
+import { styles as globalStyle } from "../../constants/globalStyle";
 import {
   AvailabilitySlot,
   getTherapistAvailability,
@@ -56,8 +58,10 @@ export default function DoctorList() {
 
   return (
     <>
-      <OrientationLock variant="portrait" />
-      <Header />
+  <OrientationLock variant="portrait-up"/>
+  <View 
+    style={globalStyle.container}>
+      <Header title="Doctors"/>
       <FlatList
         contentContainerStyle={styles.listContent}
         data={therapists}
@@ -100,6 +104,7 @@ export default function DoctorList() {
         showsVerticalScrollIndicator={false}
       />
       <Footer />
+      </View>
     </>
   );
 }

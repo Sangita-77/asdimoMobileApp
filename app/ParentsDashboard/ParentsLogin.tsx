@@ -513,7 +513,7 @@ export default function Index() {
             <View>
               {activeTab === "signin" && (
                 <>
-                  <Text style={styles.signinText}>
+                  <Text style={globalStyle.signinText}>
                     Sign in to Your Account{" "}
                   </Text>
                   <View style={styles.ContentBox}>
@@ -601,7 +601,7 @@ export default function Index() {
               )}
               {activeTab === "signup" && (
                 <>
-                  <Text style={styles.signinText}>Create Your Account</Text>
+                  <Text style={globalStyle.signinText}>Create Your Account</Text>
                   <View style={styles.ContentBox}>
                     <Form type="step">
                       <StepOne />
@@ -669,13 +669,6 @@ const styles = StyleSheet.create({
     left: -60,
     bottom: -20,
     zIndex: 99,
-  },
-  signinText: {
-    color: "#000",
-    textAlign: "center",
-    fontWeight: 500,
-    fontSize: 24,
-    marginBottom: 15,
   },
   socialConnection: {
     borderRightWidth: 1,

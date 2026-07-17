@@ -8,7 +8,7 @@ import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Image, ImageBackground, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import { styles as globalStyle } from "../../constants/globalStyle";
-import LottieView from "lottie-react-native";
+// import LottieView from "lottie-react-native";
 // import { pauseGameSound, resumeGameSound } from "../components/SoundCompo/GameSound";
 
 export default function Index() {

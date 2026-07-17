@@ -3,6 +3,8 @@ import Header from "@/components/ui/Header";
 import OrientationLock from "@/components/ui/ScreenOrientation";
 import { Appointment, getLoggedInUserId, getParentAppointments } from "@/services/authService";
 import React, { useCallback, useEffect, useState } from "react";
+import { LinearGradient } from "expo-linear-gradient";
+import { styles as globalStyle } from "../../constants/globalStyle";
 import {
   ActivityIndicator,
   FlatList,
@@ -53,7 +55,8 @@ export default function Bookings() {
   return (
     <>
       <OrientationLock variant="portrait" />
-      <Header />
+      <View style={globalStyle.container}>
+      <Header title="Doctor List"/>
       <FlatList
         data={appointments}
         keyExtractor={(item) => item._id}
@@ -94,6 +97,7 @@ export default function Bookings() {
         showsVerticalScrollIndicator={false}
       />
       <Footer />
+      </View>
     </>
   );
 }

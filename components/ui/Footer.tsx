@@ -1,12 +1,26 @@
 import OrientationLock from "@/components/ui/ScreenOrientation";
 import React from "react";
-import { Text } from "react-native";
+import { Text, StyleSheet, View} from "react-native";
 
-export default function Footer() {
+export default function footer() {
   return (
     <>
     <OrientationLock variant="portrait" />
-    <Text>Footer</Text>
+    <View style={styles.HeaderContainerWrap}>
+       <Text style={styles.HeaderText}>Footer</Text>
+    </View>
     </>
   );
 }
+const styles = StyleSheet.create({
+  HeaderContainerWrap:{
+    backgroundColor: "#00A0ED",
+    width: "100%",
+    padding: 15,
+  },
+  HeaderText:{
+   color: "#fff",
+   fontSize: 20,
+   fontWeight: 500,
+  },
+});

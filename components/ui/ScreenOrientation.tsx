@@ -14,25 +14,45 @@ interface OrientationLockProps {
   variant?: OrientationVariant;
 }
 
+const orientationMap = {
+  portrait: ScreenOrientation.OrientationLock.PORTRAIT,
+  "portrait-up": ScreenOrientation.OrientationLock.PORTRAIT_UP,
+  "portrait-down": ScreenOrientation.OrientationLock.PORTRAIT_DOWN,
+  landscape: ScreenOrientation.OrientationLock.LANDSCAPE,
+  "landscape-left": ScreenOrientation.OrientationLock.LANDSCAPE_LEFT,
+  "landscape-right": ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT,
+} as const;
+
 export default function OrientationLock({
   variant = "landscape",
 }: OrientationLockProps) {
   useFocusEffect(
     useCallback(() => {
-      const orientationMap = {
-        portrait: ScreenOrientation.OrientationLock.PORTRAIT,
-        "portrait-up": ScreenOrientation.OrientationLock.PORTRAIT_UP,
-        "portrait-down": ScreenOrientation.OrientationLock.PORTRAIT_DOWN,
-        landscape: ScreenOrientation.OrientationLock.LANDSCAPE,
-        "landscape-left": ScreenOrientation.OrientationLock.LANDSCAPE_LEFT,
-        "landscape-right": ScreenOrientation.OrientationLock.LANDSCAPE_RIGHT,
+      let isMounted = true;
+
+      const lockOrientation = async () => {
+        try {
+          if (!isMounted) return;
+
+          await ScreenOrientation.lockAsync(
+            orientationMap[variant]
+          );
+        } catch (error) {
+          console.warn(
+            `Failed to lock orientation to "${variant}":`,
+            error
+          );
+        }
       };
 
-      ScreenOrientation.lockAsync(orientationMap[variant]);
+      lockOrientation();
 
       return () => {
-        // Optional
-        // ScreenOrientation.unlockAsync();
+        isMounted = false;
+
+        // ScreenOrientation.unlockAsync().catch((error) => {
+        //   console.warn("Failed to unlock orientation:", error);
+        // });
       };
     }, [variant])
   );

@@ -1,172 +1,116 @@
-import Button from "@/components/ButtonCompo/Button";
-import Input from "@/components/ui/Input";
-import LandscapeLock from "@/components/ui/ScreenOrientation";
-import { ROUTES } from "@/constants/routes";
-import { loginUser } from "@/services/authService";
-import { Asset } from "expo-asset";
-import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
-import { useEffect, useState } from "react";
-import {
-    Alert,
-    Image,
-    StyleSheet,
-    View,
-    useWindowDimensions
-} from "react-native";
-import CloudFloat from "../../components/AnimationCompo/CloudFloat";
-import BackButton from "../../components/ButtonCompo/BackButton";
+import CompoLoginBack from "@/components/ui/CompoLoginBack";
+import { View, StyleSheet, Text, Dimensions } from "react-native";
 import Form from "../../components/ui/Form";
-import { styles as globalStyle } from "../../constants/globalStyle";
+import Input from "@/components/ui/Input";
+import { styles as globalStyle } from "@/constants/globalStyle";
+import Button from "@/components/ButtonCompo/Button";
+import { MaterialIcons, FontAwesome, MaterialCommunityIcons, SimpleLineIcons, Feather } from "@expo/vector-icons";
 
+const { width } = Dimensions.get("window");
 
-export default function Index() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const Rainbow = require("../../assets/images/Rainbow.png");
-  const Cloude = require("../../assets/images/Cloude.png");
-  const TreeLogin = require("../../assets/images/TreeLogin.png");
-  const dimoAnimation = require("../../assets/images/dimoAnimation.mp4");
-  const LoadingDimo = require("../../assets/images/Diano_Run.gif");
-  const GoogleIcon = require("../../assets/images/GoogleIcon.png");
-  const FacebookIcon = require("../../assets/images/FacebookIcon.png");
-
-  const { width, height } = useWindowDimensions();
-
-  const handleSubmit = async () => {
-    if (!email.trim() || !password.trim()) {
-      Alert.alert("Validation", "Please enter your email and password.");
-      return;
-    }
-
-    try {
-      setIsSubmitting(true);
-      await loginUser(email, password);
-      // router.replace("/MainScreens/home");
-      router.replace(ROUTES.APP.HOME);
-    } catch (error) {
-      Alert.alert(
-        "Login failed",
-        error instanceof Error ? error.message : "Unable to log in",
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  useEffect(() => {
-    Asset.loadAsync([
-      Rainbow,
-      Cloude,
-      TreeLogin,
-      dimoAnimation,
-      LoadingDimo,
-      GoogleIcon,
-      FacebookIcon,
-    ]);
-  }, []);
+export default function Login() {
   return (
-    <>
-      <LandscapeLock />
-      <LinearGradient
-        colors={["#8AF8F8", "#FFA3D6"]}
-        style={globalStyle.container}
-      >
-        <BackButton />
-        <Image source={TreeLogin} style={styles.TreeLogin} />
-        <Image
-          source={LoadingDimo}
-          style={styles.AnimDino}
-          resizeMode="contain"
-        />
-        <View style={StyleSheet.absoluteFillObject}>
-          {/* Small cloudes */}
-          <CloudFloat source={Cloude} top={height * 0.02} size={width * 0.07} left={-width * 0.5} duration={40000} loop />
-          <CloudFloat source={Cloude} top={height * 0.02} size={width * 0.15} left={-width * 0.5} duration={40000} loop />
-          <CloudFloat source={Cloude} top={height * 0.02} size={width * 0.15} left={-width * 0.5} duration={40000} loop />
-          {/* Medium cloudes */}
-          <CloudFloat source={Cloude} top={height * 0.2} size={width * 0.2} left={width * 0.6} duration={13000} loop={false} />
-          <CloudFloat source={Cloude} top={height * 0.1} size={width * 0.2} left={-width * 0.6} duration={35000} loop />
-          <CloudFloat source={Cloude} top={height * 0.22} size={width * 0.2} left={width * 0.02} duration={25000} loop={false} />
-          <CloudFloat source={Cloude} top={height * 0.22} size={width * 0.3} left={-width * 0.7} duration={60000} />
-          {/* Large cloudes */}
-          <CloudFloat source={Cloude} top={height * 0.15} size={width * 0.25} left={-width * 0.68} duration={40000} loop />
-        </View>
+    <CompoLoginBack>
         <View style={styles.FormWrap}>
-          <Form type="normal">
+        <Text style={globalStyle.signinText}>
+          Child Basic Information
+        </Text>
+        <Form type="normal">
               <Input
                 variant="full"
-                placeholder="Enter Phone/Email ID"
+                placeholder="Child Name"
                 autoCapitalize="none"
                 keyboardType="email-address"
                 autoComplete="email"
                 textContentType="username"
+                icon={<MaterialIcons name="child-care" size={35} color="#8E8A9A"/>}
               />
             <View style={globalStyle.Dflex}>  
               <Input
-                variant="half"
-                placeholder="Enter Password"
-                secureTextEntry
-                autoCapitalize="none"
-                autoCorrect={false}
-                textContentType="password"
-                autoComplete="password"
+                type="select"
+                variant="third"
+                placeholder="Gender"
+                // selectedValue={gender}
+                // onValueChange={setGender}
+                icon={<FontAwesome name="transgender" size={30} color="#8E8A9A" />}
+                options={[
+                  { label: "Male", value: "male" },
+                  { label: "Female", value: "female" },
+                  { label: "Others", value: "others" },
+                ]}
               />
               <Input
-                variant="half"
-                placeholder="Enter Password"
-                secureTextEntry
+                variant="third"
+                placeholder="Age"
                 autoCapitalize="none"
-                autoCorrect={false}
-                textContentType="password"
-                autoComplete="password"
+                keyboardType="email-address"
+                autoComplete="email"
+                textContentType="username"
+                icon={<MaterialCommunityIcons name="calendar-month-outline" size={30} color="#8E8A9A" />}
+              />
+              <Input
+                type="select"
+                variant="third"
+                placeholder="Grade"
+                // selectedValue={grade}
+                // onValueChange={setGrade}
+                icon={<SimpleLineIcons name="book-open" size={25} color="#8E8A9A" />}
+                options={[
+                  { label: "First", value: "first" },
+                  { label: "Second", value: "second" },
+                ]}
               />
             </View>
+            <View style={globalStyle.Dflex}>
+              <Input
+                type="select"
+                variant="half"
+                placeholder="Family Type"
+                // selectedValue={familytype}
+                // onValueChange={setFamilyType}
+                icon={<MaterialCommunityIcons name="human-male-female-child" size={25} color="#8E8A9A" />}
+                options={[
+                  { label: "Nuclear", value: "nuclear" },
+                  { label: "Joint", value: "joint" },
+                ]}
+              />
+              <Input
+                type="select"
+                variant="half"
+                placeholder="Language"
+                // selectedValue={language}
+                // onValueChange={setLanguage}
+                icon={<MaterialIcons name="language" size={25} color="#8E8A9A" />}
+                options={[
+                  { label: "English", value: "first" },
+                  { label: "Bengali", value: "bengali" },
+                  { label: "Hindi", value: "hindi" },
+                ]}
+              />              
+            </View> 
+            <View style={globalStyle.Dflex}>
             <Button
-              text={isSubmitting ? "Please wait..." : "Continue"}
-              onPress={handleSubmit}
-              width="full"
+              text="Submit"
+              // onPress={handleSubmit}
+              width="half"
               textSize="lg"
-              disabled={isSubmitting}
             />
+            <Button
+              text="Add Another Child"
+              // onPress={handleSubmit}
+              width="half"
+              variant="transparent"
+              icon={<Feather name="plus-circle" size={28} color="#763DFF" />}
+              textSize="lg"
+            />
+            </View>
           </Form>
-        <View>
-      </View>
-    </View>
-  </LinearGradient>
-</>
-);
+        </View>
+    </CompoLoginBack>
+  );
 }
 
+
 const styles = StyleSheet.create({
-  formStyles: { marginTop: 20 },
-  FormWrap: { zIndex: 100, marginLeft: 180 },
-  ContentBox: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 20,
-  },
-  TreeLogin: { position: "absolute", left: 0, top: -2, zIndex: 99 },
-  AnimDino: {
-    width: 320,
-    height: 300,
-    position: "absolute",
-    left: -60,
-    bottom: -20,
-    zIndex: 99,
-  },
-  signinText: {
-    color: "#000",
-    textAlign: "center",
-    fontWeight: 500,
-    fontSize: 24,
-    marginBottom: 15,
-  },
-  socialConnection: {
-    borderRightWidth: 1,
-    paddingRight: 20,
-    borderColor: "#AFEBEE",
-  },
+  FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
 });

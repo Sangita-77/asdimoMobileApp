@@ -46,19 +46,11 @@ export default function SettingsScreen() {
     ]);
   }, []);
 
-  useEffect(() => {
-    ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
-
-    return () => {
-      ScreenOrientation.unlockAsync();
-    };
-  }, []);
-
   if (!loaded) return null;
 
   return (
     <>
-    <LandscapeLock />
+    <LandscapeLock variant="landscape"/>
     <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
         <ImageBackground source={bgImg} style={StyleSheet.absoluteFillObject} resizeMode="cover" >
         <View style={StyleSheet.absoluteFillObject}>

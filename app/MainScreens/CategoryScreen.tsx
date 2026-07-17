@@ -111,7 +111,7 @@ animations.forEach((anim, index) => {
 
   return (
 <> 
-<LandscapeLock />
+<LandscapeLock variant="landscape"/>
     <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>  
       <ImageBackground  source={images.bgImg} style={StyleSheet.absoluteFillObject} resizeMode="cover" >
         <View style={styles.container}>

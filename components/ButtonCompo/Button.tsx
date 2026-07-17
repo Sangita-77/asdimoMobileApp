@@ -12,13 +12,13 @@ type ButtonProps = {
   text: string;
   onPress?: () => void;
   textSize?: "sm" | "md" | "lg";
-  variant?: "transparent" | "white" | "solid";
+  variant?: "transparent" | "white" | "solid" | "border";
   icon?: React.ReactNode;
   disabled?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
   iconPosition?: "left" | "right";
-  width?: "full" | "auto";
+  width?: "full" | "half" | "auto";
 };
 
 export default function Button({
@@ -40,8 +40,14 @@ export default function Button({
       disabled={disabled}
       style={[
         styles.button,
-        variant === "solid" ? styles.solid : variant === "transparent" ? styles.transparent : styles.white,
+        variant === "solid" && styles.solidButton,
+        variant === "white" && styles.whiteButton,
+        variant === "transparent" && styles.transparentButton,
+        variant === "border" && styles.transparentButton,
+
         width === "full" && styles.fullWidth,
+        width === "half" && styles.halfWidth,
+
         disabled && styles.disabled,
         style,
       ]}
@@ -54,10 +60,14 @@ export default function Button({
         <Text
           style={[
             styles.text,
-            variant === "solid" ? styles.solid : variant === "transparent" ? styles.transparent : styles.white,
+            variant === "solid" && styles.solidText,
+            variant === "white" && styles.whiteText,
+            variant === "transparent" && styles.transparentText,
+
             textSize === "sm" && styles.sm,
             textSize === "md" && styles.md,
             textSize === "lg" && styles.lg,
+
             textStyle,
           ]}
         >
@@ -73,16 +83,78 @@ export default function Button({
 }
 
 const styles = StyleSheet.create({
-  button: { height: 58, borderRadius: 50, justifyContent: "center", alignItems: "center", paddingHorizontal: 20,},
   solid: { backgroundColor: "#763DFF",  color: "#FFF",},
   white: { backgroundColor: "#fff", color: "#000", },
   transparent: { backgroundColor: "transparent", borderWidth: 0, borderColor: "#4F46E5", },
-  disabled: { opacity: 0.5, },
-  fullWidth: { width: "100%", minWidth: 280, },
-  content: { flexDirection: "row", alignItems: "center", justifyContent: "center", },
-  icon: { marginHorizontal: 6, },
-  text: {fontWeight: "600", },
-  sm: { fontSize: 14, },
-  md: { fontSize: 16, },
-  lg: { fontSize: 22, },
+  button: {
+  height: 55,
+  borderRadius: 50,
+  justifyContent: "center",
+  alignItems: "center",
+  paddingHorizontal: 20,
+},
+
+solidButton: {
+  backgroundColor: "#763DFF",
+},
+
+whiteButton: {
+  backgroundColor: "#FFF",
+},
+
+transparentButton: {
+  backgroundColor: "transparent",
+  borderWidth: 1,
+  borderColor: "#763DFF",
+},
+
+solidText: {
+  color: "#FFF",
+},
+
+whiteText: {
+  color: "#111827",
+},
+
+transparentText: {
+  color: "#763DFF",
+},
+
+fullWidth: {
+  width: "100%",
+},
+
+halfWidth: {
+  width: "49%",
+},
+
+content: {
+  flexDirection: "row",
+  alignItems: "center",
+  justifyContent: "center",
+},
+
+icon: {
+  marginHorizontal: 6,
+},
+
+text: {
+  fontWeight: "600",
+},
+
+sm: {
+  fontSize: 14,
+},
+
+md: {
+  fontSize: 16,
+},
+
+lg: {
+  fontSize: 22,
+},
+
+disabled: {
+  opacity: 0.5,
+},
 });
