@@ -12,7 +12,7 @@ const { width } = Dimensions.get("window");
 
 export default function Login() {
   const [childName, setChildName] = useState("");
-  const [childAge, setChildAge] = useState("");
+  const [dob, setDob] = useState("");
   const [childGender, setChildGender] = useState("");
   const [grade, setGrade] = useState("");
   const [familyType, setFamilyType] = useState("");
@@ -23,20 +23,54 @@ export default function Login() {
 
   const clearForm = () => {
     setChildName("");
-    setChildAge("");
+    setDob("");
     setChildGender("");
     setGrade("");
     setFamilyType("");
     setLanguage("");
   };
 
+  const handleDobChange = (value: string) => {
+    const digits = value.replace(/\D/g, "").slice(0, 8);
+    const formattedDob =
+      digits.length > 4
+        ? `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
+        : digits.length > 2
+          ? `${digits.slice(0, 2)}/${digits.slice(2)}${digits.length === 4 ? "/" : ""}`
+          : digits.length === 2
+            ? `${digits}/`
+            : digits;
+
+    setDob(formattedDob);
+    if (isError) {
+      setMessage("");
+      setIsError(false);
+    }
+  };
+
   const handleSubmit = async () => {
-    const age = Number(childAge);
-    if (!childName.trim() || !childAge.trim() || !Number.isInteger(age) || age < 0 || !childGender || !grade || !familyType || !language) {
+    const dobMatch = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(dob);
+    const birthDate = dobMatch
+      ? new Date(Number(dobMatch[3]), Number(dobMatch[2]) - 1, Number(dobMatch[1]))
+      : null;
+    const isValidDob = birthDate &&
+      birthDate.getFullYear() === Number(dobMatch![3]) &&
+      birthDate.getMonth() === Number(dobMatch![2]) - 1 &&
+      birthDate.getDate() === Number(dobMatch![1]) &&
+      birthDate <= new Date();
+
+    if (!childName.trim() || !birthDate || !isValidDob || !childGender || !grade || !familyType || !language) {
       setIsError(true);
-      setMessage("Please complete all fields with a valid age.");
+      setMessage("Please complete all fields with a valid date of birth (dd/mm/yyyy).");
       return;
     }
+
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const birthdayHasOccurred =
+      today.getMonth() > birthDate.getMonth() ||
+      (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
+    if (!birthdayHasOccurred) age -= 1;
 
     const parentId = await getLoggedInUserId();
     if (!parentId) {
@@ -52,6 +86,7 @@ export default function Login() {
         parentId,
         childName: childName.trim(),
         childAge: age,
+        dob,
         childGender,
         grade,
         familyType,
@@ -101,11 +136,12 @@ export default function Login() {
               />
               <Input
                 variant="third"
-                placeholder="Age"
-                value={childAge}
-                onChangeText={setChildAge}
+                placeholder="DOB (dd/mm/yyyy)"
+                value={dob}
+                onChangeText={handleDobChange}
                 autoCapitalize="none"
-                keyboardType="number-pad"
+                keyboardType="numbers-and-punctuation"
+                maxLength={10}
                 icon={<MaterialCommunityIcons name="calendar-month-outline" size={30} color="#8E8A9A" />}
               />
               <Input

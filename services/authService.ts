@@ -90,6 +90,7 @@ export type ChildInformationPayload = {
   parentId: number;
   childName: string;
   childAge: number;
+  dob: string;
   childGender: string;
   grade: string;
   familyType: string;
