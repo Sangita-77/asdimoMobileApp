@@ -7,6 +7,7 @@ export const AUTH_ENDPOINTS = {
   verifyEmail: "/auth/send-email-otp",
   validateOtp: "/auth/validate-email-otp",
   register: "/auth/register",
+  addChildInformation: "/auth/add-child-information",
   getAllUsers: "/auth/getAllUsers",
   getTherapistAvailability: "/therapists/get_availability",
   appointments: "/appointments",

@@ -86,6 +86,23 @@ export type ParentRegistrationPayload = {
   referralCode?: string;
 };
 
+export type ChildInformationPayload = {
+  parentId: number;
+  childName: string;
+  childAge: number;
+  dob: string;
+  childGender: string;
+  grade: string;
+  familyType: string;
+  language: string;
+};
+
+type AddChildInformationResponse = {
+  success: boolean;
+  message?: string;
+  data?: ChildInformationPayload & { _id: string; childId: number };
+};
+
 async function getStoredToken(key: string) {
   return AsyncStorage.getItem(key);
 }
@@ -320,6 +337,14 @@ export async function getTherapists() {
   }
 
 
+}
+
+export function addChildInformation(payload: ChildInformationPayload) {
+  return postAuthEndpoint<AddChildInformationResponse>(
+    AUTH_ENDPOINTS.addChildInformation,
+    payload,
+    true,
+  );
 }
 
 export async function getLoggedInUserId() {
