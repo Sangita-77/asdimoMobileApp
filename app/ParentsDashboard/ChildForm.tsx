@@ -1,17 +1,16 @@
 import CompoLoginBack from "@/components/ui/CompoLoginBack";
-import { View, StyleSheet, Text, Dimensions } from "react-native";
+import { View, Text } from "react-native";
 import Form from "../../components/ui/Form";
 import Input from "@/components/ui/Input";
 import { styles as globalStyle } from "@/constants/globalStyle";
 import Button from "@/components/ButtonCompo/Button";
 import { MaterialIcons, FontAwesome, MaterialCommunityIcons, SimpleLineIcons, Feather } from "@expo/vector-icons";
 
-const { width } = Dimensions.get("window");
 
 export default function Login() {
   return (
     <CompoLoginBack>
-        <View style={styles.FormWrap}>
+        <View style={globalStyle.FormWrap}>
         <Text style={globalStyle.signinText}>
           Child Basic Information
         </Text>
@@ -109,8 +108,3 @@ export default function Login() {
     </CompoLoginBack>
   );
 }
-
-
-const styles = StyleSheet.create({
-  FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
-});

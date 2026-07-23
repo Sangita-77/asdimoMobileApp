@@ -14,4 +14,5 @@ export const styles = StyleSheet.create({
   safeArea: { flex: 1, },
   listContent:{ flexGrow: 1, padding: 16,},
   signinText: { color: "#000", textAlign: "center", fontWeight: "bold", fontSize: width * 0.035, marginBottom: 10, },
+  FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
 });

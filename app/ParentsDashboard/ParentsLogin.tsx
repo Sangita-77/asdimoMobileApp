@@ -1,6 +1,6 @@
 import Button from "@/components/ButtonCompo/Button";
 import Input from "@/components/ui/Input";
-import LandscapeLock from "@/components/ui/ScreenOrientation";
+import CompoLoginBack from "@/components/ui/CompoLoginBack";
 import Select from "@/components/ui/Select";
 import Tab from "@/components/ui/Tab";
 import { ROUTES } from "@/constants/routes";
@@ -11,7 +11,6 @@ import {
   verifySignupEmail,
 } from "@/services/authService";
 import { Asset } from "expo-asset";
-import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
@@ -20,11 +19,12 @@ import {
   Text,
   View,
   useWindowDimensions,
+  Dimensions,
 } from "react-native";
-import CloudFloat from "../../components/AnimationCompo/CloudFloat";
-import BackButton from "../../components/ButtonCompo/BackButton";
 import Form, { useForm } from "../../components/ui/Form";
 import { styles as globalStyle } from "../../constants/globalStyle";
+
+const { width } = Dimensions.get("window");
 
 function StepOne() {
   const { nextStep, formData, setFormData, errors } = useForm();
@@ -348,12 +348,9 @@ export default function Index() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const Rainbow = require("../../assets/images/Rainbow.png");
   const Cloude = require("../../assets/images/Cloude.png");
-  const TreeLogin = require("../../assets/images/TreeLogin.png");
   const LoadingDimo = require("../../assets/images/Diano_Run.gif");
   const GoogleIcon = require("../../assets/images/GoogleIcon.png");
   const FacebookIcon = require("../../assets/images/FacebookIcon.png");
-
-  const { width, height } = useWindowDimensions();
 
   const handleSubmit = async () => {
     const email = signInEmail.trim();
@@ -407,7 +404,6 @@ export default function Index() {
       await Asset.loadAsync([
         Rainbow,
         Cloude,
-        TreeLogin,
         LoadingDimo,
         GoogleIcon,
         FacebookIcon,
@@ -418,89 +414,8 @@ export default function Index() {
 
   return (
     <>
-      <LandscapeLock />
-      <LinearGradient
-        colors={["#8AF8F8", "#FFA3D6"]}
-        style={globalStyle.container}
-      >
-        <BackButton />
-        <Image source={TreeLogin} style={styles.TreeLogin} />
-        <Image
-          source={LoadingDimo}
-          style={styles.AnimDino}
-          resizeMode="contain"
-        />
-        <View style={StyleSheet.absoluteFillObject}>
-          {/* Small cloudes */}
-          <CloudFloat
-            source={Cloude}
-            top={height * 0.02}
-            size={width * 0.07}
-            left={-width * 0.5}
-            duration={40000}
-            loop
-          />
-          <CloudFloat
-            source={Cloude}
-            top={height * 0.02}
-            size={width * 0.15}
-            left={-width * 0.5}
-            duration={40000}
-            loop
-          />
-          <CloudFloat
-            source={Cloude}
-            top={height * 0.02}
-            size={width * 0.15}
-            left={-width * 0.5}
-            duration={40000}
-            loop
-          />
-
-          {/* Medium cloudes */}
-          <CloudFloat
-            source={Cloude}
-            top={height * 0.2}
-            size={width * 0.2}
-            left={width * 0.6}
-            duration={13000}
-            loop={false}
-          />
-          <CloudFloat
-            source={Cloude}
-            top={height * 0.1}
-            size={width * 0.2}
-            left={-width * 0.6}
-            duration={35000}
-            loop
-          />
-          <CloudFloat
-            source={Cloude}
-            top={height * 0.22}
-            size={width * 0.2}
-            left={width * 0.02}
-            duration={25000}
-            loop={false}
-          />
-          <CloudFloat
-            source={Cloude}
-            top={height * 0.22}
-            size={width * 0.3}
-            left={-width * 0.7}
-            duration={60000}
-          />
-
-          {/* Large cloudes */}
-          <CloudFloat
-            source={Cloude}
-            top={height * 0.15}
-            size={width * 0.25}
-            left={-width * 0.68}
-            duration={40000}
-            loop
-          />
-        </View>
-        <View style={styles.FormWrap}>
+    <CompoLoginBack>
+        <View style={globalStyle.FormWrap}>
           <View>
             <Tab
               tabs={[
@@ -645,7 +560,7 @@ export default function Index() {
             </View>
           </View>
         </View>
-      </LinearGradient>
+    </CompoLoginBack>
     </>
   );
 }
@@ -654,26 +569,7 @@ const styles = StyleSheet.create({
   formError: { color: "#E53935", fontSize: 12, marginBottom: 10 },
   formSuccess: { color: "#2E7D32", fontSize: 12, marginBottom: 10 },
   formStyles: { marginTop: 20 },
-  FormWrap: { zIndex: 100, marginLeft: 180 },
-  ContentBox: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 20,
-  },
-  TreeLogin: { position: "absolute", left: 0, top: -2, zIndex: 99 },
-  AnimDino: {
-    width: 320,
-    height: 300,
-    position: "absolute",
-    left: -60,
-    bottom: -20,
-    zIndex: 99,
-  },
-  socialConnection: {
-    borderRightWidth: 1,
-    paddingRight: 20,
-    borderColor: "#AFEBEE",
-  },
+  ContentBox: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 20, },
+  socialConnection: { borderRightWidth: 1, paddingRight: 20, borderColor: "#AFEBEE", },
   varText: { textAlign: "center" },
 });
