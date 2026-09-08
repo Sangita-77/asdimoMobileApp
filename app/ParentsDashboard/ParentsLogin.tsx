@@ -5,17 +5,23 @@ import Select from "@/components/ui/Select";
 import Tab from "@/components/ui/Tab";
 import { ROUTES } from "@/constants/routes";
 import {
+  facebookLogin,
+  googleLogin,
   loginUser,
   registerParent,
   validateSignupOtp,
   verifySignupEmail,
 } from "@/services/authService";
 import { Asset } from "expo-asset";
+import * as Facebook from "expo-auth-session/providers/facebook";
+import * as Google from "expo-auth-session/providers/google";
+import * as WebBrowser from "expo-web-browser";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   Image,
+  Platform,
   StyleSheet,
   Text,
   View,
@@ -25,6 +31,9 @@ import CloudFloat from "../../components/AnimationCompo/CloudFloat";
 import BackButton from "../../components/ButtonCompo/BackButton";
 import Form, { useForm } from "../../components/ui/Form";
 import { styles as globalStyle } from "../../constants/globalStyle";
+
+WebBrowser.maybeCompleteAuthSession();
+
 
 function StepOne() {
   const { nextStep, formData, setFormData, errors } = useForm();
@@ -346,6 +355,32 @@ export default function Index() {
     loginError: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+  const [isFacebookSubmitting, setIsFacebookSubmitting] = useState(false);
+  const googleClientId =
+    Platform.OS === "web"
+      ? process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID
+      : Platform.OS === "ios"
+        ? process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID
+        : process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
+  const [googleRequest, , promptGoogle] = Google.useIdTokenAuthRequest({
+    // A placeholder keeps an unset environment variable from crashing the
+    // screen. The Google button remains disabled until a real ID is supplied.
+    androidClientId:
+      process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID || "missing-client-id",
+    iosClientId:
+      process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID || "missing-client-id",
+    webClientId:
+      process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || "missing-client-id",
+    selectAccount: true,
+  });
+  const facebookAppId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
+  const [facebookRequest, , promptFacebook] = Facebook.useAuthRequest({
+    // This placeholder prevents an unset environment variable from crashing
+    // the screen. The Facebook button remains disabled until it is configured.
+    clientId: facebookAppId || "missing-facebook-app-id",
+  });
+  
   const Rainbow = require("../../assets/images/Rainbow.png");
   const Cloude = require("../../assets/images/Cloude.png");
   const TreeLogin = require("../../assets/images/TreeLogin.png");
@@ -402,6 +437,75 @@ export default function Index() {
     }
   };
 
+  const handleGoogleLogin = async () => {
+    try {
+      if (!googleClientId) {
+        throw new Error("Google sign-in is not configured for this platform.");
+      }
+
+      setSignInErrors((previous) => ({ ...previous, loginError: "" }));
+      setIsGoogleSubmitting(true);
+
+      const result = await promptGoogle();
+      if (result.type === "cancel" || result.type === "dismiss") return;
+
+      if (result.type !== "success") {
+        throw new Error("Google sign-in could not be completed. Please try again.");
+      }
+
+      const idToken = result.params.id_token;
+      if (!idToken) {
+        throw new Error("Google did not return an ID token.");
+      }
+
+      await googleLogin(idToken);
+      router.replace(ROUTES.APP.HOME);
+    } catch (error) {
+      setSignInErrors((previous) => ({
+        ...previous,
+        loginError:
+          error instanceof Error ? error.message : "Google login failed.",
+      }));
+    } finally {
+      setIsGoogleSubmitting(false);
+    }
+  };
+
+  const handleFacebookLogin = async () => {
+    try {
+      if (!facebookAppId) {
+        throw new Error("Facebook sign-in is not configured for this app.");
+      }
+
+      setSignInErrors((previous) => ({ ...previous, loginError: "" }));
+      setIsFacebookSubmitting(true);
+
+      const result = await promptFacebook();
+      if (result.type === "cancel" || result.type === "dismiss") return;
+
+      if (result.type !== "success") {
+        throw new Error("Facebook sign-in could not be completed. Please try again.");
+      }
+
+      const facebookAccessToken =
+        result.authentication?.accessToken || result.params.access_token;
+      if (!facebookAccessToken) {
+        throw new Error("Facebook did not return an access token.");
+      }
+
+      await facebookLogin(facebookAccessToken);
+      router.replace(ROUTES.APP.HOME);
+    } catch (error) {
+      setSignInErrors((previous) => ({
+        ...previous,
+        loginError:
+          error instanceof Error ? error.message : "Facebook login failed.",
+      }));
+    } finally {
+      setIsFacebookSubmitting(false);
+    }
+  };
+
   useEffect(() => {
     async function loadAssets() {
       await Asset.loadAsync([
@@ -409,7 +513,6 @@ export default function Index() {
         Cloude,
         TreeLogin,
         LoadingDimo,
-        GoogleIcon,
         FacebookIcon,
       ]);
     }
@@ -516,15 +619,17 @@ export default function Index() {
                   <Text style={globalStyle.signinText}>
                     Sign in to Your Account{" "}
                   </Text>
+
                   <View style={styles.ContentBox}>
                     <View style={styles.socialConnection}>
                       <Button
                         style={{ marginBottom: 20 }}
-                        text="Continue with Google"
-                        // onPress={handleSubmit}
+                        text={isGoogleSubmitting ? "Connecting to Google..." : "Continue with Google"}
+                        onPress={handleGoogleLogin}
                         width="full"
                         textSize="md"
                         variant="white"
+                        disabled={!googleClientId || !googleRequest || isGoogleSubmitting}
                         icon={
                           <Image
                             source={GoogleIcon}
@@ -533,11 +638,12 @@ export default function Index() {
                         }
                       />
                       <Button
-                        text="Continue with Facebook"
-                        // onPress={handleSubmit}
+                        text={isFacebookSubmitting ? "Connecting to Facebook..." : "Continue with Facebook"}
+                        onPress={handleFacebookLogin}
                         width="full"
                         textSize="md"
                         variant="white"
+                        disabled={!facebookAppId || !facebookRequest || isFacebookSubmitting}
                         icon={
                           <Image
                             source={FacebookIcon}
@@ -612,7 +718,8 @@ export default function Index() {
                       <StepSix />
                     </Form>
                     <View style={globalStyle.Dflex}>
-                      <Button
+                     <Button
+                        style={{ marginBottom: 20 }}
                         text="Continue with Google"
                         // onPress={handleSubmit}
                         width="auto"
