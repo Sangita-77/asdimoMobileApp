@@ -1,20 +1,20 @@
 import Button from "@/components/ButtonCompo/Button";
+import Calender from "@/components/ui/Calender";
 import Footer from "@/components/ui/Footer";
 import Header from "@/components/ui/Header";
-import Calender from "@/components/ui/Calender";
 import OrientationLock from "@/components/ui/ScreenOrientation";
 import { API_BASE_URL } from "@/constants/config";
-import { LinearGradient } from "expo-linear-gradient";
-import { styles as globalStyle } from "../../constants/globalStyle";
 import { ROUTES } from "@/constants/routes";
-import { router } from "expo-router";
 import {
   AvailabilitySlot,
   createAppointment,
+  getAccessToken,
   getLoggedInUserId,
   getTherapistAvailability,
 } from "@/services/authService";
-import { useLocalSearchParams } from "expo-router";
+import * as Linking from "expo-linking";
+import { router, useLocalSearchParams } from "expo-router";
+import * as WebBrowser from "expo-web-browser";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -25,6 +25,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { styles as globalStyle } from "../../constants/globalStyle";
 
 function toDateValue(date: string) {
   const [day, month, year] = date.split("-").map(Number);
@@ -49,16 +50,21 @@ function isPastTime(slot: AvailabilitySlot) {
 }
 
 export default function BookDoctor() {
-  const { therapistId: therapistIdParam, therapistName, profileImg } =
-    useLocalSearchParams<{
-      therapistId?: string;
-      therapistName?: string;
-      profileImg?: string;
-    }>();
+  const {
+    therapistId: therapistIdParam,
+    therapistName,
+    profileImg,
+  } = useLocalSearchParams<{
+    therapistId?: string;
+    therapistName?: string;
+    profileImg?: string;
+  }>();
   const therapistId = Number(therapistIdParam);
   const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
-  const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(
+    null,
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [isBooking, setIsBooking] = useState(false);
   const [error, setError] = useState("");
@@ -117,18 +123,62 @@ export default function BookDoctor() {
     const parentId = await getLoggedInUserId();
     if (!parentId) {
       setIsBookingError(true);
-      setBookingMessage("Unable to identify your account. Please sign in again.");
+      setBookingMessage(
+        "Unable to identify your account. Please sign in again.",
+      );
       return;
     }
 
     try {
       setIsBooking(true);
       setBookingMessage("");
-      const response = await createAppointment({
+      const appointmentPayload = {
         teacherId: therapistId,
         date: selectedSlot.date,
         time: selectedSlot.time,
         parentId,
+      };
+      const accessToken = await getAccessToken();
+      if (!accessToken) {
+        throw new Error("Your session has expired. Please sign in again.");
+      }
+
+      const returnUrl = Linking.createURL("payment-complete");
+      const paymentUrl = new URL(
+        "http://localhost:5173/dev/asDimoWebApp/payment",
+      );
+      paymentUrl.searchParams.set("accessToken", accessToken);
+      paymentUrl.searchParams.set("amount", "499");
+      paymentUrl.searchParams.set("user", JSON.stringify({ parentId }));
+      paymentUrl.searchParams.set(
+        "metadata",
+        JSON.stringify({
+          source: "mobile-book-appointment",
+          appointment: appointmentPayload,
+        }),
+      );
+      paymentUrl.searchParams.set("returnUrl", returnUrl);
+
+      const paymentResult = await WebBrowser.openAuthSessionAsync(
+        paymentUrl.toString(),
+        returnUrl,
+      );
+      if (paymentResult.type !== "success") {
+        throw new Error("Payment was cancelled before completion.");
+      }
+
+      const paymentParams = Linking.parse(paymentResult.url).queryParams || {};
+      if (paymentParams.payment !== "success") {
+        throw new Error("Payment could not be confirmed.");
+      }
+      const paymentId = paymentParams.paymentId;
+      if (typeof paymentId !== "string" || !paymentId.trim()) {
+        throw new Error("Payment reference is missing.");
+      }
+
+      const response = await createAppointment({
+        ...appointmentPayload,
+        paymentId,
       });
       setAvailability((current) =>
         current.map((slot) =>
@@ -159,126 +209,165 @@ export default function BookDoctor() {
     <>
       <OrientationLock variant="portrait" />
       <View style={globalStyle.container}>
-      <Header title="Book Appointment"/>
-      <ScrollView contentContainerStyle={styles.container}>
-        <View style={styles.profileContainer}>
-          {imageUri ? (
-            <Image source={{ uri: imageUri }} style={styles.avatar} />
-          ) : (
-            <View style={styles.placeholder}>
-              <Text style={styles.placeholderText}>
-                {name.charAt(0).toUpperCase()}
-              </Text>
-            </View>
-          )}
-          <Text style={styles.doctorName}>{name}</Text>
-        </View>
-
-        {isLoading ? (
-          <View style={styles.statusContainer}>
-            <ActivityIndicator size="large" color="#2563EB" />
+        <Header title="Book Appointment" />
+        <ScrollView contentContainerStyle={styles.container}>
+          <View style={styles.profileContainer}>
+            {imageUri ? (
+              <Image source={{ uri: imageUri }} style={styles.avatar} />
+            ) : (
+              <View style={styles.placeholder}>
+                <Text style={styles.placeholderText}>
+                  {name.charAt(0).toUpperCase()}
+                </Text>
+              </View>
+            )}
+            <Text style={styles.doctorName}>{name}</Text>
           </View>
-        ) : error ? (
-          <Text style={styles.errorText}>{error}</Text>
-        ) : (
-          <>
-            <Text style={styles.heading}>Select Date</Text>
-            <Calender
-              selectedDate={selectedDate}
-              availableDates={dates}
-              onDateChange={(date) => {
-                setSelectedDate(date);
-                setSelectedSlot(null);
-              }}
-            />
 
-            <Text style={styles.heading}>Select Time</Text>
-            <View style={styles.timeContainer}>
-              {slotsForSelectedDate.map((slot) => {
-                const disabled = isPastTime(slot);
-                const isSelected = selectedSlot?._id === slot._id;
-                return (
-                  <Pressable
-                    key={slot._id}
-                    disabled={disabled}
-                    onPress={() => setSelectedSlot(slot)}
-                    style={[
-                      styles.timeButton,
-                      isSelected && styles.selectedTime,
-                      disabled && styles.disabledTime,
-                    ]}
-                  >
-                    <Text
+          {isLoading ? (
+            <View style={styles.statusContainer}>
+              <ActivityIndicator size="large" color="#2563EB" />
+            </View>
+          ) : error ? (
+            <Text style={styles.errorText}>{error}</Text>
+          ) : (
+            <>
+              <Text style={styles.heading}>Select Date</Text>
+              <Calender
+                selectedDate={selectedDate}
+                availableDates={dates}
+                onDateChange={(date) => {
+                  setSelectedDate(date);
+                  setSelectedSlot(null);
+                }}
+              />
+
+              <Text style={styles.heading}>Select Time</Text>
+              <View style={styles.timeContainer}>
+                {slotsForSelectedDate.map((slot) => {
+                  const disabled = isPastTime(slot);
+                  const isSelected = selectedSlot?._id === slot._id;
+                  return (
+                    <Pressable
+                      key={slot._id}
+                      disabled={disabled}
+                      onPress={() => setSelectedSlot(slot)}
                       style={[
-                        styles.timeText,
-                        isSelected && styles.selectedTimeText,
-                        disabled && styles.disabledTimeText,
+                        styles.timeButton,
+                        isSelected && styles.selectedTime,
+                        disabled && styles.disabledTime,
                       ]}
                     >
-                      {slot.time}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-            {!slotsForSelectedDate.length ? (
-              <Text style={styles.noSlots}>No available time slots for this date.</Text>
-            ) : null}
+                      <Text
+                        style={[
+                          styles.timeText,
+                          isSelected && styles.selectedTimeText,
+                          disabled && styles.disabledTimeText,
+                        ]}
+                      >
+                        {slot.time}
+                      </Text>
+                    </Pressable>
+                  );
+                })}
+              </View>
+              {!slotsForSelectedDate.length ? (
+                <Text style={styles.noSlots}>
+                  No available time slots for this date.
+                </Text>
+              ) : null}
 
-            {bookingMessage ? (
-              <Text
-                style={[
-                  styles.bookingMessage,
-                  isBookingError ? styles.bookingError : styles.bookingSuccess,
-                ]}
-              >
-                {bookingMessage}
-              </Text>
-            ) : null}
-            <Button
-              text={isBooking ? "Booking..." : "Book Appointment"}
-              textSize="lg"
-              width="full"
-              disabled={!selectedSlot || isBooking}
-              onPress={handleBookAppointment}
-            />
-          </>
-        )}
-        <Button
-         style={styles.PastbookingBtn}
-          text="Bookings"
-          textSize="lg"
-          width="full"
-          onPress={() => {
-            router.push(ROUTES.AUTH.BOOKINGS);
-          }}
-        />
-      </ScrollView>
+              {bookingMessage ? (
+                <Text
+                  style={[
+                    styles.bookingMessage,
+                    isBookingError
+                      ? styles.bookingError
+                      : styles.bookingSuccess,
+                  ]}
+                >
+                  {bookingMessage}
+                </Text>
+              ) : null}
+              <Button
+                text={isBooking ? "Booking..." : "Book Appointment"}
+                textSize="lg"
+                width="full"
+                disabled={!selectedSlot || isBooking}
+                onPress={handleBookAppointment}
+              />
+            </>
+          )}
+          <Button
+            style={styles.PastbookingBtn}
+            text="Bookings"
+            textSize="lg"
+            width="full"
+            onPress={() => {
+              router.push(ROUTES.AUTH.BOOKINGS);
+            }}
+          />
+        </ScrollView>
 
-      <Footer />
+        <Footer />
       </View>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  PastbookingBtn:{marginTop: 20},
+  PastbookingBtn: { marginTop: 20 },
   container: { padding: 20, flexGrow: 1 },
   profileContainer: { alignItems: "center", marginBottom: 24 },
   avatar: { width: 88, height: 88, borderRadius: 44 },
-  placeholder: { width: 88, height: 88, borderRadius: 44, backgroundColor: "#2563EB", justifyContent: "center", alignItems: "center" },
+  placeholder: {
+    width: 88,
+    height: 88,
+    borderRadius: 44,
+    backgroundColor: "#2563EB",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   placeholderText: { color: "#FFF", fontSize: 34, fontWeight: "700" },
-  doctorName: { color: "#111827", fontSize: 21, fontWeight: "700", marginTop: 10 },
-  heading: { color: "#1F2937", fontSize: 18, fontWeight: "700", marginBottom: 10, marginTop: 14 },
-  timeContainer: { flexDirection: "row", flexWrap: "wrap", gap: 12, paddingBottom: 20 },
-  timeButton: { paddingVertical: 10, paddingHorizontal: 18, borderRadius: 10, borderWidth: 1, borderColor: "#93C5FD", backgroundColor: "#FFF" },
+  doctorName: {
+    color: "#111827",
+    fontSize: 21,
+    fontWeight: "700",
+    marginTop: 10,
+  },
+  heading: {
+    color: "#1F2937",
+    fontSize: 18,
+    fontWeight: "700",
+    marginBottom: 10,
+    marginTop: 14,
+  },
+  timeContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+    paddingBottom: 20,
+  },
+  timeButton: {
+    paddingVertical: 10,
+    paddingHorizontal: 18,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: "#93C5FD",
+    backgroundColor: "#FFF",
+  },
   selectedTime: { backgroundColor: "#2563EB", borderColor: "#2563EB" },
   disabledTime: { backgroundColor: "#d8d5d5", borderColor: "#E5E7EB" },
   timeText: { color: "#1D4ED8", fontWeight: "600" },
   selectedTimeText: { color: "#FFF" },
   disabledTimeText: { color: "#95a0b6" },
   noSlots: { color: "#888e99", marginBottom: 20 },
-  statusContainer: { flex: 1, alignItems: "center", justifyContent: "center", padding: 36 },
+  statusContainer: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 36,
+  },
   errorText: { color: "#DC2626", textAlign: "center", fontSize: 16 },
   bookingMessage: { textAlign: "center", fontSize: 15, marginBottom: 12 },
   bookingError: { color: "#DC2626" },

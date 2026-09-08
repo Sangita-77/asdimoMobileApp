@@ -140,9 +140,11 @@ function getUserIdFromToken(token: string | null) {
     const payload = JSON.parse(
       atob(encodedPayload.replace(/-/g, "+").replace(/_/g, "/")),
     ) as Record<string, unknown>;
-    return [payload.userId, payload.parentId, payload.id, payload.sub]
-      .map(toFiniteNumber)
-      .find((value): value is number => value !== null) || null;
+    return (
+      [payload.userId, payload.parentId, payload.id, payload.sub]
+        .map(toFiniteNumber)
+        .find((value): value is number => value !== null) || null
+    );
   } catch {
     return null;
   }
@@ -326,13 +328,16 @@ export async function googleLogin(idToken: string) {
  * The API validates the Facebook token before creating the app session.
  */
 export async function facebookLogin(facebookAccessToken: string) {
-  const response = await fetch(`${API_BASE_URL}${AUTH_ENDPOINTS.facebookLogin}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetch(
+    `${API_BASE_URL}${AUTH_ENDPOINTS.facebookLogin}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ accessToken: facebookAccessToken }),
     },
-    body: JSON.stringify({ accessToken: facebookAccessToken }),
-  });
+  );
 
   const data = await response.json().catch(() => ({}));
 
@@ -397,7 +402,9 @@ async function postAuthEndpoint<T>(
 }
 
 export function verifySignupEmail(email: string) {
-  return postAuthEndpoint<{ message?: string }>(AUTH_ENDPOINTS.verifyEmail, { email });
+  return postAuthEndpoint<{ message?: string }>(AUTH_ENDPOINTS.verifyEmail, {
+    email,
+  });
 }
 
 export function validateSignupOtp(email: string, otp: string) {
@@ -422,7 +429,7 @@ export async function getTherapists() {
     throw new Error("Only parent accounts can view therapists.");
   }
 
-  if(loggedInUserFlag === 2){
+  if (loggedInUserFlag === 2) {
     const response = await postAuthEndpoint<GetUsersResponse>(
       AUTH_ENDPOINTS.getAllUsers,
       { flag: 3 },
@@ -430,7 +437,7 @@ export async function getTherapists() {
     );
 
     return response.data || [];
-  }else{
+  } else {
     const response = await postAuthEndpoint<GetUsersResponse>(
       AUTH_ENDPOINTS.getAllUsers,
       { flag: 5 },
@@ -439,8 +446,6 @@ export async function getTherapists() {
 
     return response.data || [];
   }
-
-
 }
 
 export function addChildInformation(payload: ChildInformationPayload) {
@@ -479,6 +484,7 @@ export function createAppointment(payload: {
   date: string;
   time: string;
   parentId: number;
+  paymentId: string;
 }) {
   return postAuthEndpoint<CreateAppointmentResponse>(
     AUTH_ENDPOINTS.appointments,
