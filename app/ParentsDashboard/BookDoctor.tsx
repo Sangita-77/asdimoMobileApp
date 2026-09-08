@@ -145,7 +145,7 @@ export default function BookDoctor() {
 
       const returnUrl = Linking.createURL("payment-complete");
       const paymentUrl = new URL(
-        "http://localhost:5173/dev/asDimoWebApp/payment",
+        "https://dreamgroupsindia.com/dev/asDimoWebApp/payment",
       );
       paymentUrl.searchParams.set("accessToken", accessToken);
       paymentUrl.searchParams.set("amount", "499");
