@@ -2,17 +2,21 @@ import LandscapeLock from "@/components/ui/ScreenOrientation";
 import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
 import React, { useEffect } from "react";
-import { Image, StyleSheet, View, useWindowDimensions, Dimensions } from "react-native";
+import { Image, StyleSheet, View, useWindowDimensions, Dimensions, ImageSourcePropType } from "react-native";
 import { styles as globalStyle } from "../../constants/globalStyle";
 import CloudFloat from "../AnimationCompo/CloudFloat";
 import BackButton from "../ButtonCompo/BackButton";
 const { width } = Dimensions.get("window");
 
-export default function Index() {
+interface BackgroundProps {
+  dinoImage?: ImageSourcePropType;
+}
+
+export default function Index({ dinoImage }: BackgroundProps) {
   const Rainbow = require("../../assets/images/Rainbow.png");
   const Cloude = require("../../assets/images/Cloude.png");
   const TreeLogin = require("../../assets/images/TreeLogin.png");
-  const LoadingDimo = require("../../assets/images/Diano_Run.gif");
+  const DefaultDino = require("../../assets/images/Diano_Run.gif");
 
 
   const { width, height } = useWindowDimensions();
@@ -20,7 +24,7 @@ export default function Index() {
   useEffect(() => {
     async function loadAssets() {
       await Asset.loadAsync([
-        Rainbow, Cloude, TreeLogin, LoadingDimo
+        Rainbow, Cloude, TreeLogin, dinoImage ?? DefaultDino,
       ]);
     }
     loadAssets();
@@ -36,7 +40,7 @@ export default function Index() {
         <BackButton />
         <Image source={TreeLogin} style={styles.TreeLogin} />
         <Image
-          source={LoadingDimo}
+          source={dinoImage ?? DefaultDino}
           style={styles.AnimDino}
           resizeMode="contain"
         />

@@ -1,5 +1,5 @@
 import CompoLoginBack from "@/components/ui/CompoLoginBack";
-import { View, StyleSheet, Text, Dimensions } from "react-native";
+import { View, Text, StyleSheet } from "react-native";
 import Form from "../../components/ui/Form";
 import Input from "@/components/ui/Input";
 import { styles as globalStyle } from "@/constants/globalStyle";
@@ -8,7 +8,6 @@ import { MaterialIcons, FontAwesome, MaterialCommunityIcons, SimpleLineIcons, Fe
 import { addChildInformation, getLoggedInUserId } from "@/services/authService";
 import React, { useState } from "react";
 
-const { width } = Dimensions.get("window");
 
 export default function Login() {
   const [childName, setChildName] = useState("");
@@ -105,7 +104,7 @@ export default function Login() {
 
   return (
     <CompoLoginBack>
-        <View style={styles.FormWrap}>
+        <View style={globalStyle.FormWrap}>
         <Text style={globalStyle.signinText}>
           Child Basic Information
         </Text>
@@ -194,10 +193,10 @@ export default function Login() {
               text={isSubmitting ? "Submitting..." : "Submit"}
               onPress={handleSubmit}
               disabled={isSubmitting}
-              width="half"
+              width="full"
               textSize="lg"
             />
-            <Button
+            {/* <Button
               text="Add Another Child"
               onPress={() => {
                 clearForm();
@@ -207,7 +206,7 @@ export default function Login() {
               variant="transparent"
               icon={<Feather name="plus-circle" size={28} color="#763DFF" />}
               textSize="lg"
-            />
+            /> */}
             </View>
           </Form>
         </View>
@@ -215,9 +214,7 @@ export default function Login() {
   );
 }
 
-
 const styles = StyleSheet.create({
-  FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
   message: { textAlign: "center", fontSize: 15, marginBottom: 12 },
   errorMessage: { color: "#DC2626" },
   successMessage: { color: "#16A34A" },
