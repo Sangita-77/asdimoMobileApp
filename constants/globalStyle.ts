@@ -4,6 +4,7 @@ const { width } = Dimensions.get("window");
 
 export const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f0f0f0d0",},
+  container2: { flex: 1, justifyContent: "center", alignItems: "center",},
 
   // Global Styles Start
   LoadingDimo: { width: 350, height: 220, },

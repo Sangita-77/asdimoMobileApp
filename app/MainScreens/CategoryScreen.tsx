@@ -33,8 +33,9 @@ interface Category {
 }
 
 const categories = [
-  { id: 1, title: "Puzzle", icon: images.PuzzleIcon, route: ROUTES.PUZZLE.PUZZLE_1, },
+  // { id: 1, title: "Puzzle", icon: images.PuzzleIcon, route: ROUTES.PUZZLE.PUZZLE_1, },
   { id: 2, title: "Shape Matching", icon: images.ShapeMatchingIcon, route: ROUTES.SHAPESORTING.SHAPESORTING_1, },
+  { id: 3, title: "Color Matching", icon: images.ShapeMatchingIcon, route: ROUTES.SHAPESORTING.SHAPESORTING_1, },
   // { id: 3, title: "Emotions", icon: images.emotions, route: "/emotions", },
   // { id: 4, title: "Motor Skill", icon: images.motorSkill, route: "/motor-skill", },
   // { id: 5, title: "Sequencing", icon: images.sequencing, route: "/motor-skill", },

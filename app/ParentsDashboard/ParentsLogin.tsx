@@ -414,7 +414,7 @@ export default function Index() {
 
   return (
     <>
-    <CompoLoginBack>
+    <CompoLoginBack dinoImage={require("@/assets/images/Diano_Run.gif")}>
         <View style={globalStyle.FormWrap}>
           <View>
             <Tab

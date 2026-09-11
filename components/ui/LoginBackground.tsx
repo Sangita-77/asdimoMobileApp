@@ -12,7 +12,7 @@ interface BackgroundProps {
   dinoImage?: ImageSourcePropType;
 }
 
-export default function Index({ dinoImage }: BackgroundProps) {
+export default function Background({ dinoImage }: BackgroundProps) {
   const Rainbow = require("../../assets/images/Rainbow.png");
   const Cloude = require("../../assets/images/Cloude.png");
   const TreeLogin = require("../../assets/images/TreeLogin.png");
@@ -39,11 +39,13 @@ export default function Index({ dinoImage }: BackgroundProps) {
       >
         <BackButton />
         <Image source={TreeLogin} style={styles.TreeLogin} />
-        <Image
-          source={dinoImage ?? DefaultDino}
-          style={styles.AnimDino}
-          resizeMode="contain"
-        />
+        {dinoImage && (
+          <Image
+            source={dinoImage}
+            style={styles.AnimDino}
+            resizeMode="contain"
+          />
+        )}
         <View style={StyleSheet.absoluteFillObject}>
           {/* Small cloudes */}
           <CloudFloat source={Cloude} top={height * 0.02} size={width * 0.07} left={-width * 0.5} duration={40000} loop />

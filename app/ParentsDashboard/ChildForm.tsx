@@ -103,7 +103,7 @@ export default function Login() {
   };
 
   return (
-    <CompoLoginBack>
+    <CompoLoginBack dinoImage={require("@/assets/images/Diano_Run.gif")}>
         <View style={globalStyle.FormWrap}>
         <Text style={globalStyle.signinText}>
           Child Basic Information
