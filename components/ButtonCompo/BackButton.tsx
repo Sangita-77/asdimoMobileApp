@@ -1,7 +1,6 @@
-import { router, Href } from "expo-router";
-import React from "react";
-import { Image, Pressable, StyleSheet } from "react-native";
+import { Href, router } from "expo-router";
 import * as ScreenOrientation from "expo-screen-orientation";
+import { Image, Pressable, StyleSheet } from "react-native";
 
 interface BackButtonProps {
   size?: number;
@@ -22,7 +21,7 @@ export default function BackButton({
 }: BackButtonProps) {
   const onBackPress = async () => {
     await ScreenOrientation.lockAsync(
-      ScreenOrientation.OrientationLock.LANDSCAPE
+      ScreenOrientation.OrientationLock.LANDSCAPE,
     );
 
     if (router.canGoBack()) {
@@ -50,8 +49,8 @@ export default function BackButton({
         style={{
           width: size,
           height: size,
-          resizeMode: "contain",
         }}
+        resizeMode="contain"
       />
     </Pressable>
   );

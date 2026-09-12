@@ -1,27 +1,17 @@
-import React, { forwardRef, useImperativeHandle } from "react";
-import {
-  Dimensions,
-  Platform,
-  StyleSheet,
-  View,
-} from "react-native";
+import { forwardRef, useImperativeHandle } from "react";
+import { Dimensions, Platform, StyleSheet, View } from "react-native";
 
 import MaskedView from "@react-native-masked-view/masked-view";
 
-import Svg, {
-  Circle,
-  Defs,
-  Mask,
-  Rect,
-} from "react-native-svg"; 
+import Svg, { Circle, Defs, Mask, Rect } from "react-native-svg";
 
 import Animated, {
-  Easing,
-  runOnJS,
-  useAnimatedProps,
-  useAnimatedStyle,
-  useSharedValue,
-  withTiming,
+    Easing,
+    runOnJS,
+    useAnimatedProps,
+    useAnimatedStyle,
+    useSharedValue,
+    withTiming,
 } from "react-native-reanimated";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -78,7 +68,7 @@ const CircularTransition = forwardRef<TransitionRef>((_, ref) => {
             opacity.value = withTiming(0, {
               duration: 120,
             });
-          }
+          },
         );
       } else {
         scale.value = MAX_SCALE;
@@ -93,7 +83,7 @@ const CircularTransition = forwardRef<TransitionRef>((_, ref) => {
             opacity.value = withTiming(0, {
               duration: 120,
             });
-          }
+          },
         );
       }
     },
@@ -114,7 +104,7 @@ const CircularTransition = forwardRef<TransitionRef>((_, ref) => {
             if (finished && callback) {
               runOnJS(callback)();
             }
-          }
+          },
         );
       } else {
         scale.value = 0;
@@ -129,92 +119,85 @@ const CircularTransition = forwardRef<TransitionRef>((_, ref) => {
             if (finished && callback) {
               runOnJS(callback)();
             }
-          }
+          },
         );
       }
     },
   }));
 
-if (Platform.OS === "ios") {
-  return (
-    <Animated.View
-      pointerEvents="none"
-      style={[
-        StyleSheet.absoluteFill,
-        {
-          zIndex: 999999,
-        },
-        overlayStyle,
-      ]}
-    >
-      <MaskedView
-        style={StyleSheet.absoluteFill}
-        maskElement={
-          <View
-            style={{
-              flex: 1,
-              backgroundColor: "black", // Mask must be opaque
-            }}
-          >
-          <Svg
-            width={width}
-            height={height}
-            style={StyleSheet.absoluteFill}
-          >
-            <Defs>
-              <Mask id="mask">
+  if (Platform.OS === "ios") {
+    return (
+      <Animated.View
+        style={[
+          StyleSheet.absoluteFill,
+          {
+            zIndex: 999999,
+            pointerEvents: "none",
+          },
+          overlayStyle,
+        ]}
+      >
+        <MaskedView
+          style={StyleSheet.absoluteFill}
+          maskElement={
+            <View
+              style={{
+                flex: 1,
+                backgroundColor: "black", // Mask must be opaque
+              }}
+            >
+              <Svg
+                width={width}
+                height={height}
+                style={StyleSheet.absoluteFill}
+              >
+                <Defs>
+                  <Mask id="mask">
+                    <Rect width={width} height={height} fill="white" />
+
+                    <AnimatedCircle
+                      animatedProps={animatedProps}
+                      cx={width / 2}
+                      cy={height / 2}
+                      fill="black"
+                    />
+                  </Mask>
+                </Defs>
+
                 <Rect
                   width={width}
                   height={height}
-                  fill="white"
+                  fill="#fff"
+                  mask="url(#mask)"
                 />
-
-                <AnimatedCircle
-                  animatedProps={animatedProps}
-                  cx={width / 2}
-                  cy={height / 2}
-                  fill="black"
-                />
-              </Mask>
-            </Defs>
-
-            <Rect
-              width={width}
-              height={height}
-              fill="#fff"
-              mask="url(#mask)"
-            />
-          </Svg>
-          </View>
-        }
-      >
-        <View
-          style={[
-            StyleSheet.absoluteFill,
-            {
-              backgroundColor: "#fff", // Your transition color
-            },
-          ]}
-        />
-      </MaskedView>
-    </Animated.View>
-  );
-}
+              </Svg>
+            </View>
+          }
+        >
+          <View
+            style={[
+              StyleSheet.absoluteFill,
+              {
+                backgroundColor: "#fff", // Your transition color
+              },
+            ]}
+          />
+        </MaskedView>
+      </Animated.View>
+    );
+  }
 
   return (
     <Animated.View
-      pointerEvents="none"
       style={[
         StyleSheet.absoluteFill,
         styles.container,
+        { pointerEvents: "none" },
       ]}
     >
       <Animated.View
         renderToHardwareTextureAndroid
-        style={[
-          styles.circle,
-          circleStyle,
-        ]}
+        style={[styles.circle, circleStyle]}
       />
     </Animated.View>
   );

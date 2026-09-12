@@ -8,20 +8,19 @@ import LandscapeLock from "@/components/ui/ScreenOrientation";
 import { ROUTES } from "@/constants/routes";
 import { Asset } from "expo-asset";
 import { router } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  Animated,
-  Image,
-  ImageBackground,
-  Platform,
-  Pressable,
-  StyleSheet,
-  View,
+    Animated,
+    Image,
+    ImageBackground,
+    Platform,
+    Pressable,
+    StyleSheet,
+    View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { loadGameSound } from "../../components/SoundCompo/GameSound";
-import { styles as globalStyle } from "../../constants/globalStyle";
-import { commonStyles } from "../../constants/globalStyle";
+import { commonStyles, styles as globalStyle } from "../../constants/globalStyle";
 
 // PRELOAD IMAGES
 const bgImg = require("@/assets/images/background.png");
@@ -74,9 +73,9 @@ export default function HomeScreen() {
   return (
     <ProtectedRoute>
       <>
-        <LandscapeLock variant="landscape"/>
+        <LandscapeLock variant="landscape" />
 
-       {/* <CircularReveal 
+        {/* <CircularReveal 
        triggerClose={close}
         backgroundImage={bgImg}
          onCloseComplete={() =>
@@ -109,15 +108,15 @@ export default function HomeScreen() {
                     </View>
                   </View>
                   <View style={styles.PlayButton}>
-                      <Pressable
-                        onPress={() => {
-                          playClickSound();
+                    <Pressable
+                      onPress={() => {
+                        playClickSound();
 
-                          transition.current?.cover(() => {
-                              router.push(ROUTES.APP.CATEGORY);
-                          });
-                        }}
-                      >
+                        transition.current?.cover(() => {
+                          router.push(ROUTES.APP.CATEGORY);
+                        });
+                      }}
+                    >
                       <Animated.Image
                         source={playImg}
                         style={{ transform: [{ scale: scaleAnim }] }}
@@ -127,10 +126,14 @@ export default function HomeScreen() {
                 </View>
 
                 <View style={styles.gridItemLast}>
-                  <Image source={RingImage} style={styles.ringImage} />
+                  <Image
+                    source={RingImage}
+                    style={styles.ringImage}
+                    resizeMode="contain"
+                  />
                 </View>
               </View>
-              <SettingsButton/>
+              <SettingsButton />
             </View>
           </ImageBackground>
         </SafeAreaView>
@@ -187,6 +190,5 @@ const styles = StyleSheet.create({
   ringImage: {
     width: 120,
     height: 160,
-    resizeMode: "contain",
   },
 });

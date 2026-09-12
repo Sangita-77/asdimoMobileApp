@@ -1,11 +1,10 @@
-import React from "react";
 import {
-  Alert,
-  BackHandler,
-  Image,
-  Platform,
-  Pressable,
-  StyleSheet
+    Alert,
+    BackHandler,
+    Image,
+    Platform,
+    Pressable,
+    StyleSheet,
 } from "react-native";
 
 interface QuitButtonProps {
@@ -21,23 +20,18 @@ export default function QuitButton({
   top = 10,
   right = 20,
 }: QuitButtonProps) {
-
   const handleQuit = () => {
-    Alert.alert(
-      "Exit App",
-      "Are you sure you want to quit?",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Exit",
-          onPress: () => {
-            if (Platform.OS === "android") {
-              BackHandler.exitApp();
-            }
-          },
+    Alert.alert("Exit App", "Are you sure you want to quit?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Exit",
+        onPress: () => {
+          if (Platform.OS === "android") {
+            BackHandler.exitApp();
+          }
         },
-      ]
-    );
+      },
+    ]);
   };
 
   return (
@@ -47,7 +41,8 @@ export default function QuitButton({
     >
       <Image
         source={icon}
-        style={{ width: size, height: size, resizeMode: "contain" }}
+        style={{ width: size, height: size }}
+        resizeMode="contain"
       />
     </Pressable>
   );

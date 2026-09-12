@@ -2,10 +2,10 @@ import React from "react";
 import { Image, Vibration } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, {
-  runOnJS,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
+    runOnJS,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring,
 } from "react-native-reanimated";
 
 // TYPES (redeclare or import if shared)
@@ -61,9 +61,7 @@ export default function DraggablePiece({
   const target = slots.find((s) => s.id === piece.id);
 
   const addPlaced = (id: number) => {
-    setPlaced((prev) =>
-      prev.includes(id) ? prev : [...prev, id]
-    );
+    setPlaced((prev) => (prev.includes(id) ? prev : [...prev, id]));
   };
 
   const gesture = Gesture.Pan()
@@ -126,9 +124,7 @@ export default function DraggablePiece({
           },
           externalStyle,
           isHintPiece && {
-            shadowColor: "gold",
-            shadowOpacity: 1,
-            shadowRadius: 100,
+            boxShadow: "0px 0px 100px gold",
             elevation: 100,
           },
           style,

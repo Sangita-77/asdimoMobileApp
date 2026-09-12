@@ -1,4 +1,4 @@
-import React, { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef } from "react";
 import {
     ImageBackground,
     Platform,
@@ -104,8 +104,7 @@ export default function CircularReveal({
             <Svg
               width={width}
               height={height}
-              style={StyleSheet.absoluteFill}
-              pointerEvents="none"
+              style={[StyleSheet.absoluteFill, { pointerEvents: "none" }]}
             >
               <Defs>
                 <Mask id="mask">

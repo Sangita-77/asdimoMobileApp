@@ -6,7 +6,16 @@ import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Animated, Image, ImageBackground, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import {
+  Animated,
+  Image,
+  ImageBackground,
+  Platform,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import { styles as globalStyle } from "../../constants/globalStyle";
 // import LottieView from "lottie-react-native";
 // import { pauseGameSound, resumeGameSound } from "../components/SoundCompo/GameSound";
@@ -24,15 +33,15 @@ export default function Index() {
   const Rainbow = require("../../assets/images/Rainbow.png");
   const Cloude = require("../../assets/images/Cloude.png");
 
-// useFocusEffect(
-//   useCallback(() => {
-//     pauseGameSound(); // pause on this screen
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     pauseGameSound(); // pause on this screen
 
-//     return () => {
-//       resumeGameSound(); // resume when leaving
-//     };
-//   }, [])
-// );
+  //     return () => {
+  //       resumeGameSound(); // resume when leaving
+  //     };
+  //   }, [])
+  // );
 
   useEffect(() => {
     Asset.loadAsync([LoadingDimo, LoaderImage, Rainbow, Cloude]);
@@ -51,15 +60,11 @@ export default function Index() {
       if (count >= 100) {
         clearInterval(interval);
         void isAuthenticated().then((authenticated) => {
-          router.replace(
-            authenticated ? ROUTES.APP.HOME : ROUTES.AUTH.LOGIN,
-          );
+          router.replace(authenticated ? ROUTES.APP.HOME : ROUTES.AUTH.LOGIN);
         });
       }
-    }, 70
-  );
-  return () => clearInterval(interval);
-
+    }, 70);
+    return () => clearInterval(interval);
   }, []);
 
   const widthInterpolated = animatedWidth.interpolate({
@@ -71,49 +76,100 @@ export default function Index() {
     Animated.timing(fadeAnim, {
       toValue: 1,
       duration: 1000,
-      useNativeDriver: true,
+      useNativeDriver: Platform.OS !== "web",
     }).start();
   }, []);
 
   return (
-    
-    <> 
-  <LandscapeLock />
-  <LinearGradient 
-    colors={["#35FFFF", "#E45FAA"]}
-    style={styles.container}>
-    <Animated.View style={[{ opacity: fadeAnim }]}>  
-    
-    <ImageBackground
-      source={Rainbow}
-      style={styles.rainbowImage}
-      resizeMode="contain"        
-    >   
-   <View style={commonStyles.absoluteFill}>
-    {/* Small cloudes */}
-    <CloudFloat source={Cloude} top={height * 0.1} size={width * 0.2} left={width * 0.8} duration={8000} loop={false} />
-    <CloudFloat source={Cloude} top={height * 0.05} size={width * 0.2} left={width * 0.1} duration={25000} loop={false} />
-      {/* loops */}
-      <CloudFloat source={Cloude} top={60} size={120} left={-300} duration={27000} loop/>
-      <CloudFloat source={Cloude} top={60} size={120} left={-600} duration={37000} loop/>
+    <>
+      <LandscapeLock />
+      <LinearGradient colors={["#35FFFF", "#E45FAA"]} style={styles.container}>
+        <Animated.View style={[{ opacity: fadeAnim }]}>
+          <ImageBackground
+            source={Rainbow}
+            style={styles.rainbowImage}
+            resizeMode="contain"
+          >
+            <View style={commonStyles.absoluteFill}>
+              {/* Small cloudes */}
+              <CloudFloat
+                source={Cloude}
+                top={height * 0.1}
+                size={width * 0.2}
+                left={width * 0.8}
+                duration={8000}
+                loop={false}
+              />
+              <CloudFloat
+                source={Cloude}
+                top={height * 0.05}
+                size={width * 0.2}
+                left={width * 0.1}
+                duration={25000}
+                loop={false}
+              />
+              {/* loops */}
+              <CloudFloat
+                source={Cloude}
+                top={60}
+                size={120}
+                left={-300}
+                duration={27000}
+                loop
+              />
+              <CloudFloat
+                source={Cloude}
+                top={60}
+                size={120}
+                left={-600}
+                duration={37000}
+                loop
+              />
 
-    {/* Medium cloudes */} 
-      <CloudFloat source={Cloude} top={height * 0.1} size={width * 0.2} left={-width * 0.5} duration={27000} loop />
-      <CloudFloat source={Cloude} top={height * 0.15} size={width * 0.2} left={-width} duration={37000} loop />
-      {/* loops */}
-      <CloudFloat source={Cloude} top={height * 0.12} size={Math.min(width * 0.3, 180)} left={-width * 0.5} duration={40000} loop={false} />
-      
-    {/* Large cloudes */}
-      <CloudFloat source={Cloude} top={height * 0.2} size={Math.min(width * 0.35, 210)} left={width * 0.6} duration={32000} loop={false} />
+              {/* Medium cloudes */}
+              <CloudFloat
+                source={Cloude}
+                top={height * 0.1}
+                size={width * 0.2}
+                left={-width * 0.5}
+                duration={27000}
+                loop
+              />
+              <CloudFloat
+                source={Cloude}
+                top={height * 0.15}
+                size={width * 0.2}
+                left={-width}
+                duration={37000}
+                loop
+              />
+              {/* loops */}
+              <CloudFloat
+                source={Cloude}
+                top={height * 0.12}
+                size={Math.min(width * 0.3, 180)}
+                left={-width * 0.5}
+                duration={40000}
+                loop={false}
+              />
 
-    </View>       
-      <View style={styles.ContentBox}>
-        <Image
-          source={LoadingDimo}
-          style={globalStyle.LoadingDimo}
-          resizeMode="contain"
-        />
-    {/* <View
+              {/* Large cloudes */}
+              <CloudFloat
+                source={Cloude}
+                top={height * 0.2}
+                size={Math.min(width * 0.35, 210)}
+                left={width * 0.6}
+                duration={32000}
+                loop={false}
+              />
+            </View>
+            <View style={styles.ContentBox}>
+              <Image
+                source={LoadingDimo}
+                style={globalStyle.LoadingDimo}
+                resizeMode="contain"
+              />
+              {/* <View
       style={{
         flex: 1,
         justifyContent: "center",
@@ -126,25 +182,25 @@ export default function Index() {
         loop
       />
     </View> */}
-        <Text style={styles.percentText}>{progress}%</Text>
-        <View style={styles.progressWrapper}>
-          <Animated.View style={[styles.progressFill, { width: widthInterpolated }]}>
-          <Image
-            source={LoaderImage}
-            style={commonStyles.absoluteFill}
-            resizeMode="cover"
-          />
+              <Text style={styles.percentText}>{progress}%</Text>
+              <View style={styles.progressWrapper}>
+                <Animated.View
+                  style={[styles.progressFill, { width: widthInterpolated }]}
+                >
+                  <Image
+                    source={LoaderImage}
+                    style={commonStyles.absoluteFill}
+                    resizeMode="cover"
+                  />
+                </Animated.View>
+              </View>
+            </View>
+          </ImageBackground>
         </Animated.View>
-        </View>
-      </View>
-      </ImageBackground>
-      </Animated.View>
-    </LinearGradient>
+      </LinearGradient>
     </>
   );
 }
-
-
 
 const styles = StyleSheet.create({
   container: {
@@ -152,27 +208,25 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  ContentBox:{
+  ContentBox: {
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
     width: "70%",
   },
-    rainbowImage:{
-      width: 700,
-      height: 500,
-      justifyContent: "center",
-      alignItems: "center",
-    },
+  rainbowImage: {
+    width: 700,
+    height: 500,
+    justifyContent: "center",
+    alignItems: "center",
+  },
   progressWrapper: {
     width: "80%",
     height: 62,
     backgroundColor: "#1E2151",
     borderRadius: 50,
     overflow: "hidden",
-    shadowColor: "#077E98",
-    shadowOpacity: 1,
-    shadowRadius: 10,
+    boxShadow: "0px 0px 10px rgba(7, 126, 152, 1)",
     elevation: 10,
     padding: 5,
     borderColor: "#0FEFEF",

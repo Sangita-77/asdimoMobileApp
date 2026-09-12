@@ -1,13 +1,13 @@
 import { AvailabilitySlot } from "@/services/authService";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
-  Image,
-  ImageSourcePropType,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
+    Image,
+    ImageSourcePropType,
+    Pressable,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
 
 interface DoctorListCardProps {
@@ -47,7 +47,10 @@ export default function DoctorListCard({
     [availability],
   );
   const dates = useMemo(
-    () => [...new Set(availableSlots.map((slot) => slot.date))].sort((a, b) => dateValue(a) - dateValue(b)),
+    () =>
+      [...new Set(availableSlots.map((slot) => slot.date))].sort(
+        (a, b) => dateValue(a) - dateValue(b),
+      ),
     [availableSlots],
   );
   const [selectedDate, setSelectedDate] = useState(dates[0] || "");
@@ -119,7 +122,9 @@ export default function DoctorListCard({
                 style={styles.moreButton}
                 onPress={() => setShowAllSlots((current) => !current)}
               >
-                <Text style={styles.moreText}>{showAllSlots ? "Less" : "More"}</Text>
+                <Text style={styles.moreText}>
+                  {showAllSlots ? "Less" : "More"}
+                </Text>
                 <Ionicons
                   name={showAllSlots ? "chevron-up" : "chevron-down"}
                   size={19}
@@ -128,10 +133,7 @@ export default function DoctorListCard({
               </Pressable>
             ) : null}
             <View>
-                  <Pressable
-                    style={styles.button}
-                    onPress={appointmentBooking}
-                  >
+              <Pressable style={styles.button} onPress={appointmentBooking}>
                 <Text style={styles.buttonText}>Book Now</Text>
               </Pressable>
             </View>
@@ -145,7 +147,7 @@ export default function DoctorListCard({
 }
 
 const styles = StyleSheet.create({
-    button: {
+  button: {
     backgroundColor: "#2563EB",
     paddingHorizontal: 17,
     paddingVertical: 9,
@@ -161,31 +163,74 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFF",
     borderRadius: 15,
     borderWidth: 1,
-    borderColor: "#e7e6e6", 
+    borderColor: "#e7e6e6",
     padding: 18,
     marginVertical: 10,
     elevation: 4,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 6 },
+    boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.1)",
   },
   topSection: { flexDirection: "row", marginBottom: 16 },
   image: { width: 70, height: 70, borderRadius: 10 },
-  avatarPlaceholder: { width: 95, height: 95, borderRadius: 10, backgroundColor: "#1682E7", justifyContent: "center", alignItems: "center", },
+  avatarPlaceholder: {
+    width: 95,
+    height: 95,
+    borderRadius: 10,
+    backgroundColor: "#1682E7",
+    justifyContent: "center",
+    alignItems: "center",
+  },
   avatarLetter: { color: "#FFF", fontSize: 40, fontWeight: "700" },
-  availabilityStatus: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 5 },
-  statusDot: { width: 4, height: 4, borderRadius: 6, backgroundColor: "#49AD3D", marginRight: 4 },
+  availabilityStatus: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 5,
+  },
+  statusDot: {
+    width: 4,
+    height: 4,
+    borderRadius: 6,
+    backgroundColor: "#49AD3D",
+    marginRight: 4,
+  },
   statusText: { color: "#49AD3D", fontSize: 11, fontWeight: "400" },
   details: { flex: 1, paddingLeft: 18, paddingTop: 4 },
   name: { color: "#101010", fontSize: 16, fontWeight: "700", lineHeight: 26 },
   specialty: { color: "#73798D", fontSize: 14, lineHeight: 25 },
-  dateBar: { flexDirection: "row", alignItems: "center", backgroundColor: "#EDF7FF", borderRadius: 8, minHeight: 40, paddingHorizontal: 16 },
-  dateText: { flex: 1, color: "#1682E7", fontSize: 15, fontWeight: "700", marginLeft: 14 },
+  dateBar: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#EDF7FF",
+    borderRadius: 8,
+    minHeight: 40,
+    paddingHorizontal: 16,
+  },
+  dateText: {
+    flex: 1,
+    color: "#1682E7",
+    fontSize: 15,
+    fontWeight: "700",
+    marginLeft: 14,
+  },
   slotsRow: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 14 },
-  slotButton: { borderWidth: 2, borderColor: "#95CBF8", borderRadius: 8, paddingHorizontal: 16, paddingVertical: 5 },
+  slotButton: {
+    borderWidth: 2,
+    borderColor: "#95CBF8",
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 5,
+  },
   slotText: { color: "#1682E7", fontSize: 16, fontWeight: "700" },
-  moreButton: { flexDirection: "row", alignItems: "center", borderWidth: 2, borderColor: "#95CBF8", borderRadius: 8, paddingHorizontal: 10 , paddingVertical: 10, gap: 4 },
+  moreButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 2,
+    borderColor: "#95CBF8",
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
+    gap: 4,
+  },
   moreText: { color: "#1682E7", fontSize: 16, fontWeight: "700" },
   noSlots: { color: "#73798D", fontSize: 15, marginTop: 4 },
 });

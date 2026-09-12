@@ -1,6 +1,7 @@
 import { useFocusEffect } from "expo-router";
-import { useCallback } from "react";
 import * as ScreenOrientation from "expo-screen-orientation";
+import { useCallback } from "react";
+import { Platform } from "react-native";
 
 type OrientationVariant =
   | "portrait"
@@ -32,16 +33,11 @@ export default function OrientationLock({
 
       const lockOrientation = async () => {
         try {
-          if (!isMounted) return;
+          if (!isMounted || Platform.OS === "web") return;
 
-          await ScreenOrientation.lockAsync(
-            orientationMap[variant]
-          );
+          await ScreenOrientation.lockAsync(orientationMap[variant]);
         } catch (error) {
-          console.warn(
-            `Failed to lock orientation to "${variant}":`,
-            error
-          );
+          console.warn(`Failed to lock orientation to "${variant}":`, error);
         }
       };
 
@@ -54,7 +50,7 @@ export default function OrientationLock({
         //   console.warn("Failed to unlock orientation:", error);
         // });
       };
-    }, [variant])
+    }, [variant]),
   );
 
   return null;
