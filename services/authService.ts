@@ -323,6 +323,64 @@ export async function googleLogin(idToken: string) {
   return data as LoginResponse;
 }
 
+//////////////// google signup /////////////////////
+
+export async function googleSignup(
+  idToken: string,
+  userData: Pick<ParentRegistrationPayload, "flag">,
+) {
+  const response = await fetch(
+    `${API_BASE_URL}${AUTH_ENDPOINTS.googleSignup}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ idToken, ...userData }),
+    },
+  );
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Google signup failed");
+  }
+
+  const accessToken = extractValue(data as Record<string, any>, [
+    "accessToken",
+    "token",
+    "data.accessToken",
+    "data.token",
+  ]);
+  const refreshToken = extractValue(data as Record<string, any>, [
+    "refreshToken",
+    "data.refreshToken",
+  ]);
+
+  if (!accessToken) {
+    throw new Error("Google signup did not return an access token");
+  }
+
+  await saveAuthTokens(accessToken, refreshToken || "");
+
+  const user = data?.data?.user ?? data?.user;
+  const userFlag = toFiniteNumber(user?.flag);
+  if (userFlag !== null) {
+    await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
+  }
+
+  const userId = [user?._id, user?.userId, user?.id]
+    .map(toFiniteNumber)
+    .find((value): value is number => value !== null);
+  if (userId !== undefined) {
+    await AsyncStorage.setItem(USER_ID_KEY, String(userId));
+  }
+
+  return data as LoginResponse;
+}
+
+//////////////// google signup /////////////////////
+
 /**
  * Exchanges a Facebook OAuth access token for an AsDimo session.
  * The API validates the Facebook token before creating the app session.
@@ -377,6 +435,62 @@ export async function facebookLogin(facebookAccessToken: string) {
 
   return data as LoginResponse;
 }
+
+//////////////// facebook signup /////////////////////
+export async function facebookSignup(
+  facebookAccessToken: string,
+  userData: Pick<ParentRegistrationPayload, "flag">,
+) {
+  const response = await fetch(
+    `${API_BASE_URL}${AUTH_ENDPOINTS.facebookSignup}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ accessToken: facebookAccessToken, ...userData }),
+    },
+  );
+
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Facebook signup failed");
+  }
+
+  const accessToken = extractValue(data as Record<string, any>, [
+    "accessToken",
+    "token",
+    "data.accessToken",
+    "data.token",
+  ]);
+  const refreshToken = extractValue(data as Record<string, any>, [
+    "refreshToken",
+    "data.refreshToken",
+  ]);
+
+  if (!accessToken) {
+    throw new Error("Facebook signup did not return an access token");
+  }
+
+  await saveAuthTokens(accessToken, refreshToken || "");
+
+  const user = data?.data?.user ?? data?.user;
+  const userFlag = toFiniteNumber(user?.flag);
+  if (userFlag !== null) {
+    await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
+  }
+
+  const userId = [user?._id, user?.userId, user?.id]
+    .map(toFiniteNumber)
+    .find((value): value is number => value !== null);
+  if (userId !== undefined) {
+    await AsyncStorage.setItem(USER_ID_KEY, String(userId));
+  }
+
+  return data as LoginResponse;
+}
+//////////////// facebook signup /////////////////////
 
 async function postAuthEndpoint<T>(
   endpoint: string,
