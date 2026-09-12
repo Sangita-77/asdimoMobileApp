@@ -2,9 +2,9 @@ import BackButton from "@/components/ButtonCompo/BackButton";
 import SettingsButton from "@/components/ButtonCompo/SettingsButton";
 import LandscapeLock from "@/components/ui/ScreenOrientation";
 import { Asset } from "expo-asset";
-import { Audio } from "expo-av";
+import { createAudioPlayer, AudioPlayer, } from "expo-audio";
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Image, ImageBackground, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ChalkCircle from "../../../components/AnimationCompo/Hinthand";
 import { Theme } from "../../../constants/theme";
 import DraggablePiece from "./DraggablePiece";
+import { commonStyles } from "../../../constants/globalStyle";
 
 // PRELOAD IMAGES
 const bgImg = require("@/assets/images/GameElements/ShapeGameBG.png");
@@ -43,51 +44,61 @@ export default function ShapeSorting({ game, currentLevel, }: { game: GameData; 
   const [showCelebration, setShowCelebration] = useState(false);
   
   // Sounds
-  const correctSoundRef = useRef<Audio.Sound | null>(null);
-  const wrongSoundRef = useRef<Audio.Sound | null>(null);
-  const winSoundRef = useRef<Audio.Sound | null>(null);
+const correctSoundRef = useRef<AudioPlayer | null>(null);
+const wrongSoundRef = useRef<AudioPlayer | null>(null);
+const winSoundRef = useRef<AudioPlayer | null>(null);
 
-  useEffect(() => {
+useEffect(() => {
+  const correctPlayer = createAudioPlayer(
+    require("../../../assets/musics/Correct.mp3")
+  );
 
-  Asset.loadAsync([bgImg, TitleBoard, SlotBG, settingsImg, BackButtonIcon]);
+  const wrongPlayer = createAudioPlayer(
+    require("../../../assets/musics/Wrong.mp3")
+  );
 
-  const loadSounds = async () => {
-    const { sound: correct } = await Audio.Sound.createAsync(
-      require("../../../assets/musics/Correct.mp3")
-    );
-    const { sound: wrong } = await Audio.Sound.createAsync(
-      require("../../../assets/musics/Wrong.mp3")
-    );
-    const { sound: win } = await Audio.Sound.createAsync(
-      require("../../../assets/musics/Win.mp3")
-    );
+  const winPlayer = createAudioPlayer(
+    require("../../../assets/musics/Win.mp3")
+  );
 
-    correctSoundRef.current = correct;
-    wrongSoundRef.current = wrong;
-    winSoundRef.current = win;
-  };
-
-  loadSounds();
+  correctSoundRef.current = correctPlayer;
+  wrongSoundRef.current = wrongPlayer;
+  winSoundRef.current = winPlayer;
 
   return () => {
-    correctSoundRef.current?.unloadAsync();
-    wrongSoundRef.current?.unloadAsync();
-    winSoundRef.current?.unloadAsync();
+    correctPlayer.remove();
+    wrongPlayer.remove();
+    winPlayer.remove();
   };
 }, []);
 
 
-const playCorrect = async () => {
-  await correctSoundRef.current?.replayAsync();
+const playCorrect = () => {
+  const player = correctSoundRef.current;
+
+  if (!player) return;
+
+  player.seekTo(0);
+  player.play();
 };
 
-const playWrong = async () => {
-  await wrongSoundRef.current?.replayAsync();
+const playWrong = () => {
+  const player = wrongSoundRef.current;
+
+  if (!player) return;
+
+  player.seekTo(0);
+  player.play();
 };
 
-  const playWin = async () => {
-    await winSoundRef.current?.replayAsync();
-  };
+const playWin = () => {
+  const player = winSoundRef.current;
+
+  if (!player) return;
+
+  player.seekTo(0);
+  player.play();
+};
 
   
 const routes = [
@@ -122,7 +133,7 @@ return (
   <BackButton icon={BackButtonIcon} />
   <ImageBackground
        source={bgImg}
-        style={StyleSheet.absoluteFillObject}
+        style={commonStyles.absoluteFill}
         resizeMode="cover"
         
       >

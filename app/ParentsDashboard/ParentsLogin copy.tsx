@@ -1,18 +1,12 @@
 import Button from "@/components/ButtonCompo/Button";
-import CompoLoginBack from "@/components/ui/CompoLoginBack";
 import Input from "@/components/ui/Input";
+import CompoLoginBack from "@/components/ui/CompoLoginBack";
 import Select from "@/components/ui/Select";
 import Tab from "@/components/ui/Tab";
 import { ROUTES } from "@/constants/routes";
 import {
   facebookLogin,
-  /////////////////////
-  facebookSignup,
-  ///////////////////////
   googleLogin,
-  /////////////////
-  googleSignup,
-  //////////////////
   loginUser,
   registerParent,
   validateSignupOtp,
@@ -23,23 +17,24 @@ import { Asset } from "expo-asset";
 import * as Facebook from "expo-auth-session/providers/facebook";
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
+import { LinearGradient } from "expo-linear-gradient";
 
 import { router } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  //////////
-  Dimensions,
-  /////////////
   Image,
   Platform,
   StyleSheet,
   Text,
   View,
+  Dimensions,
 } from "react-native";
 import Form, { useForm } from "../../components/ui/Form";
 import { styles as globalStyle } from "../../constants/globalStyle";
 
+
 WebBrowser.maybeCompleteAuthSession();
+
 
 
 function StepOne() {
@@ -63,9 +58,7 @@ function StepOne() {
       setFormData((previous) => ({ ...previous, fullName: name, email }));
       nextStep();
     } catch (error) {
-      setRequestError(
-        error instanceof Error ? error.message : "Unable to send OTP.",
-      );
+      setRequestError(error instanceof Error ? error.message : "Unable to send OTP.");
     } finally {
       setIsSendingOtp(false);
     }
@@ -95,9 +88,7 @@ function StepOne() {
         />
       </View>
 
-      {requestError ? (
-        <Text style={styles.formError}>{requestError}</Text>
-      ) : null}
+      {requestError ? <Text style={styles.formError}>{requestError}</Text> : null}
       <Button
         text={isSendingOtp ? "Sending OTP..." : "Next Step"}
         textSize="lg"
@@ -131,9 +122,7 @@ function StepTwo() {
       await verifySignupEmail(formData.email);
       setTimer(30);
     } catch (error) {
-      setRequestError(
-        error instanceof Error ? error.message : "Unable to resend OTP.",
-      );
+      setRequestError(error instanceof Error ? error.message : "Unable to resend OTP.");
     }
   };
 
@@ -314,9 +303,7 @@ function StepSix() {
         ...(referralCode ? { referralCode } : {}),
       });
       setIsRegistrationSuccess(true);
-      setRegistrationMessage(
-        response.message || "Your account has been created.",
-      );
+      setRegistrationMessage(response.message || "Your account has been created.");
       router.replace(ROUTES.AUTH.LOGIN);
     } catch (error) {
       setIsRegistrationSuccess(false);
@@ -395,7 +382,7 @@ export default function Index() {
     // the screen. The Facebook button remains disabled until it is configured.
     clientId: facebookAppId || "missing-facebook-app-id",
   });
-
+  
   const Rainbow = require("../../assets/images/Rainbow.png");
   const Cloude = require("../../assets/images/Cloude.png");
   const LoadingDimo = require("../../assets/images/Diano_Run.gif");
@@ -443,6 +430,7 @@ export default function Index() {
             ? error.message
             : "Login failed. Please check your credentials.",
       }));
+
     } finally {
       setIsSubmitting(false);
     }
@@ -461,9 +449,7 @@ export default function Index() {
       if (result.type === "cancel" || result.type === "dismiss") return;
 
       if (result.type !== "success") {
-        throw new Error(
-          "Google sign-in could not be completed. Please try again.",
-        );
+        throw new Error("Google sign-in could not be completed. Please try again.");
       }
 
       const idToken = result.params.id_token;
@@ -483,43 +469,6 @@ export default function Index() {
       setIsGoogleSubmitting(false);
     }
   };
-///////////////////////////////////////////////
-  const handleGoogleSignup = async () => {
-    try {
-      if (!googleClientId) {
-        throw new Error("Google signup is not configured for this platform.");
-      }
-
-      setSignInErrors((previous) => ({ ...previous, loginError: "" }));
-      setIsGoogleSubmitting(true);
-
-      const result = await promptGoogle();
-      if (result.type === "cancel" || result.type === "dismiss") return;
-
-      if (result.type !== "success") {
-        throw new Error(
-          "Google signup could not be completed. Please try again.",
-        );
-      }
-
-      const idToken = result.params.id_token;
-      if (!idToken) {
-        throw new Error("Google did not return an ID token.");
-      }
-
-      await googleSignup(idToken, { flag: 4 });
-      router.replace(ROUTES.APP.HOME);
-    } catch (error) {
-      setSignInErrors((previous) => ({
-        ...previous,
-        loginError:
-          error instanceof Error ? error.message : "Google signup failed.",
-      }));
-    } finally {
-      setIsGoogleSubmitting(false);
-    }
-  };
-///////////////////////////////////////////////////
 
   const handleFacebookLogin = async () => {
     try {
@@ -534,9 +483,7 @@ export default function Index() {
       if (result.type === "cancel" || result.type === "dismiss") return;
 
       if (result.type !== "success") {
-        throw new Error(
-          "Facebook sign-in could not be completed. Please try again.",
-        );
+        throw new Error("Facebook sign-in could not be completed. Please try again.");
       }
 
       const facebookAccessToken =
@@ -558,49 +505,14 @@ export default function Index() {
     }
   };
 
-
-///////////////////////////////////////
-  const handleFacebookSignup = async () => {
-    try {
-      if (!facebookAppId) {
-        throw new Error("Facebook signup is not configured for this app.");
-      }
-
-      setSignInErrors((previous) => ({ ...previous, loginError: "" }));
-      setIsFacebookSubmitting(true);
-
-      const result = await promptFacebook();
-      if (result.type === "cancel" || result.type === "dismiss") return;
-
-      if (result.type !== "success") {
-        throw new Error(
-          "Facebook signup could not be completed. Please try again.",
-        );
-      }
-
-      const facebookAccessToken =
-        result.authentication?.accessToken || result.params.access_token;
-      if (!facebookAccessToken) {
-        throw new Error("Facebook did not return an access token.");
-      }
-
-      await facebookSignup(facebookAccessToken, { flag: 4 });
-      router.replace(ROUTES.APP.HOME);
-    } catch (error) {
-      setSignInErrors((previous) => ({
-        ...previous,
-        loginError:
-          error instanceof Error ? error.message : "Facebook signup failed.",
-      }));
-    } finally {
-      setIsFacebookSubmitting(false);
-    }
-  };
-  /////////////////////////////////////////
-
   useEffect(() => {
     async function loadAssets() {
-      await Asset.loadAsync([Rainbow, Cloude, LoadingDimo, FacebookIcon]);
+      await Asset.loadAsync([
+        Rainbow,
+        Cloude,
+        LoadingDimo,
+        FacebookIcon,
+      ]);
     }
     loadAssets();
   }, []);
@@ -609,7 +521,6 @@ export default function Index() {
   return (
     <>
     <CompoLoginBack dinoImage={require("@/assets/images/Diano_Run.gif")}>
-
         <View style={globalStyle.FormWrap}>
           <View>
             <Tab
@@ -634,20 +545,12 @@ export default function Index() {
                     <View style={styles.socialConnection}>
                       <Button
                         style={{ marginBottom: 20 }}
-                        text={
-                          isGoogleSubmitting
-                            ? "Connecting to Google..."
-                            : "Continue with Google"
-                        }
+                        text={isGoogleSubmitting ? "Connecting to Google..." : "Continue with Google"}
                         onPress={handleGoogleLogin}
                         width="full"
                         textSize="md"
                         variant="white"
-                        disabled={
-                          !googleClientId ||
-                          !googleRequest ||
-                          isGoogleSubmitting
-                        }
+                        disabled={!googleClientId || !googleRequest || isGoogleSubmitting}
                         icon={
                           <Image
                             source={GoogleIcon}
@@ -656,20 +559,12 @@ export default function Index() {
                         }
                       />
                       <Button
-                        text={
-                          isFacebookSubmitting
-                            ? "Connecting to Facebook..."
-                            : "Continue with Facebook"
-                        }
+                        text={isFacebookSubmitting ? "Connecting to Facebook..." : "Continue with Facebook"}
                         onPress={handleFacebookLogin}
                         width="full"
                         textSize="md"
                         variant="white"
-                        disabled={
-                          !facebookAppId ||
-                          !facebookRequest ||
-                          isFacebookSubmitting
-                        }
+                        disabled={!facebookAppId || !facebookRequest || isFacebookSubmitting}
                         icon={
                           <Image
                             source={FacebookIcon}
@@ -710,9 +605,7 @@ export default function Index() {
                           textContentType="password"
                           autoComplete="password"
                           value={signInPassword}
-                          error={
-                            signInErrors.password || signInErrors.loginError
-                          }
+                          error={signInErrors.password || signInErrors.loginError}
                           onChangeText={(text) => {
                             setSignInPassword(text);
                             if (signInErrors.password) {
@@ -751,26 +644,13 @@ export default function Index() {
                       <StepSix />
                     </Form>
                     <View style={globalStyle.Dflex}>
-
-                      <Button
+                     <Button
                         style={{ marginRight: 10 }}
-                        text={
-                          isGoogleSubmitting
-                            ? "Connecting to Google..."
-                            : "Continue with Google"
-                        }
-                        onPress={handleGoogleSignup}
-
+                        text="Continue with Google"
+                        // onPress={handleSubmit}
                         width="auto"
                         textSize="md"
-                        ///////////////////
                         variant="white"
-                        disabled={
-                          !googleClientId ||
-                          !googleRequest ||
-                          isGoogleSubmitting
-                          ///////////////////////////
-                        }
                         icon={
                           <Image
                             source={GoogleIcon}
@@ -779,22 +659,11 @@ export default function Index() {
                         }
                       />
                       <Button
-                        text={
-                          isFacebookSubmitting
-                            ? "Connecting to Facebook..."
-                            : "Continue with Facebook"
-                        }
-                        onPress={handleFacebookSignup}
+                        text="Continue with Facebook"
+                        // onPress={handleSubmit}
                         width="auto"
                         textSize="md"
-                        ////////////////////////
                         variant="white"
-                        disabled={
-                          !facebookAppId ||
-                          !facebookRequest ||
-                          isFacebookSubmitting
-                          /////////////////////////
-                        }
                         icon={
                           <Image
                             source={FacebookIcon}
@@ -809,7 +678,7 @@ export default function Index() {
             </View>
           </View>
         </View>
-      </CompoLoginBack>
+    </CompoLoginBack>
     </>
   );
 }
@@ -818,7 +687,6 @@ const styles = StyleSheet.create({
   formError: { color: "#E53935", fontSize: 12, marginBottom: 10, },
   formSuccess: { color: "#2E7D32", fontSize: 12, marginBottom: 10 },
   formStyles: { marginTop: 20 },
-
   ContentBox: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 20, },
   socialConnection: { borderRightWidth: 1, paddingRight: 20, borderColor: "#AFEBEE", },
   signinText:{color: "#000", textAlign: "center", fontWeight: 500, fontSize: 24, marginBottom: 15},

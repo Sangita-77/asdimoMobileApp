@@ -19,6 +19,7 @@ const Hexagon = require("@/assets/images/GameElements/Hexagon.png");
 const HexagonSlot = require("@/assets/images/GameElements/HexagonSlot.png");
 const Round = require("@/assets/images/GameElements/Round.png");
 const RoundSlot = require("@/assets/images/GameElements/RoundSlot.png");
+import { commonStyles } from "../../../constants/globalStyle";
 
 
 
@@ -111,7 +112,7 @@ export default function ShapeSorting1() {
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...commonStyles.absoluteFill,
     backgroundColor: "rgba(0, 0, 0, 0.87)",
     justifyContent: "center",
     alignItems: "center",

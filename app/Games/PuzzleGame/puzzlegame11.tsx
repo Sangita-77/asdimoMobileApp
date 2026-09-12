@@ -8,7 +8,7 @@ import {
   View,
 } from "react-native";
 import PuzzleGame from "./puzzlegame";
-
+import { commonStyles } from "../../../constants/globalStyle";
 
 // LOAD ONCE (outside component)
 const BrinjalOne = require("@/assets/images/puzzleGameElements/brinjalOne.png");
@@ -105,7 +105,7 @@ export default function PuzzleGame1() {
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...commonStyles.absoluteFill,
     backgroundColor: "rgba(0, 0, 0, 0.87)",
     justifyContent: "center",
     alignItems: "center",

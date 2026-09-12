@@ -1,4 +1,4 @@
-import { StyleSheet,Dimensions } from "react-native";
+import { StyleSheet, Dimensions } from "react-native";
 
 const { width } = Dimensions.get("window");
 
@@ -14,6 +14,10 @@ export const styles = StyleSheet.create({
   // Global Styles End
   safeArea: { flex: 1, },
   listContent:{ flexGrow: 1, padding: 16,},
-  signinText: { color: "#000", textAlign: "center", fontWeight: "bold", fontSize: width * 0.035, marginBottom: 10, },
+  signinText: { color: "#000", textAlign: "center", fontWeight: "bold", marginBottom: 10, },
   FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
+});
+
+export const commonStyles = StyleSheet.create({
+  absoluteFill: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, },
 });

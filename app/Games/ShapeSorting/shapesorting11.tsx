@@ -9,6 +9,7 @@ import {
 } from "react-native";
 
 import ShapeSorting from "./shapesorting";
+import { commonStyles } from "../../../constants/globalStyle";
 
 // LOAD ONCE (outside component)
 const Star = require("@/assets/images/GameElements/Star.png");
@@ -107,7 +108,7 @@ export default function ShapeSorting1() {
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...commonStyles.absoluteFill,
     backgroundColor: "rgba(0, 0, 0, 0.87)",
     justifyContent: "center",
     alignItems: "center",
