@@ -1,4 +1,3 @@
-import React from "react";
 import {
   StyleSheet,
   Text,
@@ -58,13 +57,8 @@ export default function Input({
   };
 
   return (
-    <View
-      style={[
-        styles.container,
-        containerStyles[variant],
-      ]}
-    >
-      {label && <Text style={styles.label}>{label}</Text>}
+    <View style={[styles.container, containerStyles[variant]]}>
+      {label ? <Text style={styles.label}>{label}</Text> : null}
 
       {type === "select" ? (
         <View
@@ -74,11 +68,7 @@ export default function Input({
             !editable && styles.disabledInput,
           ]}
         >
-          {icon && (
-            <View style={styles.iconContainer}>
-              {icon}
-            </View>
-          )}
+          {icon && <View style={styles.iconContainer}>{icon}</View>}
 
           <Dropdown
             style={styles.dropdown}
@@ -96,9 +86,7 @@ export default function Input({
             value={selectedValue}
             maxHeight={280}
             showsVerticalScrollIndicator={false}
-            onChange={(item) =>
-              onValueChange?.(item.value)
-            }
+            onChange={(item) => onValueChange?.(item.value)}
           />
         </View>
       ) : (
@@ -109,22 +97,14 @@ export default function Input({
             !editable && styles.disabledInput,
           ]}
         >
-          {icon && (
-            <View style={styles.iconContainer}>
-              {icon}
-            </View>
-          )}
+          {icon && <View style={styles.iconContainer}>{icon}</View>}
 
           <TextInput
             {...props}
             placeholder={placeholder}
             editable={editable}
             placeholderTextColor="#999"
-            style={[
-              styles.input,
-              variant === "otp" && styles.otpInput,
-              style,
-            ]}
+            style={[styles.input, variant === "otp" && styles.otpInput, style]}
           />
         </View>
       )}
@@ -137,19 +117,14 @@ export default function Input({
               {String(timer).padStart(2, "0")}
             </Text>
           ) : (
-            <Text
-              style={styles.resend}
-              onPress={onResend}
-            >
+            <Text style={styles.resend} onPress={onResend}>
               Resend OTP
             </Text>
           )}
         </View>
       )}
 
-      {!!error && (
-        <Text style={styles.error}>{error}</Text>
-      )}
+      {!!error && <Text style={styles.error}>{error}</Text>}
     </View>
   );
 }
@@ -258,13 +233,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     marginHorizontal: 8,
 
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.05,
-    shadowRadius: 6,
+    boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.05)",
     elevation: 2,
   },
 
@@ -305,13 +274,7 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     backgroundColor: "#FFF",
 
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 8,
-    },
-    shadowOpacity: 0.12,
-    shadowRadius: 20,
+    boxShadow: "0px 8px 20px rgba(0, 0, 0, 0.12)",
     elevation: 10,
   },
 

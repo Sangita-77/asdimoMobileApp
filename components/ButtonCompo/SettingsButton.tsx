@@ -1,7 +1,6 @@
-import { router, Href } from "expo-router";
-import React from "react";
-import { Image, Pressable, StyleSheet } from "react-native";
 import { ROUTES } from "@/constants/routes";
+import { Href, router } from "expo-router";
+import { Image, Pressable, StyleSheet } from "react-native";
 
 interface SettingsButtonProps {
   size?: number;
@@ -38,8 +37,8 @@ export default function SettingsButton({
         style={{
           width: size,
           height: size,
-          resizeMode: "contain",
         }}
+        resizeMode="contain"
       />
     </Pressable>
   );

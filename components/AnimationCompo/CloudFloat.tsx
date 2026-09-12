@@ -1,9 +1,10 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  Animated,
-  ImageSourcePropType,
-  StyleSheet,
-  useWindowDimensions,
+    Animated,
+    ImageSourcePropType,
+    Platform,
+    StyleSheet,
+    useWindowDimensions,
 } from "react-native";
 
 interface CloudFloatProps {
@@ -24,38 +25,38 @@ export default function CloudFloat({
   loop = true,
 }: CloudFloatProps) {
   const { width } = useWindowDimensions();
-const translateX = useRef(new Animated.Value(0)).current;
+  const translateX = useRef(new Animated.Value(0)).current;
 
   const [visible, setVisible] = useState(true);
 
-useEffect(() => {
-  let mounted = true;
+  useEffect(() => {
+    let mounted = true;
 
-  const startAnimation = () => {
-    translateX.setValue(0);
+    const startAnimation = () => {
+      translateX.setValue(0);
 
-    Animated.timing(translateX, {
-      toValue: width + 20 - left,
-      duration,
-      useNativeDriver: true,
-    }).start(({ finished }) => {
-      if (!mounted) return;
+      Animated.timing(translateX, {
+        toValue: width + 20 - left,
+        duration,
+        useNativeDriver: Platform.OS !== "web",
+      }).start(({ finished }) => {
+        if (!mounted) return;
 
-      if (loop && finished) {
-        startAnimation();
-      } else if (finished) {
-        setVisible(false);
-      }
-    });
-  };
+        if (loop && finished) {
+          startAnimation();
+        } else if (finished) {
+          setVisible(false);
+        }
+      });
+    };
 
-  startAnimation();
+    startAnimation();
 
-  return () => {
-    mounted = false;
-    translateX.stopAnimation();
-  };
-}, [width, left, duration, loop]);
+    return () => {
+      mounted = false;
+      translateX.stopAnimation();
+    };
+  }, [width, left, duration, loop]);
 
   if (!visible) return null;
 

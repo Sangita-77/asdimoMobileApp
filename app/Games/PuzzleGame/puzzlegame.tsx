@@ -3,18 +3,30 @@ import SettingsButton from "@/components/ButtonCompo/SettingsButton";
 import LandscapeLock from "@/components/ui/ScreenOrientation";
 import { ROUTES } from "@/constants/routes";
 import { Asset } from "expo-asset";
-import { createAudioPlayer, AudioPlayer } from "expo-audio";   
+import { AudioPlayer, createAudioPlayer } from "expo-audio";
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
-import { Image, ImageBackground, Pressable, Text, View, useWindowDimensions, StyleSheet } from "react-native";
+import {
+  Image,
+  ImageBackground,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+} from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 import ChalkCircle from "../../../components/AnimationCompo/Hinthand";
+import { commonStyles } from "../../../constants/globalStyle";
 import { Theme } from "../../../constants/theme";
 import DraggablePiece from "./DraggablePiece";
-import { commonStyles } from "../../../constants/globalStyle";
 
 // PRELOAD IMAGES
 const bgImg = require("@/assets/images/GameElements/PuzzleGameBG.png");
@@ -27,90 +39,134 @@ const HintBulb = require("@/assets/images/HintBulb.png");
 const dinoimg = require("@/assets/images/dino-img01.png");
 const roundSlot = require("@/assets/images/roundSlot.png");
 
-
 const SIZE = 100;
 //TYPES
-export type Slot = { id: number; x: number; y: number; image: any; width: number; height: number; };
-export type Piece = { id: number; image: any; startX: number; startY: number; width: number; height: number; };
-export type FullPiece = { id: number; x: number; y: number; image: any; width: number; height: number; };
-export type GameData = { slots: Slot[]; pieces: Piece[]; fullpieces: FullPiece[]; };
-
+export type Slot = {
+  id: number;
+  x: number;
+  y: number;
+  image: any;
+  width: number;
+  height: number;
+};
+export type Piece = {
+  id: number;
+  image: any;
+  startX: number;
+  startY: number;
+  width: number;
+  height: number;
+};
+export type FullPiece = {
+  id: number;
+  x: number;
+  y: number;
+  image: any;
+  width: number;
+  height: number;
+};
+export type GameData = {
+  slots: Slot[];
+  pieces: Piece[];
+  fullpieces: FullPiece[];
+};
 
 // Game Logic
-export default function PuzzleGame({ game, currentLevel, }: { game: GameData; currentLevel: number; }) {
+export default function PuzzleGame({
+  game,
+  currentLevel,
+}: {
+  game: GameData;
+  currentLevel: number;
+}) {
   const { width, height } = useWindowDimensions();
   const router = useRouter();
   const { slots, fullpieces, pieces: piecesData } = game;
-  const [hintPath, setHintPath] = useState<{ fromX: number; fromY: number; toX: number; toY: number; } | null>(null);
+  const [hintPath, setHintPath] = useState<{
+    fromX: number;
+    fromY: number;
+    toX: number;
+    toY: number;
+  } | null>(null);
   const [showHint, setShowHint] = useState<number | null>(null);
-  const [slotBoxLayout, setSlotBoxLayout] = useState({ x: 0, y: 0, width: 0, height: 0, });
-  const [pieceBoxLayout, setPieceBoxLayout] = useState({ x: 0, y: 0, width: 0, height: 0, });
+  const [slotBoxLayout, setSlotBoxLayout] = useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
+  const [pieceBoxLayout, setPieceBoxLayout] = useState({
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0,
+  });
   const [placed, setPlaced] = useState<number[]>([]);
   const [showCelebration, setShowCelebration] = useState(false);
 
   // Sounds
-const correctSoundRef = useRef<AudioPlayer | null>(null);
-const wrongSoundRef = useRef<AudioPlayer | null>(null);
-const winSoundRef = useRef<AudioPlayer | null>(null);
+  const correctSoundRef = useRef<AudioPlayer | null>(null);
+  const wrongSoundRef = useRef<AudioPlayer | null>(null);
+  const winSoundRef = useRef<AudioPlayer | null>(null);
 
-useEffect(() => {
-  Asset.loadAsync([
-    bgImg,
-    TitleBoard,
-    SlotBG,
-    settingsImg,
-    BackButtonIcon,
-    HintBulb,
-    dinoimg,
-    roundSlot,
-  ]);
+  useEffect(() => {
+    Asset.loadAsync([
+      bgImg,
+      TitleBoard,
+      SlotBG,
+      settingsImg,
+      BackButtonIcon,
+      HintBulb,
+      dinoimg,
+      roundSlot,
+    ]);
 
-  const correctPlayer = createAudioPlayer(
-    require("../../../assets/musics/Correct.mp3")
-  );
+    const correctPlayer = createAudioPlayer(
+      require("../../../assets/musics/Correct.mp3"),
+    );
 
-  const wrongPlayer = createAudioPlayer(
-    require("../../../assets/musics/Wrong.mp3")
-  );
+    const wrongPlayer = createAudioPlayer(
+      require("../../../assets/musics/Wrong.mp3"),
+    );
 
-  const winPlayer = createAudioPlayer(
-    require("../../../assets/musics/Win.mp3")
-  );
+    const winPlayer = createAudioPlayer(
+      require("../../../assets/musics/Win.mp3"),
+    );
 
-  correctSoundRef.current = correctPlayer;
-  wrongSoundRef.current = wrongPlayer;
-  winSoundRef.current = winPlayer;
+    correctSoundRef.current = correctPlayer;
+    wrongSoundRef.current = wrongPlayer;
+    winSoundRef.current = winPlayer;
 
-  return () => {
-    correctPlayer.remove();
-    wrongPlayer.remove();
-    winPlayer.remove();
+    return () => {
+      correctPlayer.remove();
+      wrongPlayer.remove();
+      winPlayer.remove();
+    };
+  }, []);
+
+  const playCorrect = () => {
+    const player = correctSoundRef.current;
+    if (!player) return;
+
+    player.seekTo(0);
+    player.play();
   };
-}, []);
 
-const playCorrect = () => {
-  const player = correctSoundRef.current;
-  if (!player) return;
+  const playWrong = () => {
+    const player = wrongSoundRef.current;
+    if (!player) return;
 
-  player.seekTo(0);
-  player.play();
-};
+    player.seekTo(0);
+    player.play();
+  };
 
-const playWrong = () => {
-  const player = wrongSoundRef.current;
-  if (!player) return;
+  const playWin = () => {
+    const player = winSoundRef.current;
+    if (!player) return;
 
-  player.seekTo(0);
-  player.play();
-};
-
-const playWin = () => {
-  const player = winSoundRef.current;
-  if (!player) return;
-
-  player.seekTo(0);
-  player.play();
-};
+    player.seekTo(0);
+    player.play();
+  };
 
   const routes = [
     ROUTES.PUZZLE.PUZZLE_1,
@@ -139,7 +195,6 @@ const playWin = () => {
     }
   }, [placed]);
 
-
   return (
     <>
       <LandscapeLock />
@@ -150,20 +205,20 @@ const playWin = () => {
           source={bgImg}
           style={commonStyles.absoluteFill}
           resizeMode="cover"
-
         >
           <GestureHandlerRootView style={{ flex: 1 }}>
-
             <View style={styles.container}>
               <Pressable
                 style={styles.hintButton}
                 onPress={() => {
-                  const remaining = piecesData.find(p => !placed.includes(p.id));
+                  const remaining = piecesData.find(
+                    (p) => !placed.includes(p.id),
+                  );
                   if (!remaining) return;
 
                   setShowHint(remaining.id);
 
-                  const target = slots.find(s => s.id === remaining.id);
+                  const target = slots.find((s) => s.id === remaining.id);
                   if (!target) return;
 
                   // calculate global positions
@@ -192,7 +247,7 @@ const playWin = () => {
               <View
                 style={[
                   styles.pieceBox,
-                  { width: width * 0.20, height: height * 0.64, },
+                  { width: width * 0.2, height: height * 0.64 },
                 ]}
                 onLayout={(e) => {
                   setPieceBoxLayout(e.nativeEvent.layout);
@@ -228,7 +283,15 @@ const playWin = () => {
                   source={TitleBoard}
                   style={styles.TextBoard}
                 >
-                  <Text style={[styles.GameText, { color: Theme.color.GameText, fontFamily: Theme.fonts.GroBold }]}>
+                  <Text
+                    style={[
+                      styles.GameText,
+                      {
+                        color: Theme.color.GameText,
+                        fontFamily: Theme.fonts.GroBold,
+                      },
+                    ]}
+                  >
                     Complete The Picture
                   </Text>
                 </ImageBackground>
@@ -236,11 +299,11 @@ const playWin = () => {
                 <ImageBackground
                   style={[
                     styles.SlotBG,
-                    { width: width * 0.43, height: height * 0.88, },
+                    { width: width * 0.43, height: height * 0.88 },
                   ]}
                   source={SlotBG}
-                  resizeMode="contain">
-
+                  resizeMode="contain"
+                >
                   {slots.map((slot) => {
                     const isHint = showHint === slot.id;
 
@@ -273,7 +336,6 @@ const playWin = () => {
                       </View>
                     );
                   })}
-
                 </ImageBackground>
               </View>
 
@@ -281,7 +343,7 @@ const playWin = () => {
               <View
                 style={[
                   styles.pieceBox,
-                  { width: width * 0.20, height: height * 0.64, },
+                  { width: width * 0.2, height: height * 0.64 },
                 ]}
               >
                 <Image
@@ -325,7 +387,7 @@ const playWin = () => {
                 <ConfettiCannon
                   count={150}
                   origin={{ x: width / 2, y: 0 }} // center top
-                // fadeOut
+                  // fadeOut
                 />
               )}
               {hintPath && <HintHand path={hintPath} />}
@@ -342,7 +404,6 @@ const playWin = () => {
     </>
   );
 }
-
 
 // HintHand
 
@@ -384,7 +445,6 @@ function HintHand({
     };
   }, [path]);
 
-
   const style = useAnimatedStyle(() => ({
     top: 0,
     left: 0,
@@ -396,11 +456,16 @@ function HintHand({
   }));
 
   return (
-    <Animated.Text style={[style, {
-      fontSize: 40,
-      zIndex: 999,
-      elevation: 999,
-    },]}>
+    <Animated.Text
+      style={[
+        style,
+        {
+          fontSize: 40,
+          zIndex: 999,
+          elevation: 999,
+        },
+      ]}
+    >
       👆
     </Animated.Text>
   );
@@ -408,20 +473,77 @@ function HintHand({
 
 // STYLES
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, },
-  slotText: { color: "white", fontSize: 12, textAlign: "center", },
-  container: { position: "relative", flex: 1, flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", marginTop: 20, marginRight: 10, marginLeft: 10, },
-  slotBox: { borderWidth: 2, borderColor: "#00000000", position: "relative", zIndex: 0, },
-  SlotBG: { width: "100%", height: "100%", },
-  GameText: { position: "absolute", width: "auto", height: 45, left: 0, right: 0, margin: "auto", top: 8, textAlign: "center", fontSize: 20, },
-  TextBoard: { position: "absolute", width: "auto", height: 45, left: 0, right: 0, margin: "auto", zIndex: 99999, top: -20, textAlign: "center", flex: 1, alignItems: "center", justifyContent: "center", },
-  pieceBox: { position: "relative", zIndex: 9, },
-  slot: { position: "absolute", width: SIZE, height: SIZE, },
-  piece: { position: "absolute", width: SIZE, height: SIZE, borderRadius: 10, },
-  winText: { position: "absolute", bottom: 50, alignSelf: "center", color: "white", fontSize: 24, },
-  hintButton: { position: "absolute", top: 5, left: 100, zIndex: 99, },
-  hintSlot: { borderWidth: 0, borderColor: "gold", shadowColor: "yellow", shadowOpacity: 1, shadowRadius: 100, elevation: 10, borderRadius: 100, backgroundColor: "#ffd9001f", },
-  hintPiece: { borderWidth: 0, borderColor: "gold", shadowColor: "gold", shadowOpacity: 1, shadowRadius: 100, elevation: 100, backgroundColor: "#ffd9001f", borderRadius: 100, },
+  safeArea: { flex: 1 },
+  slotText: { color: "white", fontSize: 12, textAlign: "center" },
+  container: {
+    position: "relative",
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    alignItems: "center",
+    marginTop: 20,
+    marginRight: 10,
+    marginLeft: 10,
+  },
+  slotBox: {
+    borderWidth: 2,
+    borderColor: "#00000000",
+    position: "relative",
+    zIndex: 0,
+  },
+  SlotBG: { width: "100%", height: "100%" },
+  GameText: {
+    position: "absolute",
+    width: "auto",
+    height: 45,
+    left: 0,
+    right: 0,
+    margin: "auto",
+    top: 8,
+    textAlign: "center",
+    fontSize: 20,
+  },
+  TextBoard: {
+    position: "absolute",
+    width: "auto",
+    height: 45,
+    left: 0,
+    right: 0,
+    margin: "auto",
+    zIndex: 99999,
+    top: -20,
+    textAlign: "center",
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  pieceBox: { position: "relative", zIndex: 9 },
+  slot: { position: "absolute", width: SIZE, height: SIZE },
+  piece: { position: "absolute", width: SIZE, height: SIZE, borderRadius: 10 },
+  winText: {
+    position: "absolute",
+    bottom: 50,
+    alignSelf: "center",
+    color: "white",
+    fontSize: 24,
+  },
+  hintButton: { position: "absolute", top: 5, left: 100, zIndex: 99 },
+  hintSlot: {
+    borderWidth: 0,
+    borderColor: "gold",
+    boxShadow: "0px 0px 100px yellow",
+    elevation: 10,
+    borderRadius: 100,
+    backgroundColor: "#ffd9001f",
+  },
+  hintPiece: {
+    borderWidth: 0,
+    borderColor: "gold",
+    boxShadow: "0px 0px 100px gold",
+    elevation: 100,
+    backgroundColor: "#ffd9001f",
+    borderRadius: 100,
+  },
   // Overlayer:{position: "absolute", right: 0, bottom: 0,},
-  ChalkRound: {}
+  ChalkRound: {},
 });
