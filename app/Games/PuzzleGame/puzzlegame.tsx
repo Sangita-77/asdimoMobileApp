@@ -3,7 +3,7 @@ import SettingsButton from "@/components/ButtonCompo/SettingsButton";
 import LandscapeLock from "@/components/ui/ScreenOrientation";
 import { ROUTES } from "@/constants/routes";
 import { Asset } from "expo-asset";
-import { Audio } from "expo-audio";   
+import { createAudioPlayer, AudioPlayer } from "expo-audio";   
 import { useRouter } from "expo-router";
 import { useEffect, useRef, useState } from "react";
 import { Image, ImageBackground, Pressable, Text, View, useWindowDimensions, StyleSheet } from "react-native";
@@ -49,52 +49,68 @@ export default function PuzzleGame({ game, currentLevel, }: { game: GameData; cu
   const [showCelebration, setShowCelebration] = useState(false);
 
   // Sounds
-  const correctSoundRef = useRef<Audio.Sound | null>(null);
-  const wrongSoundRef = useRef<Audio.Sound | null>(null);
-  const winSoundRef = useRef<Audio.Sound | null>(null);
+const correctSoundRef = useRef<AudioPlayer | null>(null);
+const wrongSoundRef = useRef<AudioPlayer | null>(null);
+const winSoundRef = useRef<AudioPlayer | null>(null);
 
-  useEffect(() => {
+useEffect(() => {
+  Asset.loadAsync([
+    bgImg,
+    TitleBoard,
+    SlotBG,
+    settingsImg,
+    BackButtonIcon,
+    HintBulb,
+    dinoimg,
+    roundSlot,
+  ]);
 
-    Asset.loadAsync([bgImg, TitleBoard, SlotBG, settingsImg, BackButtonIcon, HintBulb, dinoimg, roundSlot]);
+  const correctPlayer = createAudioPlayer(
+    require("../../../assets/musics/Correct.mp3")
+  );
 
-    const loadSounds = async () => {
-      const { sound: correct } = await Audio.Sound.createAsync(
-        require("../../../assets/musics/Correct.mp3")
-      );
-      const { sound: wrong } = await Audio.Sound.createAsync(
-        require("../../../assets/musics/Wrong.mp3")
-      );
-      const { sound: win } = await Audio.Sound.createAsync(
-        require("../../../assets/musics/Win.mp3")
-      );
+  const wrongPlayer = createAudioPlayer(
+    require("../../../assets/musics/Wrong.mp3")
+  );
 
-      correctSoundRef.current = correct;
-      wrongSoundRef.current = wrong;
-      winSoundRef.current = win;
-    };
+  const winPlayer = createAudioPlayer(
+    require("../../../assets/musics/Win.mp3")
+  );
 
-    loadSounds();
+  correctSoundRef.current = correctPlayer;
+  wrongSoundRef.current = wrongPlayer;
+  winSoundRef.current = winPlayer;
 
-    return () => {
-      correctSoundRef.current?.unloadAsync();
-      wrongSoundRef.current?.unloadAsync();
-      winSoundRef.current?.unloadAsync();
-    };
-  }, []);
-
-
-  const playCorrect = async () => {
-    await correctSoundRef.current?.replayAsync();
+  return () => {
+    correctPlayer.remove();
+    wrongPlayer.remove();
+    winPlayer.remove();
   };
+}, []);
 
-  const playWrong = async () => {
-    await wrongSoundRef.current?.replayAsync();
-  };
+const playCorrect = () => {
+  const player = correctSoundRef.current;
+  if (!player) return;
 
-  const playWin = async () => {
-    await winSoundRef.current?.replayAsync();
-  };
+  player.seekTo(0);
+  player.play();
+};
 
+const playWrong = () => {
+  const player = wrongSoundRef.current;
+  if (!player) return;
+
+  player.seekTo(0);
+  player.play();
+};
+
+const playWin = () => {
+  const player = winSoundRef.current;
+  if (!player) return;
+
+  player.seekTo(0);
+  player.play();
+};
 
   const routes = [
     ROUTES.PUZZLE.PUZZLE_1,
