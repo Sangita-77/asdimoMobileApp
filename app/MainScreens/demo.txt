@@ -7,7 +7,7 @@ import LandscapeLock from "@/components/ui/ScreenOrientation";
 import { ROUTES } from "@/constants/routes";
 import { Asset } from "expo-asset";
 import { router } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
     Animated,
     ImageBackground,
@@ -18,6 +18,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { loadGameSound } from "../../components/SoundCompo/GameSound";
+import { commonStyles } from "../../constants/globalStyle";
 
 
 // PRELOAD IMAGES
@@ -77,7 +78,7 @@ export default function HomeScreen() {
         <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
           <ImageBackground
             source={bgImg}
-            style={StyleSheet.absoluteFillObject}
+            style={commonStyles.absoluteFill}
             resizeMode="cover"
           >
             <View style={styles.container}>

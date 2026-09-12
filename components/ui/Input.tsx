@@ -1,5 +1,5 @@
 import React from "react";
-import { StyleSheet, Text, TextInput, TextInputProps, View, } from "react-native";
+import { StyleSheet, Text, TextInput, TextInputProps, View, Dimensions } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 
 type Option = {
@@ -10,7 +10,7 @@ type Option = {
 type InputProps = TextInputProps & {
   label?: string;
   error?: string;
-  variant?: "full" | "half" | "third" | "otp";
+  variant?: "full" | "half" | "third" | "fixed" | "otp";
   icon?: any;
   type?: "text" | "select";
   options?: Option[];
@@ -41,8 +41,10 @@ export default function Input({
     <View
       style={[
         styles.container,
-        variant === "half"
+          variant === "half"
           ? styles.halfContainer
+          : variant === "fixed"
+          ? styles.fixedContainer
           : variant === "third"
           ? styles.thirdContainer
           : variant === "otp"
@@ -123,10 +125,11 @@ export default function Input({
     </View>
   );
 }
-
+const { width } = Dimensions.get("window");
 const styles = StyleSheet.create({
   container: { marginBottom: 18, },
   fullContainer: { width: "100%", },
+  fixedContainer: { width: width * 0.4 },
   halfContainer: { width: "50%", },
   thirdContainer:{ width: "33.33%", },
   otpContainer: { alignItems: "center", width: "100%", }, 

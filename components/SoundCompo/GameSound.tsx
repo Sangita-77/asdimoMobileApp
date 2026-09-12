@@ -1,44 +1,50 @@
-import { Audio } from "expo-av";
+import { createAudioPlayer, AudioPlayer } from "expo-audio";
 
-let sound: Audio.Sound | null = null;
+let sound: AudioPlayer | null = null;
 
 export const loadGameSound = async () => {
   if (!sound) {
-    const { sound: newSound } = await Audio.Sound.createAsync(
-      require("../../assets/musics/music.mp3"),
-      {
-        shouldPlay: true,
-        isLooping: true,
-        volume: 1,
-      }
+    sound = createAudioPlayer(
+      require("../../assets/musics/music.mp3")
     );
-    sound = newSound;
+
+    sound.loop = true;
+    sound.volume = 1;
+    sound.play();
   } else {
-    // if already loaded but paused → resume
-    await sound.playAsync();
+    // If already loaded but paused → resume
+    sound.play();
   }
 };
 
-export const setGameVolume = async (volume: number) => {
+export const setGameVolume = (volume: number) => {
   if (sound) {
-    await sound.setVolumeAsync(volume);
+    sound.volume = volume;
   }
 };
 
-export const pauseGameSound = async () => {
+export const pauseGameSound = () => {
   if (sound) {
-    await sound.pauseAsync();
+    sound.pause();
   }
 };
 
-export const resumeGameSound = async () => {
+export const resumeGameSound = () => {
   if (sound) {
-    await sound.playAsync();
+    sound.play();
   }
 };
 
-export const stopGameSound = async () => {
+export const stopGameSound = () => {
   if (sound) {
-    await sound.stopAsync(); 
+    sound.pause();
+    sound.seekTo(0);
+  }
+};
+
+export const unloadGameSound = () => {
+  if (sound) {
+    sound.remove();
+    sound = null;
   }
 };

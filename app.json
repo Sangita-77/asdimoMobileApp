@@ -7,7 +7,6 @@
     "icon": "./assets/images/icon.png",
     "scheme": "asdimo",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.swatibazal.asdimo",
@@ -22,7 +21,6 @@
         "backgroundImage": "./assets/images/android-icon-background.png",
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.swatibazal.asdimo"
     },
@@ -48,7 +46,10 @@
       "expo-video",
       "expo-web-browser",
       "expo-asset",
-      "expo-screen-orientation"
+      "expo-screen-orientation",
+      "expo-image",
+      "expo-status-bar",
+      "expo-audio"
     ],
     "experiments": {
       "typedRoutes": true,

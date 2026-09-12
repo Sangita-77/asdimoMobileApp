@@ -6,7 +6,8 @@ import { Image, StyleSheet, View, useWindowDimensions, Dimensions, ImageSourcePr
 import { styles as globalStyle } from "../../constants/globalStyle";
 import CloudFloat from "../AnimationCompo/CloudFloat";
 import BackButton from "../ButtonCompo/BackButton";
-const { width } = Dimensions.get("window");
+// const { width } = Dimensions.get("window");
+import { commonStyles } from "../../constants/globalStyle";
 
 interface BackgroundProps {
   dinoImage?: ImageSourcePropType;
@@ -42,11 +43,17 @@ export default function Background({ dinoImage }: BackgroundProps) {
         {dinoImage && (
           <Image
             source={dinoImage}
-            style={styles.AnimDino}
+            style={[
+              styles.AnimDino,
+              {
+                width: width * 0.2,
+                height: width * 0.25,
+              },
+            ]}
             resizeMode="contain"
           />
         )}
-        <View style={StyleSheet.absoluteFillObject}>
+        <View style={commonStyles.absoluteFill}>
           {/* Small cloudes */}
           <CloudFloat source={Cloude} top={height * 0.02} size={width * 0.07} left={-width * 0.5} duration={40000} loop />
           <CloudFloat source={Cloude} top={height * 0.02} size={width * 0.15} left={-width * 0.5} duration={40000} loop />
@@ -69,6 +76,17 @@ export default function Background({ dinoImage }: BackgroundProps) {
 }
 
 const styles = StyleSheet.create({
-  TreeLogin: { position: "absolute", left: 0, top: -2, zIndex: 99 },
-  AnimDino: { width: width * 0.2, height: width * 0.25, position: "absolute", left:  5, bottom: 10, zIndex: 99, },
+  TreeLogin: {
+    position: "absolute",
+    left: 0,
+    top: -2,
+    zIndex: 99,
+  },
+
+  AnimDino: {
+    position: "absolute",
+    left: 5,
+    bottom: 10,
+    zIndex: 99,
+  },
 });

@@ -10,6 +10,7 @@ import { Animated, Image, ImageBackground, StyleSheet, Text, View, useWindowDime
 import { styles as globalStyle } from "../../constants/globalStyle";
 // import LottieView from "lottie-react-native";
 // import { pauseGameSound, resumeGameSound } from "../components/SoundCompo/GameSound";
+import { commonStyles } from "../../constants/globalStyle";
 
 export default function Index() {
   const [progress, setProgress] = useState(0);
@@ -88,7 +89,7 @@ export default function Index() {
       style={styles.rainbowImage}
       resizeMode="contain"        
     >   
-   <View style={StyleSheet.absoluteFillObject}>
+   <View style={commonStyles.absoluteFill}>
     {/* Small cloudes */}
     <CloudFloat source={Cloude} top={height * 0.1} size={width * 0.2} left={width * 0.8} duration={8000} loop={false} />
     <CloudFloat source={Cloude} top={height * 0.05} size={width * 0.2} left={width * 0.1} duration={25000} loop={false} />
@@ -130,7 +131,7 @@ export default function Index() {
           <Animated.View style={[styles.progressFill, { width: widthInterpolated }]}>
           <Image
             source={LoaderImage}
-            style={StyleSheet.absoluteFillObject}
+            style={commonStyles.absoluteFill}
             resizeMode="cover"
           />
         </Animated.View>

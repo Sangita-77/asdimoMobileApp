@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { loadGameSound } from "../../components/SoundCompo/GameSound";
 import { Theme } from "../../constants/theme";
 const CloseButton = require("@/assets/images/CloseButton.png");
+import { commonStyles } from "../../constants/globalStyle";
 
 const images = {
   bgImg: require("@/assets/images/background.png"),
@@ -114,7 +115,7 @@ animations.forEach((anim, index) => {
 <> 
 <LandscapeLock variant="landscape"/>
     <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>  
-      <ImageBackground  source={images.bgImg} style={StyleSheet.absoluteFillObject} resizeMode="cover" >
+      <ImageBackground  source={images.bgImg} style={commonStyles.absoluteFill} resizeMode="cover" >
         <View style={styles.container}>
         {Platform.OS === "android" && ( <QuitButton icon={CloseButton} /> )}
             <BackButton/>

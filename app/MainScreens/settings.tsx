@@ -9,7 +9,7 @@ import { ROUTES } from "@/constants/routes";
 import { Asset } from "expo-asset";
 import { useFonts } from "expo-font";
 import { router } from "expo-router";
-import * as ScreenOrientation from "expo-screen-orientation";
+// import * as ScreenOrientation from "expo-screen-orientation";
 import React, { useEffect } from "react";
 import {
   Image,
@@ -21,6 +21,7 @@ import {
   View
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import { commonStyles } from "../../constants/globalStyle";
 
 // PRELOAD IMAGES
 const bgImg = require("@/assets/images/SettingsBackground.png");
@@ -52,8 +53,8 @@ export default function SettingsScreen() {
     <>
     <LandscapeLock variant="landscape"/>
     <SafeAreaView style={styles.safeArea} edges={["left", "right"]}>
-        <ImageBackground source={bgImg} style={StyleSheet.absoluteFillObject} resizeMode="cover" >
-        <View style={StyleSheet.absoluteFillObject}>
+        <ImageBackground source={bgImg} style={commonStyles.absoluteFill} resizeMode="cover" >
+        <View style={commonStyles.absoluteFill}>
            <BackButton icon={BackButtonIcon} />
              {Platform.OS === "android" && <QuitButton icon={CloseButton} />}
                <View style={[styles.SettingBoardWrap]}>

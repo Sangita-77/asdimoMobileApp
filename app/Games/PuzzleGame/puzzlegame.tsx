@@ -3,10 +3,10 @@ import SettingsButton from "@/components/ButtonCompo/SettingsButton";
 import LandscapeLock from "@/components/ui/ScreenOrientation";
 import { ROUTES } from "@/constants/routes";
 import { Asset } from "expo-asset";
-import { Audio } from "expo-av";
+import { Audio } from "expo-audio";   
 import { useRouter } from "expo-router";
-import React, { useEffect, useRef, useState } from "react";
-import { Image, ImageBackground, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
+import { useEffect, useRef, useState } from "react";
+import { Image, ImageBackground, Pressable, Text, View, useWindowDimensions, StyleSheet } from "react-native";
 import ConfettiCannon from "react-native-confetti-cannon";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
@@ -14,6 +14,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import ChalkCircle from "../../../components/AnimationCompo/Hinthand";
 import { Theme } from "../../../constants/theme";
 import DraggablePiece from "./DraggablePiece";
+import { commonStyles } from "../../../constants/globalStyle";
 
 // PRELOAD IMAGES
 const bgImg = require("@/assets/images/GameElements/PuzzleGameBG.png");
@@ -131,7 +132,7 @@ export default function PuzzleGame({ game, currentLevel, }: { game: GameData; cu
         <BackButton icon={BackButtonIcon} />
         <ImageBackground
           source={bgImg}
-          style={StyleSheet.absoluteFillObject}
+          style={commonStyles.absoluteFill}
           resizeMode="cover"
 
         >

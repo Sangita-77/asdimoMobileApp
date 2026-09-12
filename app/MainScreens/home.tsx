@@ -21,6 +21,7 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { loadGameSound } from "../../components/SoundCompo/GameSound";
 import { styles as globalStyle } from "../../constants/globalStyle";
+import { commonStyles } from "../../constants/globalStyle";
 
 // PRELOAD IMAGES
 const bgImg = require("@/assets/images/background.png");
@@ -85,7 +86,7 @@ export default function HomeScreen() {
         <SafeAreaView style={globalStyle.safeArea} edges={["left", "right"]}>
           <ImageBackground
             source={bgImg}
-            style={StyleSheet.absoluteFillObject}
+            style={commonStyles.absoluteFill}
             resizeMode="cover"
           >
             <View style={styles.container}>

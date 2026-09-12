@@ -7,6 +7,7 @@ import Animated, {
     withTiming,
 } from "react-native-reanimated";
 import Svg, { Circle, Defs, Mask, Rect } from "react-native-svg";
+import { commonStyles } from "../../constants/globalStyle";
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -76,7 +77,7 @@ export default function GlobalCircleTransition({
 
 const styles = StyleSheet.create({
   overlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...commonStyles.absoluteFill,
     zIndex: 9999,
     elevation: 9999,
   },

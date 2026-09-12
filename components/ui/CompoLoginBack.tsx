@@ -1,6 +1,7 @@
 import Background from "@/components/ui/LoginBackground";
 import { ReactNode } from "react";
 import { ImageSourcePropType, StyleSheet, View } from "react-native";
+import { commonStyles } from "../../constants/globalStyle";
 
 interface SharedBackgroundProps {
   children: ReactNode;
@@ -22,6 +23,6 @@ export default function SharedBackground({
 const styles = StyleSheet.create({
   container: { flex: 1 },
   content: {
-    ...StyleSheet.absoluteFillObject,
+    ...commonStyles.absoluteFill,
   },
 });
