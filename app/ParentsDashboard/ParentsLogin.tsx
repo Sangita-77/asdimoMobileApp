@@ -20,12 +20,13 @@ import {
 } from "@/services/authService";
 import { Asset } from "expo-asset";
 
+import { makeRedirectUri } from "expo-auth-session";
 import * as Facebook from "expo-auth-session/providers/facebook";
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
 
 import { router } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   //////////
   Dimensions,
@@ -40,7 +41,6 @@ import Form, { useForm } from "../../components/ui/Form";
 import { styles as globalStyle } from "../../constants/globalStyle";
 
 WebBrowser.maybeCompleteAuthSession();
-
 
 function StepOne() {
   const { nextStep, formData, setFormData, errors } = useForm();
@@ -378,15 +378,15 @@ export default function Index() {
       : Platform.OS === "ios"
         ? process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID
         : process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
+  const googleRedirectUri =
+    Platform.OS === "web"
+      ? makeRedirectUri({ path: "" })
+      : makeRedirectUri({ native: "asdimo://oauthredirect" });
   const [googleRequest, , promptGoogle] = Google.useIdTokenAuthRequest({
-    // A placeholder keeps an unset environment variable from crashing the
-    // screen. The Google button remains disabled until a real ID is supplied.
-    androidClientId:
-      process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID || "missing-client-id",
-    iosClientId:
-      process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID || "missing-client-id",
-    webClientId:
-      process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || "missing-client-id",
+    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+    redirectUri: googleRedirectUri,
     selectAccount: true,
   });
   const facebookAppId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
@@ -483,7 +483,7 @@ export default function Index() {
       setIsGoogleSubmitting(false);
     }
   };
-///////////////////////////////////////////////
+  ///////////////////////////////////////////////
   const handleGoogleSignup = async () => {
     try {
       if (!googleClientId) {
@@ -519,7 +519,7 @@ export default function Index() {
       setIsGoogleSubmitting(false);
     }
   };
-///////////////////////////////////////////////////
+  ///////////////////////////////////////////////////
 
   const handleFacebookLogin = async () => {
     try {
@@ -558,8 +558,7 @@ export default function Index() {
     }
   };
 
-
-///////////////////////////////////////
+  ///////////////////////////////////////
   const handleFacebookSignup = async () => {
     try {
       if (!facebookAppId) {
@@ -608,8 +607,7 @@ export default function Index() {
   const { width } = Dimensions.get("window");
   return (
     <>
-    <CompoLoginBack dinoImage={require("@/assets/images/Diano_Run.gif")}>
-
+      <CompoLoginBack dinoImage={require("@/assets/images/Diano_Run.gif")}>
         <View style={globalStyle.FormWrap}>
           <View>
             <Tab
@@ -623,9 +621,11 @@ export default function Index() {
             <View>
               {activeTab === "signin" && (
                 <>
-                  <Text style={[
-                    globalStyle.signinText,
-                    { fontSize: Math.max(15, Math.min(width * 0.035, 24)), }, ]} 
+                  <Text
+                    style={[
+                      globalStyle.signinText,
+                      { fontSize: Math.max(15, Math.min(width * 0.035, 24)) },
+                    ]}
                   >
                     Sign in to Your Account{" "}
                   </Text>
@@ -737,10 +737,14 @@ export default function Index() {
               )}
               {activeTab === "signup" && (
                 <>
-                  <Text style={[
-                    globalStyle.signinText,
-                    { fontSize: Math.max(15, Math.min(width * 0.035, 24)), }, ]} 
-                  >Create Your Account</Text>
+                  <Text
+                    style={[
+                      globalStyle.signinText,
+                      { fontSize: Math.max(15, Math.min(width * 0.035, 24)) },
+                    ]}
+                  >
+                    Create Your Account
+                  </Text>
                   <View style={styles.ContentBox}>
                     <Form type="step">
                       <StepOne />
@@ -751,7 +755,6 @@ export default function Index() {
                       <StepSix />
                     </Form>
                     <View style={globalStyle.Dflex}>
-
                       <Button
                         style={{ marginRight: 10 }}
                         text={
@@ -760,7 +763,6 @@ export default function Index() {
                             : "Continue with Google"
                         }
                         onPress={handleGoogleSignup}
-
                         width="auto"
                         textSize="md"
                         ///////////////////
@@ -815,12 +817,27 @@ export default function Index() {
 }
 
 const styles = StyleSheet.create({
-  formError: { color: "#E53935", fontSize: 12, marginBottom: 10, },
+  formError: { color: "#E53935", fontSize: 12, marginBottom: 10 },
   formSuccess: { color: "#2E7D32", fontSize: 12, marginBottom: 10 },
   formStyles: { marginTop: 20 },
 
-  ContentBox: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 20, },
-  socialConnection: { borderRightWidth: 1, paddingRight: 20, borderColor: "#AFEBEE", },
-  signinText:{color: "#000", textAlign: "center", fontWeight: 500, fontSize: 24, marginBottom: 15},
+  ContentBox: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 20,
+  },
+  socialConnection: {
+    borderRightWidth: 1,
+    paddingRight: 20,
+    borderColor: "#AFEBEE",
+  },
+  signinText: {
+    color: "#000",
+    textAlign: "center",
+    fontWeight: 500,
+    fontSize: 24,
+    marginBottom: 15,
+  },
   varText: { textAlign: "center" },
 });
