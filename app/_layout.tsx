@@ -25,7 +25,6 @@ export default function RootLayout() {
       try {
         if (Platform.OS === "android") {
           await NavigationBar.setVisibilityAsync("hidden");
-          await NavigationBar.setBehaviorAsync("overlay-swipe");
         }
 
         await new Promise(resolve => setTimeout(resolve, 2000));
