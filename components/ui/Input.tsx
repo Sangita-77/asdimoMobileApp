@@ -51,7 +51,7 @@ export default function Input({
     third: styles.thirdContainer,
     fixed: {
       ...styles.fixedContainer,
-      width: width * 0.4,
+      width: width * 0.32,
     },
     otp: styles.otpContainer,
   };
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
   },
 
   fullContainer: {
-    width: "100%",
+    width: "100%", 
   },
 
   halfContainer: {
