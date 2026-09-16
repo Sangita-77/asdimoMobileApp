@@ -10,6 +10,10 @@ import { useEffect, useState } from "react";
 import { Platform, View } from "react-native";
 import "react-native-reanimated";
 import { SafeAreaProvider } from "react-native-safe-area-context";
+import * as Linking from "expo-linking";
+import * as WebBrowser from "expo-web-browser";
+
+WebBrowser.maybeCompleteAuthSession();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -21,6 +25,13 @@ export default function RootLayout() {
   const [appIsReady, setAppIsReady] = useState(false);
 
   useEffect(() => {
+    // Listen for incoming deep link URLs (OAuth redirects)
+    const subscription = Linking.addEventListener("url", (event) => {
+      if (event.url) {
+        WebBrowser.maybeCompleteAuthSession({ skipStateChecksum: true } as any);
+      }
+    });
+
     async function prepare() {
       try {
         if (Platform.OS === "android") {
@@ -37,23 +48,26 @@ export default function RootLayout() {
     }
 
     prepare();
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   if (!fontsLoaded || !appIsReady) {
     return null;
   }
 
-return (
-  <SafeAreaProvider>
-    <TransitionProvider>
-      <View style={{ flex: 1, backgroundColor: "#1e1e1e", overflow: "visible", }}>
-        <StatusBar hidden />
-        <RouteGuard />
-      </View>
-    </TransitionProvider>
-  </SafeAreaProvider>
-);
-
+  return (
+    <SafeAreaProvider>
+      <TransitionProvider>
+        <View style={{ flex: 1, backgroundColor: "#1e1e1e", overflow: "visible" }}>
+          <StatusBar hidden />
+          <RouteGuard />
+        </View>
+      </TransitionProvider>
+    </SafeAreaProvider>
+  );
 }
 
 function RouteGuard() {
@@ -62,7 +76,14 @@ function RouteGuard() {
   const [authenticated, setAuthenticated] = useState(false);
   const [checkedPath, setCheckedPath] = useState<string | null>(null);
   const isPublicRoute =
-  pathname === ROUTES.LANDING.LOADING || pathname === ROUTES.AUTH.LOGIN;
+    pathname === ROUTES.LANDING.LOADING ||
+    pathname === ROUTES.AUTH.LOGIN ||
+    pathname === "/+not-found" ||
+    pathname?.startsWith("/[...unmatched]") ||
+    pathname?.startsWith("/oauthredirect") ||
+    pathname?.startsWith("/authorize") ||
+    pathname?.startsWith("/privacy-policy") ||
+    pathname?.startsWith("/data-deletion");
 
   useEffect(() => {
     let mounted = true;
@@ -96,7 +117,14 @@ function RouteGuard() {
             backgroundColor: "transparent",
           },
         }}
-      />
+      >
+        <Stack.Screen name="+not-found" />
+        <Stack.Screen name="[...unmatched]" />
+        <Stack.Screen name="oauthredirect" />
+        <Stack.Screen name="authorize" />
+        <Stack.Screen name="privacy-policy" />
+        <Stack.Screen name="data-deletion" />
+      </Stack>
       {shouldRedirect && <Redirect href={ROUTES.AUTH.LOGIN} />}
     </>
   );

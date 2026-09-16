@@ -372,35 +372,178 @@ export default function Index() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
   const [isFacebookSubmitting, setIsFacebookSubmitting] = useState(false);
+  const [pendingSocialAction, setPendingSocialAction] = useState<
+    "google-login" | "google-signup" | "facebook-login" | "facebook-signup" | null
+  >(null);
+
   const googleClientId =
     Platform.OS === "web"
       ? process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID
       : Platform.OS === "ios"
         ? process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID
         : process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID;
+
   const googleRedirectUri =
     Platform.OS === "web"
       ? makeRedirectUri({ path: "" })
-      : makeRedirectUri({ native: "asdimo://oauthredirect" });
-  const [googleRequest, , promptGoogle] = Google.useIdTokenAuthRequest({
-    androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
-    iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
-    webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
-    redirectUri: googleRedirectUri,
-    selectAccount: true,
-  });
+      : Platform.OS === "ios"
+        ? makeRedirectUri({
+            native: `com.googleusercontent.apps.486198135019-91n0mqg6h1s3rrdn2ac4ksnreo1quej1:/oauthredirect`,
+          })
+        : makeRedirectUri({
+            native: "com.swatibazal.asdimo:/oauthredirect",
+          });
+
+  const [googleRequest, googleResponse, promptGoogle] =
+    Google.useIdTokenAuthRequest({
+      androidClientId: process.env.EXPO_PUBLIC_GOOGLE_ANDROID_CLIENT_ID,
+      iosClientId: process.env.EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID,
+      webClientId: process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
+      redirectUri: googleRedirectUri,
+      selectAccount: true,
+    });
+
   const facebookAppId = process.env.EXPO_PUBLIC_FACEBOOK_APP_ID;
-  const [facebookRequest, , promptFacebook] = Facebook.useAuthRequest({
-    // This placeholder prevents an unset environment variable from crashing
-    // the screen. The Facebook button remains disabled until it is configured.
-    clientId: facebookAppId || "missing-facebook-app-id",
-  });
+
+  const facebookRedirectUri =
+    Platform.OS === "web"
+      ? makeRedirectUri({ path: "" })
+      : makeRedirectUri({
+          native: `fb${facebookAppId}://authorize`,
+        });
+
+  const [facebookRequest, facebookResponse, promptFacebook] =
+    Facebook.useAuthRequest({
+      clientId: facebookAppId || "missing-facebook-app-id",
+      androidClientId: facebookAppId || "missing-facebook-app-id",
+      iosClientId: facebookAppId || "missing-facebook-app-id",
+      webClientId: facebookAppId || "missing-facebook-app-id",
+      redirectUri: facebookRedirectUri,
+    });
 
   const Rainbow = require("../../assets/images/Rainbow.png");
   const Cloude = require("../../assets/images/Cloude.png");
   const LoadingDimo = require("../../assets/images/Diano_Run.gif");
   const GoogleIcon = require("../../assets/images/GoogleIcon.png");
   const FacebookIcon = require("../../assets/images/FacebookIcon.png");
+
+  const processGoogleAuth = async (
+    idToken: string,
+    action: "login" | "signup",
+  ) => {
+    try {
+      setIsGoogleSubmitting(true);
+      setSignInErrors((prev) => ({ ...prev, loginError: "" }));
+      if (action === "login") {
+        await googleLogin(idToken);
+      } else {
+        await googleSignup(idToken, { flag: 4 });
+      }
+      router.replace(ROUTES.APP.HOME);
+    } catch (error) {
+      setSignInErrors((prev) => ({
+        ...prev,
+        loginError:
+          error instanceof Error
+            ? error.message
+            : `${action === "login" ? "Google login" : "Google signup"} failed.`,
+      }));
+    } finally {
+      setIsGoogleSubmitting(false);
+      setPendingSocialAction(null);
+    }
+  };
+
+  const processFacebookAuth = async (
+    accessToken: string,
+    action: "login" | "signup",
+  ) => {
+    try {
+      setIsFacebookSubmitting(true);
+      setSignInErrors((prev) => ({ ...prev, loginError: "" }));
+      if (action === "login") {
+        await facebookLogin(accessToken);
+      } else {
+        await facebookSignup(accessToken, { flag: 4 });
+      }
+      router.replace(ROUTES.APP.HOME);
+    } catch (error) {
+      setSignInErrors((prev) => ({
+        ...prev,
+        loginError:
+          error instanceof Error
+            ? error.message
+            : `${action === "login" ? "Facebook login" : "Facebook signup"} failed.`,
+      }));
+    } finally {
+      setIsFacebookSubmitting(false);
+      setPendingSocialAction(null);
+    }
+  };
+
+  useEffect(() => {
+    if (!googleResponse) return;
+
+    if (googleResponse.type === "success") {
+      const idToken =
+        googleResponse.authentication?.idToken ||
+        googleResponse.params?.id_token;
+
+      if (idToken && pendingSocialAction?.startsWith("google")) {
+        const action =
+          pendingSocialAction === "google-signup" ? "signup" : "login";
+        void processGoogleAuth(idToken, action);
+      }
+    } else if (googleResponse.type === "error") {
+      setIsGoogleSubmitting(false);
+      setPendingSocialAction(null);
+      setSignInErrors((prev) => ({
+        ...prev,
+        loginError:
+          googleResponse.error?.description ||
+          (googleResponse.error as any)?.message ||
+          "Google sign-in could not be completed.",
+      }));
+    } else if (
+      googleResponse.type === "cancel" ||
+      googleResponse.type === "dismiss"
+    ) {
+      setIsGoogleSubmitting(false);
+      setPendingSocialAction(null);
+    }
+  }, [googleResponse, pendingSocialAction]);
+
+  useEffect(() => {
+    if (!facebookResponse) return;
+
+    if (facebookResponse.type === "success") {
+      const accessToken =
+        facebookResponse.authentication?.accessToken ||
+        facebookResponse.params?.access_token;
+
+      if (accessToken && pendingSocialAction?.startsWith("facebook")) {
+        const action =
+          pendingSocialAction === "facebook-signup" ? "signup" : "login";
+        void processFacebookAuth(accessToken, action);
+      }
+    } else if (facebookResponse.type === "error") {
+      setIsFacebookSubmitting(false);
+      setPendingSocialAction(null);
+      setSignInErrors((prev) => ({
+        ...prev,
+        loginError:
+          facebookResponse.error?.description ||
+          (facebookResponse.error as any)?.message ||
+          "Facebook sign-in could not be completed.",
+      }));
+    } else if (
+      facebookResponse.type === "cancel" ||
+      facebookResponse.type === "dismiss"
+    ) {
+      setIsFacebookSubmitting(false);
+      setPendingSocialAction(null);
+    }
+  }, [facebookResponse, pendingSocialAction]);
 
   const handleSubmit = async () => {
     const email = signInEmail.trim();
@@ -415,8 +558,6 @@ export default function Index() {
         : signInPassword.length < 6
           ? "Password must be at least 6 characters."
           : "",
-
-      // loginError: "Login failed. Please check your credentials.",
       loginError: "",
     };
 
@@ -429,13 +570,8 @@ export default function Index() {
     try {
       setIsSubmitting(true);
       await loginUser(email, signInPassword);
-      // router.replace("/MainScreens/home");
       router.replace(ROUTES.APP.HOME);
     } catch (error) {
-      // Alert.alert(
-      //   "Login failed",
-      //   error instanceof Error ? error.message : "Unable to log in",
-      // );
       setSignInErrors((prev) => ({
         ...prev,
         loginError:
@@ -456,34 +592,30 @@ export default function Index() {
 
       setSignInErrors((previous) => ({ ...previous, loginError: "" }));
       setIsGoogleSubmitting(true);
+      setPendingSocialAction("google-login");
 
       const result = await promptGoogle();
-      if (result.type === "cancel" || result.type === "dismiss") return;
-
-      if (result.type !== "success") {
-        throw new Error(
-          "Google sign-in could not be completed. Please try again.",
-        );
+      if (result.type === "success") {
+        const idToken =
+          result.authentication?.idToken || result.params?.id_token;
+        if (idToken) {
+          await processGoogleAuth(idToken, "login");
+        }
+      } else if (result.type === "cancel" || result.type === "dismiss") {
+        setIsGoogleSubmitting(false);
+        setPendingSocialAction(null);
       }
-
-      const idToken = result.params.id_token;
-      if (!idToken) {
-        throw new Error("Google did not return an ID token.");
-      }
-
-      await googleLogin(idToken);
-      router.replace(ROUTES.APP.HOME);
     } catch (error) {
+      setIsGoogleSubmitting(false);
+      setPendingSocialAction(null);
       setSignInErrors((previous) => ({
         ...previous,
         loginError:
           error instanceof Error ? error.message : "Google login failed.",
       }));
-    } finally {
-      setIsGoogleSubmitting(false);
     }
   };
-  ///////////////////////////////////////////////
+
   const handleGoogleSignup = async () => {
     try {
       if (!googleClientId) {
@@ -492,34 +624,29 @@ export default function Index() {
 
       setSignInErrors((previous) => ({ ...previous, loginError: "" }));
       setIsGoogleSubmitting(true);
+      setPendingSocialAction("google-signup");
 
       const result = await promptGoogle();
-      if (result.type === "cancel" || result.type === "dismiss") return;
-
-      if (result.type !== "success") {
-        throw new Error(
-          "Google signup could not be completed. Please try again.",
-        );
+      if (result.type === "success") {
+        const idToken =
+          result.authentication?.idToken || result.params?.id_token;
+        if (idToken) {
+          await processGoogleAuth(idToken, "signup");
+        }
+      } else if (result.type === "cancel" || result.type === "dismiss") {
+        setIsGoogleSubmitting(false);
+        setPendingSocialAction(null);
       }
-
-      const idToken = result.params.id_token;
-      if (!idToken) {
-        throw new Error("Google did not return an ID token.");
-      }
-
-      await googleSignup(idToken, { flag: 4 });
-      router.replace(ROUTES.APP.HOME);
     } catch (error) {
+      setIsGoogleSubmitting(false);
+      setPendingSocialAction(null);
       setSignInErrors((previous) => ({
         ...previous,
         loginError:
           error instanceof Error ? error.message : "Google signup failed.",
       }));
-    } finally {
-      setIsGoogleSubmitting(false);
     }
   };
-  ///////////////////////////////////////////////////
 
   const handleFacebookLogin = async () => {
     try {
@@ -529,36 +656,30 @@ export default function Index() {
 
       setSignInErrors((previous) => ({ ...previous, loginError: "" }));
       setIsFacebookSubmitting(true);
+      setPendingSocialAction("facebook-login");
 
       const result = await promptFacebook();
-      if (result.type === "cancel" || result.type === "dismiss") return;
-
-      if (result.type !== "success") {
-        throw new Error(
-          "Facebook sign-in could not be completed. Please try again.",
-        );
+      if (result.type === "success") {
+        const accessToken =
+          result.authentication?.accessToken || result.params?.access_token;
+        if (accessToken) {
+          await processFacebookAuth(accessToken, "login");
+        }
+      } else if (result.type === "cancel" || result.type === "dismiss") {
+        setIsFacebookSubmitting(false);
+        setPendingSocialAction(null);
       }
-
-      const facebookAccessToken =
-        result.authentication?.accessToken || result.params.access_token;
-      if (!facebookAccessToken) {
-        throw new Error("Facebook did not return an access token.");
-      }
-
-      await facebookLogin(facebookAccessToken);
-      router.replace(ROUTES.APP.HOME);
     } catch (error) {
+      setIsFacebookSubmitting(false);
+      setPendingSocialAction(null);
       setSignInErrors((previous) => ({
         ...previous,
         loginError:
           error instanceof Error ? error.message : "Facebook login failed.",
       }));
-    } finally {
-      setIsFacebookSubmitting(false);
     }
   };
 
-  ///////////////////////////////////////
   const handleFacebookSignup = async () => {
     try {
       if (!facebookAppId) {
@@ -567,35 +688,29 @@ export default function Index() {
 
       setSignInErrors((previous) => ({ ...previous, loginError: "" }));
       setIsFacebookSubmitting(true);
+      setPendingSocialAction("facebook-signup");
 
       const result = await promptFacebook();
-      if (result.type === "cancel" || result.type === "dismiss") return;
-
-      if (result.type !== "success") {
-        throw new Error(
-          "Facebook signup could not be completed. Please try again.",
-        );
+      if (result.type === "success") {
+        const accessToken =
+          result.authentication?.accessToken || result.params?.access_token;
+        if (accessToken) {
+          await processFacebookAuth(accessToken, "signup");
+        }
+      } else if (result.type === "cancel" || result.type === "dismiss") {
+        setIsFacebookSubmitting(false);
+        setPendingSocialAction(null);
       }
-
-      const facebookAccessToken =
-        result.authentication?.accessToken || result.params.access_token;
-      if (!facebookAccessToken) {
-        throw new Error("Facebook did not return an access token.");
-      }
-
-      await facebookSignup(facebookAccessToken, { flag: 4 });
-      router.replace(ROUTES.APP.HOME);
     } catch (error) {
+      setIsFacebookSubmitting(false);
+      setPendingSocialAction(null);
       setSignInErrors((previous) => ({
         ...previous,
         loginError:
           error instanceof Error ? error.message : "Facebook signup failed.",
       }));
-    } finally {
-      setIsFacebookSubmitting(false);
     }
   };
-  /////////////////////////////////////////
 
   useEffect(() => {
     async function loadAssets() {
@@ -821,8 +936,23 @@ const styles = StyleSheet.create({
   formSuccess: { color: "#2E7D32", fontSize: 12, marginBottom: 10 },
   formStyles: { marginTop: 20 },
 
-  ContentBox: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 20, },
-  socialConnection: { borderRightWidth: 1, paddingRight: 20, borderColor: "#AFEBEE", },
-  signinText:{color: "#000", textAlign: "center", fontWeight: 500, fontSize: 24, marginBottom: 15},
+  ContentBox: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 20,
+  },
+  socialConnection: {
+    borderRightWidth: 1,
+    paddingRight: 20,
+    borderColor: "#AFEBEE",
+  },
+  signinText: {
+    color: "#000",
+    textAlign: "center",
+    fontWeight: 500,
+    fontSize: 24,
+    marginBottom: 15,
+  },
   varText: { textAlign: "center" },
 });
