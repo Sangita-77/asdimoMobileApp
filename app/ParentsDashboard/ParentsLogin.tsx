@@ -936,23 +936,9 @@ const styles = StyleSheet.create({
   formSuccess: { color: "#2E7D32", fontSize: 12, marginBottom: 10 },
   formStyles: { marginTop: 20 },
 
-  ContentBox: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "center",
-    gap: 20,
-  },
-  socialConnection: {
-    borderRightWidth: 1,
-    paddingRight: 20,
-    borderColor: "#AFEBEE",
-  },
-  signinText: {
-    color: "#000",
-    textAlign: "center",
-    fontWeight: 500,
-    fontSize: 24,
-    marginBottom: 15,
-  },
+
+  ContentBox: { flexDirection: "row", flexWrap: "wrap", justifyContent: "center", gap: 20, },
+  socialConnection: { borderRightWidth: 1, paddingRight: 20, borderColor: "#AFEBEE", },
+  signinText:{color: "#000", textAlign: "center", fontWeight: 500, fontSize: 24, marginBottom: 15},
   varText: { textAlign: "center" },
 });
