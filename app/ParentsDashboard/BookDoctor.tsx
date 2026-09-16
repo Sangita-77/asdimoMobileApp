@@ -12,9 +12,8 @@ import {
   getLoggedInUserId,
   getTherapistAvailability,
 } from "@/services/authService";
-import * as Linking from "expo-linking";
+import { processPayment } from "@/services/paymentService";
 import { router, useLocalSearchParams } from "expo-router";
-import * as WebBrowser from "expo-web-browser";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   ActivityIndicator,
@@ -143,42 +142,23 @@ export default function BookDoctor() {
         throw new Error("Your session has expired. Please sign in again.");
       }
 
-      const returnUrl = Linking.createURL("payment-complete");
-      const paymentUrl = new URL(
-        "https://dreamgroupsindia.com/dev/asDimoWebApp/payment",
-      );
-      paymentUrl.searchParams.set("accessToken", accessToken);
-      paymentUrl.searchParams.set("amount", "499");
-      paymentUrl.searchParams.set("user", JSON.stringify({ parentId }));
-      paymentUrl.searchParams.set(
-        "metadata",
-        JSON.stringify({
+      const paymentResult = await processPayment({
+        amount: 499,
+        description: `Consultation with ${name}`,
+        user: { parentId },
+        metadata: {
           source: "mobile-book-appointment",
           appointment: appointmentPayload,
-        }),
-      );
-      paymentUrl.searchParams.set("returnUrl", returnUrl);
+        },
+      });
 
-      const paymentResult = await WebBrowser.openAuthSessionAsync(
-        paymentUrl.toString(),
-        returnUrl,
-      );
-      if (paymentResult.type !== "success") {
-        throw new Error("Payment was cancelled before completion.");
-      }
-
-      const paymentParams = Linking.parse(paymentResult.url).queryParams || {};
-      if (paymentParams.payment !== "success") {
+      if (!paymentResult.success || !paymentResult.paymentId) {
         throw new Error("Payment could not be confirmed.");
-      }
-      const paymentId = paymentParams.paymentId;
-      if (typeof paymentId !== "string" || !paymentId.trim()) {
-        throw new Error("Payment reference is missing.");
       }
 
       const response = await createAppointment({
         ...appointmentPayload,
-        paymentId,
+        paymentId: paymentResult.paymentId,
       });
       setAvailability((current) =>
         current.map((slot) =>

@@ -12,7 +12,7 @@ Google OAuth uses three different client IDs. The web client ID is only for the 
 3. Add the Android client ID to the backend `GOOGLE_CLIENT_IDS` allowlist. The backend verifies the ID token audience, so allowing only the web client ID will reject native sign-in.
 4. Rebuild the native app after changing `.env` or native OAuth settings. `npx expo start --android` cannot update an already-installed standalone/development build.
 
-The web redirect is `http://localhost:8081/`. The native redirect is `asdimo://oauthredirect`; the `asdimo` scheme is configured in `app.json`. Do not replace native client IDs with the browser client ID.
+The web redirect is `http://localhost:8081/`. The native Google redirect is `com.swatibazal.asdimo:/oauthredirect`, and Facebook uses `fb1083657204087096://authorize`. These schemes are configured in `app.json`; do not replace native client IDs with the browser client ID.
 
 ### Android testing requirements
 

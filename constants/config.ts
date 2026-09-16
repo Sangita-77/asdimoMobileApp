@@ -19,4 +19,7 @@ export const AUTH_ENDPOINTS = {
   getTherapistAvailability: "/therapists/get_availability",
   appointments: "/appointments",
   getAppointmentsById: "/appointments/getAppointmentsById",
+  paymentKey: "/payments/key",
+  createOrder: "/payments/create-order",
+  verifyPayment: "/payments/verify-payment",
 } as const;
