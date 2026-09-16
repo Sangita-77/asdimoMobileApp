@@ -19,7 +19,7 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { loadGameSound } from "../../components/SoundCompo/GameSound";
+import { loadGameSound} from "../../components/SoundCompo/GameSound";
 import { commonStyles, styles as globalStyle } from "../../constants/globalStyle";
 
 // PRELOAD IMAGES
@@ -34,11 +34,11 @@ const RingImage = require("@/assets/images/RingImage.gif");
 export default function HomeScreen() {
   const transition = useTransition();
   const scaleAnim = useRef(new Animated.Value(1)).current;
-  const [close, setClose] = useState(false);
-  const [targetRoute, setTargetRoute] = useState("");
+  // const [close, setClose] = useState(false);
+  // const [targetRoute, setTargetRoute] = useState("");
 
   useEffect(() => {
-    loadGameSound();
+    void loadGameSound();
   }, []);
 
   useEffect(() => {

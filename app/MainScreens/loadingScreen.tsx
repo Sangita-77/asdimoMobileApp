@@ -19,6 +19,7 @@ import {
 import { styles as globalStyle } from "../../constants/globalStyle";
 // import LottieView from "lottie-react-native";
 // import { pauseGameSound, resumeGameSound } from "../components/SoundCompo/GameSound";
+import { loadGameSound, pauseGameSound, resumeGameSound, } from "@/components/SoundCompo/GameSound";
 import { commonStyles } from "../../constants/globalStyle";
 
 export default function Index() {
@@ -33,39 +34,50 @@ export default function Index() {
   const Rainbow = require("../../assets/images/Rainbow.png");
   const Cloude = require("../../assets/images/Cloude.png");
 
-  // useFocusEffect(
-  //   useCallback(() => {
-  //     pauseGameSound(); // pause on this screen
+useEffect(() => {
+  // Pause music while splash/loading screen is active
+  pauseGameSound();
 
-  //     return () => {
-  //       resumeGameSound(); // resume when leaving
-  //     };
-  //   }, [])
-  // );
+  Asset.loadAsync([
+    LoadingDimo,
+    LoaderImage,
+    Rainbow,
+    Cloude,
+  ]);
 
-  useEffect(() => {
-    Asset.loadAsync([LoadingDimo, LoaderImage, Rainbow, Cloude]);
-    let count = 0;
+  let count = 0;
 
-    const interval = setInterval(() => {
-      count += 1;
-      setProgress(count);
+  const interval = setInterval(() => {
+    count += 1;
 
-      Animated.timing(animatedWidth, {
-        toValue: count,
-        duration: 40,
-        useNativeDriver: false,
-      }).start();
+    setProgress(count);
 
-      if (count >= 100) {
-        clearInterval(interval);
-        void isAuthenticated().then((authenticated) => {
-          router.replace(authenticated ? ROUTES.APP.HOME : ROUTES.AUTH.LOGIN);
-        });
-      }
-    }, 70);
-    return () => clearInterval(interval);
-  }, []);
+    Animated.timing(animatedWidth, {
+      toValue: count,
+      duration: 40,
+      useNativeDriver: false,
+    }).start();
+
+    if (count >= 100) {
+      clearInterval(interval);
+
+      void isAuthenticated().then((authenticated) => {
+        router.replace(
+          authenticated
+            ? ROUTES.APP.HOME
+            : ROUTES.AUTH.LOGIN
+        );
+      });
+    }
+  }, 70);
+
+  return () => {
+    clearInterval(interval);
+
+    // Resume music when leaving splash screen
+    resumeGameSound();
+  };
+}, []);
 
   const widthInterpolated = animatedWidth.interpolate({
     inputRange: [0, 100],
