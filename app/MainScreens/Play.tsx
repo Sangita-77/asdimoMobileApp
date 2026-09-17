@@ -19,8 +19,8 @@ import {
     View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { loadGameSound} from "../../components/SoundCompo/GameSound";
-import { commonStyles, styles as globalStyle } from "../../constants/globalStyle";
+import { loadGameSound } from "../../components/SoundCompo/GameSound";
+import { commonStyles, globalStyle } from "../../constants/globalStyle";
 
 // PRELOAD IMAGES
 const bgImg = require("@/assets/images/background.png");

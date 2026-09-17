@@ -6,44 +6,72 @@ import { ROUTES } from "@/constants/routes";
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from "expo-router";
 import { Image, ScrollView, StyleSheet, Text, useWindowDimensions, View, } from 'react-native';
-import { getDynamicStyles } from '../../constants/globalStyle'
+import { getDynamicStyles, globalStyle } from '../../constants/globalStyle';
+import { useEffect} from "react";
+import { Asset } from "expo-asset";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 
 const DashboardIcon = require("../../assets/images/landingDashIcon.png");
 const settingsIcon = require("../../assets/images/landingSettingIcon.png");
 const LogoutIcon = require("../../assets/images/SignOut.png");
+const handleLogout = async () => {
+  try {
+    await AsyncStorage.removeItem("authSession");
+    await AsyncStorage.removeItem("authUser");
+
+    router.replace(ROUTES.AUTH.LOGIN);
+  } catch (error) {
+    console.error("Logout failed:", error);
+  }
+};
 
 const cards = [
   {
     title: 'PE',
     description: 'Test your knowledge and learn new things',
-    image: require('../../assets/images/pe-img01.png'),
-    cardbtn: require('../../assets/images/landingGreenArrow.svg'),
+    image: require('../../assets/images/pe-img01.webp'),
+    cardbtn: require('../../assets/images/landingGreenArrow.webp'),
     colors: ['#61D889', '#4DBE82'] as const,
+    route: ROUTES.APP.HOME,
   },
   {
     title: 'Appointment',
     description: 'Test your knowledge and learn new things',
     image: require('../../assets/images/appointment-img01.png'),
-    cardbtn: require('../../assets/images/landingPurpleArrow.svg'),
+    cardbtn: require('../../assets/images/landingGreenArrow.webp'),
     colors: ['#9060ED', '#7344D7'] as const,
+    route: ROUTES.AUTH.DOCTORSLIST,
   },
   {
     title: 'Games',
     description: 'Play fun and\neducational games',
     image: require('../../assets/images/games-img01.png'),
-    cardbtn: require('../../assets/images/landingBlueArrow.svg'),
+    cardbtn: require('../../assets/images/landingGreenArrow.webp'),
     colors: ['#5285EF', '#4072DB'] as const,
+    route: ROUTES.APP.LANDING,
   },
   {
     title: 'Shop',
     description: 'Explore and buy\nexciting items',
     image: require('../../assets/images/shop-img01.png'),
-    cardbtn: require('../../assets/images/landingPinkArrow.svg'),
+    cardbtn: require('../../assets/images/landingGreenArrow.webp'),
     colors: ['#EA4C9B', '#DC378B'] as const,
+    route: ROUTES.APP.HOME,
   },
 ];
 
+
 function LandingScreen() {
+  useEffect(() => {
+    Asset.loadAsync([
+      DashboardIcon,
+      settingsIcon,
+      LogoutIcon,
+    ]).catch((error) => {
+      console.error("Failed to load assets:", error);
+    });
+  }, []);
   const transition = useTransition();
   const { width } = useWindowDimensions();
   const dynamicStyles = getDynamicStyles(width);
@@ -52,17 +80,8 @@ function LandingScreen() {
     <CompoLoginBack
       dinoImage={require('@/assets/images/Diano_Run.gif')}
     >
-      <View
-        style={dynamicStyles.FormWrap}
-      >
-        <View
-          style={[
-            styles.topButtons,
-            {
-              marginRight: width * 0.05,
-            },
-          ]}
-        >
+      <View style={dynamicStyles.FormWrap} >
+        <View style={[ styles.topButtons ]} >
           <Button
             text="Go to my dashboard"
             width="auto"
@@ -70,7 +89,6 @@ function LandingScreen() {
             icon={
               <Image
                 source={DashboardIcon}
-                style={styles.iconCircle}
               />
             }
           />
@@ -83,7 +101,6 @@ function LandingScreen() {
             icon={
               <Image
                 source={settingsIcon}
-                style={styles.iconCircle}
               />
             }
             onPress={() => {
@@ -96,11 +113,11 @@ function LandingScreen() {
           />
         </View>
 
-        <Text style={styles.title}>
+        <Text style={[globalStyle.signinText, {textAlign: "left", fontSize: Math.max(15, Math.min(width * 0.035, 24)), textShadowColor: "rgba(255, 255, 255, 0.85)", textShadowOffset: { width: -2, height: -1 }, textShadowRadius: 4, }, ]} >
           Hello there!
         </Text>
 
-        <Text style={styles.subtitle}>
+        <Text style={[globalStyle.signinText, { textAlign: "left" }, ]}>
           What would you like to explore today?
         </Text>
 
@@ -114,40 +131,49 @@ function LandingScreen() {
               key={index}
               colors={card.colors}
               style={[
-                styles.card,
-                {
-                  width: width * 0.236,
-                },
+                styles.card, { width: width * 0.175, paddingLeft: width * 0.02, },
               ]}
             >
-              <Text style={styles.cardTitle}>
+              <Text style={[styles.cardTitle, { fontSize: width * 0.018, }, ]}>
                 {card.title}
               </Text>
 
-              <Text style={styles.cardDescription}>
+              <Text style={[styles.cardDescription, { fontSize: width * 0.010, lineHeight: width * 0.015}, ]}>
                 {card.description}
               </Text>
 
               <Image
                 source={card.image}
-                style={styles.cardImage}
+                style={{
+                  width: width * 0.110,
+                  height: width * 0.110,
+                }}
                 resizeMode="contain"
               />
+              <View style={{ paddingLeft: width * 0.02, paddingBottom: width * 0.02 }}>
+            <Button
+              text=""
+              style={styles.arrowButton}
+              width="auto"
+              icon={
+                <Image
+                  source={card.cardbtn}
+                  style={{
+                    width: 30,
+                    height: 30,
+                  }}
+                  resizeMode="contain"
+                />
+              }
+              onPress={() => {
+                playClickSound();
 
-              <Button
-                text=""
-                style={styles.arrowButton}
-                width="auto"
-                icon={
-                  <Image
-                    source={card.cardbtn}
-                    style={{
-                      width: 30,
-                      height: 30,
-                    }}
-                  />
-                }
-              />
+                transition.current?.cover(() => {
+                  router.push(card.route);
+                });
+              }}
+            />
+              </View>
             </LinearGradient>
           ))}
         </ScrollView>
@@ -159,6 +185,10 @@ function LandingScreen() {
           variant="white"
           textSize="md"
           icon={<Image source={LogoutIcon} />}
+          onPress={async () => {
+          playClickSound();
+          await handleLogout();
+        }}
         />
       </View>
     </CompoLoginBack>
@@ -167,13 +197,6 @@ function LandingScreen() {
 
 const styles = StyleSheet.create({
   title: { fontSize: 27, lineHeight: 27, fontWeight: '700', marginBottom: 5, color: '#272727', textAlign: 'center', },
-
-  subtitle: {
-    fontSize: 16,
-    color: '#272727',
-    marginBottom: 15,
-    textAlign: 'center',
-  },
 
   cardsContainer: {
     gap: 12,
@@ -210,12 +233,6 @@ const styles = StyleSheet.create({
     lineHeight: 14,
     marginBottom: 10,
   },
-
-  cardImage: {
-    width: '100%',
-    height: 120,
-  },
-
   arrowButton: {
     left: -11,
     bottom: 15,
@@ -233,7 +250,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
     gap: 15,
-    marginBottom: 16,
+    marginBottom: -38,
     marginTop: 17,
   },
 

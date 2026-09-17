@@ -11,13 +11,13 @@ import * as Facebook from "expo-auth-session/providers/facebook";
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
 
+import { makeRedirectUri } from "expo-auth-session";
 import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { Dimensions, Image, Platform, StyleSheet, Text, View, } from "react-native";
+import { loadGameSound } from "../../components/SoundCompo/GameSound";
 import Form, { useForm } from "../../components/ui/Form";
-import { styles as globalStyle } from "../../constants/globalStyle";
-import { loadGameSound} from "../../components/SoundCompo/GameSound";
-import { makeRedirectUri } from "expo-auth-session";
+import { globalStyle, getDynamicStyles } from "../../constants/globalStyle";
 
 
 WebBrowser.maybeCompleteAuthSession();
@@ -51,7 +51,6 @@ function StepOne() {
       setIsSendingOtp(false);
     }
   };
-
   return (
     <View>
       <View style={globalStyle.Dflex}>
@@ -710,12 +709,12 @@ export default function Index() {
   useEffect(() => {
     void loadGameSound();
   }, []);
-
+  const dynamicStyles = getDynamicStyles(width);
   return (
     <>
     <CompoLoginBack dinoImage={require("@/assets/images/Diano_Run.gif")}>
 
-        <View style={globalStyle.FormWrap}>
+        <View style={dynamicStyles.FormWrap}>
           <View>
             <Tab
               tabs={[

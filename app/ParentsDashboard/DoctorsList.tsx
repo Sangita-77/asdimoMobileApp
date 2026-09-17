@@ -2,18 +2,16 @@ import Footer from "@/components/ui/Footer";
 import Header from "@/components/ui/Header";
 import DoctorListCard from "@/components/ui/ListComponents";
 import OrientationLock from "@/components/ui/ScreenOrientation";
-import { LinearGradient } from "expo-linear-gradient";
-import { styles as globalStyle } from "../../constants/globalStyle";
+import { API_BASE_URL } from "@/constants/config";
+import { ROUTES } from "@/constants/routes";
 import {
   AvailabilitySlot,
   getTherapistAvailability,
   getTherapists,
   Therapist,
 } from "@/services/authService";
-import { API_BASE_URL } from "@/constants/config";
-import { ROUTES } from "@/constants/routes";
 import { router } from "expo-router";
-import React, { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
@@ -21,6 +19,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { globalStyle } from "../../constants/globalStyle";
 
 export default function DoctorList() {
   const [therapists, setTherapists] = useState<

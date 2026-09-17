@@ -6,25 +6,25 @@ import OrientationLock from "@/components/ui/ScreenOrientation";
 import { API_BASE_URL } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
 import {
-  AvailabilitySlot,
-  createAppointment,
-  getAccessToken,
-  getLoggedInUserId,
-  getTherapistAvailability,
+    AvailabilitySlot,
+    createAppointment,
+    getAccessToken,
+    getLoggedInUserId,
+    getTherapistAvailability,
 } from "@/services/authService";
 import { processPayment } from "@/services/paymentService";
 import { router, useLocalSearchParams } from "expo-router";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-  ActivityIndicator,
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
+    ActivityIndicator,
+    Image,
+    Pressable,
+    ScrollView,
+    StyleSheet,
+    Text,
+    View,
 } from "react-native";
-import { styles as globalStyle } from "../../constants/globalStyle";
+import { globalStyle } from "../../constants/globalStyle";
 
 function toDateValue(date: string) {
   const [day, month, year] = date.split("-").map(Number);

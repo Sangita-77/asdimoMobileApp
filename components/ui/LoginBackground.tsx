@@ -1,9 +1,9 @@
 import LandscapeLock from "@/components/ui/ScreenOrientation";
 import { Asset } from "expo-asset";
 import { LinearGradient } from "expo-linear-gradient";
-import React, { useEffect } from "react";
-import { Image, StyleSheet, View, useWindowDimensions, Dimensions, ImageSourcePropType } from "react-native";
-import { styles as globalStyle } from "../../constants/globalStyle";
+import { useEffect } from "react";
+import { Image, ImageSourcePropType, StyleSheet, View, useWindowDimensions } from "react-native";
+import { globalStyle } from "../../constants/globalStyle";
 import CloudFloat from "../AnimationCompo/CloudFloat";
 import BackButton from "../ButtonCompo/BackButton";
 // const { width } = Dimensions.get("window");

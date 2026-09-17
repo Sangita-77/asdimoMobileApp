@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 // const { width, height} = useWindowDimensions();
 
-export const styles = StyleSheet.create({
+export const globalStyle = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f0f0f0d0",},
   container2: { flex: 1, justifyContent: "center", alignItems: "center",},
 
@@ -24,5 +24,5 @@ export const commonStyles = StyleSheet.create({
 
 export const getDynamicStyles = (width: number) =>
   StyleSheet.create({
-    FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
+    FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.20, marginRight: width * 0.05, },
   });

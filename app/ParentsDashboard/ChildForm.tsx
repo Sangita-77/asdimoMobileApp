@@ -1,12 +1,12 @@
-import CompoLoginBack from "@/components/ui/CompoLoginBack";
-import { View, Text, StyleSheet } from "react-native";
-import Form from "../../components/ui/Form";
-import Input from "@/components/ui/Input";
-import { styles as globalStyle } from "@/constants/globalStyle";
 import Button from "@/components/ButtonCompo/Button";
-import { MaterialIcons, FontAwesome, MaterialCommunityIcons, SimpleLineIcons, Feather } from "@expo/vector-icons";
+import CompoLoginBack from "@/components/ui/CompoLoginBack";
+import Input from "@/components/ui/Input";
+import { globalStyle } from "@/constants/globalStyle";
 import { addChildInformation, getLoggedInUserId } from "@/services/authService";
-import React, { useState } from "react";
+import { FontAwesome, MaterialCommunityIcons, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
+import { useState } from "react";
+import { StyleSheet, Text, View } from "react-native";
+import Form from "../../components/ui/Form";
 
 
 export default function Login() {
