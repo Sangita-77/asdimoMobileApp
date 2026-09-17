@@ -19,7 +19,12 @@ import {
   Text,
   View,
 } from "react-native";
+<<<<<<< HEAD
 import { globalStyle } from "../../constants/globalStyle";
+=======
+// import { styles as globalStyle } from "../../constants/globalStyle";
+import { doctorStyles } from "../../constants/globalStyle";
+>>>>>>> 54674acaa855cfbc7a1c1845a43af8fc1d62e06c
 
 export default function DoctorList() {
   const [therapists, setTherapists] = useState<
@@ -57,52 +62,58 @@ export default function DoctorList() {
 
   return (
     <>
-  <OrientationLock variant="portrait-up"/>
-  <View 
-    style={globalStyle.container}>
-      <Header title="Doctors"/>
-      <FlatList
-        contentContainerStyle={styles.listContent}
-        data={therapists}
-        keyExtractor={(item) => item._id}
-        renderItem={({ item }) => (
-          <DoctorListCard
-            image={
-              item.profileImg
-                ? { uri: `${API_BASE_URL.replace(/\/api$/, "")}${item.profileImg}` }
-                : undefined
-            }
-            name={item.name}
-            availability={item.availability}
-            onBookNow={(slot) =>
-              console.log(`Book ${item.name} on ${slot.date} at ${slot.time}`)
-            }
-            appointmentBooking={() =>
-              router.push({
-                pathname: ROUTES.AUTH.BOOKDOCTOR,
-                params: {
-                  therapistId: String(item.userId),
-                  therapistName: item.name,
-                  profileImg: item.profileImg || "",
-                },
-              })
-            }
-          />
-        )}
-        ListEmptyComponent={
-          <View style={styles.statusContainer}>
-            {isLoading ? (
-              <ActivityIndicator size="large" color="#2563EB" />
-            ) : (
-              <Text style={styles.statusText}>
-                {error || "No therapists are available right now."}
-              </Text>
+      <OrientationLock variant="portrait-up" />
+      <View style={doctorStyles.doctorWrap}>
+        <Header title="Doctor booking" />
+        <Text>Doctor List</Text>
+        <View style={doctorStyles.cardCon}>
+          <FlatList
+            contentContainerStyle={styles.listContent}
+            data={therapists}
+            keyExtractor={(item) => item._id}
+            renderItem={({ item }) => (
+              <View style={styles.cardWrapper}>
+                <DoctorListCard
+                  image={
+                    item.profileImg
+                      ? {
+                        uri: `${API_BASE_URL.replace(/\/api$/, "")}${item.profileImg}`,
+                      }
+                      : undefined
+                  }
+                  name={item.name}
+                  availability={item.availability}
+                  onBookNow={(slot) =>
+                    console.log(`Book ${item.name} on ${slot.date} at ${slot.time}`)
+                  }
+                  appointmentBooking={() =>
+                    router.push({
+                      pathname: ROUTES.AUTH.BOOKDOCTOR,
+                      params: {
+                        therapistId: String(item.userId),
+                        therapistName: item.name,
+                        profileImg: item.profileImg || "",
+                      },
+                    })
+                  }
+                />
+              </View>
             )}
-          </View>
-        }
-        showsVerticalScrollIndicator={false}
-      />
-      <Footer />
+            ListEmptyComponent={
+              <View style={styles.statusContainer}>
+                {isLoading ? (
+                  <ActivityIndicator size="large" color="#2563EB" />
+                ) : (
+                  <Text style={styles.statusText}>
+                    {error || "No therapists are available right now."}
+                  </Text>
+                )}
+              </View>
+            }
+            showsVerticalScrollIndicator={false}
+          />
+        </View>
+        <Footer />
       </View>
     </>
   );
@@ -111,14 +122,24 @@ export default function DoctorList() {
 const styles = StyleSheet.create({
   listContent: {
     flexGrow: 1,
-    padding: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 0,
+    width: "100%",
   },
+  cardWrapper: {
+    width: "100%",
+    alignSelf: "stretch",
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+
   statusContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     padding: 24,
   },
+
   statusText: {
     color: "#4B5563",
     fontSize: 16,

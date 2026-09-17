@@ -24,5 +24,10 @@ export const commonStyles = StyleSheet.create({
 
 export const getDynamicStyles = (width: number) =>
   StyleSheet.create({
-    FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.20, marginRight: width * 0.05, },
+    FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
   });
+
+export const doctorStyles = StyleSheet.create({
+  doctorWrap: {flex: 1, justifyContent: "flex-start", alignItems: "center", backgroundColor: "#f0f0f0d0",},
+  cardCon: {width: "100%", maxWidth: 500, margin: 0, overflowY: "scroll",},
+});
