@@ -19,12 +19,8 @@ import {
   Text,
   View,
 } from "react-native";
-<<<<<<< HEAD
-import { globalStyle } from "../../constants/globalStyle";
-=======
-// import { styles as globalStyle } from "../../constants/globalStyle";
 import { doctorStyles } from "../../constants/globalStyle";
->>>>>>> 54674acaa855cfbc7a1c1845a43af8fc1d62e06c
+
 
 export default function DoctorList() {
   const [therapists, setTherapists] = useState<
