@@ -14,7 +14,7 @@ export const ROUTES = {
 
   APP: {
     HOME: "/MainScreens/home",
-    LANDING: "/MainScreens/landing",
+    LANDING: "/MainScreens/play",
     SETTINGS: "/MainScreens/settings",
     CATEGORY: "/MainScreens/CategoryScreen",
   },

@@ -2,12 +2,12 @@ import { AvailabilitySlot } from "@/services/authService";
 import { Ionicons } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";
 import {
-    Image,
-    ImageSourcePropType,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  Image,
+  ImageSourcePropType,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 
 interface DoctorListCardProps {
@@ -94,13 +94,11 @@ export default function DoctorListCard({
         <View style={styles.details}>
           <Text style={styles.name}>{name}</Text>
           <Text style={styles.specialty}>Therapist</Text>
-        </View>
-      </View>
 
-      {dates.length ? (
+          {dates.length ? (
         <>
           <Pressable style={styles.dateBar} onPress={selectNextDate}>
-            <Ionicons name="calendar-outline" size={27} color="#1682E7" />
+            <Ionicons name="calendar-outline" size={20} color="#1682E7" />
             <Text style={styles.dateText}>{formatDate(selectedDate)}</Text>
             {dates.length > 1 ? (
               <Ionicons name="chevron-forward" size={22} color="#1682E7" />
@@ -142,95 +140,35 @@ export default function DoctorListCard({
       ) : (
         <Text style={styles.noSlots}>No available slots at the moment.</Text>
       )}
+        </View>
+
+      </View>
+
+      
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  button: {
-    backgroundColor: "#2563EB",
-    paddingHorizontal: 17,
-    paddingVertical: 9,
-    borderRadius: 8,
-  },
-
-  buttonText: {
-    color: "#FFF",
-    fontWeight: "600",
-    fontSize: 15,
-  },
-  card: {
-    backgroundColor: "#FFF",
-    borderRadius: 15,
-    borderWidth: 1,
-    borderColor: "#e7e6e6",
-    padding: 18,
-    marginVertical: 10,
-    elevation: 4,
-    boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.1)",
-  },
+  button: { backgroundColor: "#2563EB", paddingHorizontal: 17, paddingVertical: 9, borderRadius: 8, }, 
+  buttonText: { color: "#FFF", fontWeight: "600", fontSize: 15, },
+  card: { backgroundColor: "#FFF", borderRadius: 15, borderWidth: 1, borderColor: "#e7e6e6", padding: 12, marginVertical: 10, elevation: 4, boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.1)", },
   topSection: { flexDirection: "row", marginBottom: 16 },
   image: { width: 70, height: 70, borderRadius: 10 },
-  avatarPlaceholder: {
-    width: 95,
-    height: 95,
-    borderRadius: 10,
-    backgroundColor: "#1682E7",
-    justifyContent: "center",
-    alignItems: "center",
-  },
+  avatarPlaceholder: { width: 95, height: 95, borderRadius: 10, backgroundColor: "#1682E7", justifyContent: "center", alignItems: "center", },
   avatarLetter: { color: "#FFF", fontSize: 40, fontWeight: "700" },
-  availabilityStatus: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 5,
-  },
-  statusDot: {
-    width: 4,
-    height: 4,
-    borderRadius: 6,
-    backgroundColor: "#49AD3D",
-    marginRight: 4,
-  },
+  availabilityStatus: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 5, },
+  statusDot: { width: 4, height: 4, borderRadius: 6, backgroundColor: "#49AD3D", marginRight: 4, },
   statusText: { color: "#49AD3D", fontSize: 11, fontWeight: "400" },
   details: { flex: 1, paddingLeft: 18, paddingTop: 4 },
-  name: { color: "#101010", fontSize: 16, fontWeight: "700", lineHeight: 26 },
-  specialty: { color: "#73798D", fontSize: 14, lineHeight: 25 },
-  dateBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#EDF7FF",
-    borderRadius: 8,
-    minHeight: 40,
-    paddingHorizontal: 16,
-  },
-  dateText: {
-    flex: 1,
-    color: "#1682E7",
-    fontSize: 15,
-    fontWeight: "700",
-    marginLeft: 14,
-  },
+  name: { color: "#000000", fontSize: 13, fontWeight: "600", lineHeight: 20, marginTop: -5, },
+  specialty: { color: "#74798B", fontSize: 12, lineHeight: 18 },
+  dateBar: { flexDirection: "row", alignItems: "center", backgroundColor: "#EDF7FF", borderRadius: 8, minHeight: 40, paddingHorizontal: 16, },
+  dateText: { flex: 1, color: "#1682E7", fontSize: 12, fontWeight: "600", marginLeft: 6, },
   slotsRow: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 14 },
-  slotButton: {
-    borderWidth: 2,
-    borderColor: "#95CBF8",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 5,
-  },
+  slotButton: { borderWidth: 2, borderColor: "#95CBF8", borderRadius: 8, paddingHorizontal: 16, paddingVertical: 5, },
   slotText: { color: "#1682E7", fontSize: 16, fontWeight: "700" },
-  moreButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: "#95CBF8",
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 10,
-    gap: 4,
-  },
+  moreButton: { flexDirection: "row", alignItems: "center", borderWidth: 2, borderColor: "#95CBF8", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 10, gap: 4, },
   moreText: { color: "#1682E7", fontSize: 16, fontWeight: "700" },
   noSlots: { color: "#73798D", fontSize: 15, marginTop: 4 },
 });

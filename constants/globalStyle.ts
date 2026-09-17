@@ -1,6 +1,6 @@
-import { StyleSheet, Dimensions } from "react-native";
+import { StyleSheet } from "react-native";
 
-const { width } = Dimensions.get("window");
+// const { width, height} = useWindowDimensions();
 
 export const styles = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f0f0f0d0",},
@@ -15,9 +15,19 @@ export const styles = StyleSheet.create({
   safeArea: { flex: 1, },
   listContent:{ flexGrow: 1, padding: 16,},
   signinText: { color: "#000", textAlign: "center", fontWeight: "bold", marginBottom: 10, },
-  FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
+  // FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
 });
 
 export const commonStyles = StyleSheet.create({
   absoluteFill: { position: "absolute", top: 0, right: 0, bottom: 0, left: 0, },
+});
+
+export const getDynamicStyles = (width: number) =>
+  StyleSheet.create({
+    FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
+  });
+
+export const doctorStyles = StyleSheet.create({
+  doctorWrap: {flex: 1, justifyContent: "flex-start", alignItems: "center", backgroundColor: "#f0f0f0d0",},
+  cardCon: {width: "100%", maxWidth: 500, margin: 0, overflowY: "scroll",},
 });
