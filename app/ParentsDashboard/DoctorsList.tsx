@@ -60,7 +60,7 @@ export default function DoctorList() {
     <>
       <OrientationLock variant="portrait-up" />
       <View style={doctorStyles.doctorWrap}>
-        <Header title="Doctor booking" />
+        <Header title="Doctor Booking" />
         <Text>Doctor List</Text>
         <View style={doctorStyles.cardCon}>
           <FlatList
