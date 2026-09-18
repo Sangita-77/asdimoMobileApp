@@ -125,20 +125,22 @@ export default function DoctorList() {
 }
 
 const styles = StyleSheet.create({
-  // titleWrap: {
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   gap: 8,
-  //   width: "100%",
-  //   paddingHorizontal: 16,
-  //   paddingTop: 20,
-  // },
-  // titleInfo: {
-  //   color: "#212121",
-  //   fontSize: 16,
-  //   fontWeight: 600,
-  // },
+  cardCon:{height: 2000},
+  titleWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingTop: 20,
+  },
+  titleInfo: {
+    color: "#212121",
+    fontSize: 16,
+    fontWeight: 600,
+  },
   listContent: {
+    height: "85%", 
     flexGrow: 1,
     paddingVertical: 16,
     paddingHorizontal: 0,
