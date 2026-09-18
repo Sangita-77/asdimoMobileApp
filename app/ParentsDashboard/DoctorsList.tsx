@@ -111,7 +111,7 @@ export default function Bookings() {
 }
 
 const styles = StyleSheet.create({
-  listContent: { flexGrow: 1, padding: 20 },
+  listContent: { flexGrow: 1, padding: 10, backgroundColor: "#fff"},
   heading: {
     color: "#111827",
     fontSize: 27,

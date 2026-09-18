@@ -31,7 +31,7 @@ export default function Header({
     <>
       <OrientationLock variant="portrait" />
 
-      <View>
+      <View style={styles.HeaderContainer}>
         <View style={styles.HeaderContainerWrap}>
           {showBack && (
             <TouchableOpacity
@@ -98,6 +98,7 @@ export default function Header({
 }
 
 const styles = StyleSheet.create({
+  HeaderContainer:{backgroundColor: "#ffffff",},
   HeaderContainerWrap: {
     backgroundColor: "#00A0ED",
     width: "100%",

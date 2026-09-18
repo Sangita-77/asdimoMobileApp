@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 // const { width, height} = useWindowDimensions();
 
 export const globalStyle = StyleSheet.create({
-  container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f0f0f0d0",},
+  container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#ffffff",},
   container2: { flex: 1, justifyContent: "center", alignItems: "center",},
 
   // Global Styles Start
