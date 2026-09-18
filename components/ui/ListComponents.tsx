@@ -152,7 +152,7 @@ export default function DoctorListCard({
 const styles = StyleSheet.create({
   button: { backgroundColor: "#1386E7", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, }, 
   buttonText: { color: "#FFF", fontWeight: "600", fontSize: 11, lineHeight: 14,},
-  card: { backgroundColor: "#FFF", borderRadius: 15, borderWidth: 1, borderColor: "#e7e6e6", padding: 12, marginVertical: 8, elevation: 4, boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.1)", },
+  card: { backgroundColor: "#FFF", borderRadius: 15, borderWidth: 0, borderColor: "#e7e6e6", padding: 12, marginVertical: 8, elevation: 4, boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.1)", },
   topSection: { flexDirection: "row", },
   image: { width: 70, height: 70, borderRadius: 10 },
   avatarPlaceholder: { width: 95, height: 95, borderRadius: 10, backgroundColor: "#1682E7", justifyContent: "center", alignItems: "center", },
