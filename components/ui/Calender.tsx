@@ -89,49 +89,51 @@ export default function CustomCalendar({
         </Pressable>
       </View>
 
-      <View style={styles.weekRow}>
-        {DAYS.map((day) => (
-          <Text key={day} style={styles.weekDay}>
-            {day}
-          </Text>
-        ))}
-      </View>
+      <View style={styles.calenderDateCon}>
+        <View style={styles.weekRow}>
+          {DAYS.map((day) => (
+            <Text key={day} style={styles.weekDay}>
+              {day}
+            </Text>
+          ))}
+        </View>
 
-      <View style={styles.grid}>
-        {calendar.map((day, index) => {
-          if (!day)
-            return <View key={`empty-${index}`} style={styles.emptyCell} />;
+        <View style={styles.grid}>
+          {calendar.map((day, index) => {
+            if (!day)
+              return <View key={`empty-${index}`} style={styles.emptyCell} />;
 
-          const date = new Date(year, month, day);
-          const dateKey = toDateKey(date);
-          const isSelected = dateKey === selectedDate;
-          const disabled =
-            date < today ||
-            (availableDates !== undefined && !availableDateSet.has(dateKey));
+            const date = new Date(year, month, day);
+            const dateKey = toDateKey(date);
+            const isSelected = dateKey === selectedDate;
+            const disabled =
+              date < today ||
+              (availableDates !== undefined && !availableDateSet.has(dateKey));
 
-          return (
-            <Pressable
-              key={dateKey}
-              disabled={disabled}
-              onPress={() => onDateChange?.(dateKey)}
-              style={[
-                styles.day,
-                isSelected && styles.selected,
-                disabled && styles.disabledDay,
-              ]}
-            >
-              <Text
+            return (
+              <Pressable
+                key={dateKey}
+                disabled={disabled}
+                onPress={() => onDateChange?.(dateKey)}
                 style={[
-                  styles.dayText,
-                  isSelected && styles.selectedText,
-                  disabled && styles.disabledText,
+                  styles.day,
+                  isSelected && styles.selected,
+                  disabled && styles.disabledDay,
                 ]}
               >
-                {day}
-              </Text>
-            </Pressable>
-          );
-        })}
+                <Text
+                  style={[
+                    styles.dayText,
+                    isSelected && styles.selectedText,
+                    disabled && styles.disabledText,
+                  ]}
+                >
+                  {day}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
     </View>
   );
@@ -140,10 +142,7 @@ export default function CustomCalendar({
 const styles = StyleSheet.create({
   card: {
     backgroundColor: "#FFF",
-    borderRadius: 20,
-    padding: 18,
     elevation: 4,
-    boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.08)",
   },
   header: {
     flexDirection: "row",
@@ -151,22 +150,26 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 18,
   },
-  month: { fontSize: 20, fontWeight: "700", color: "#1F2937" },
+  month: { fontSize: 18, fontWeight: "600", color: "#464255" },
   arrowButton: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: "#EFF6FF",
+    width: 21,
+    height: 21,
+    borderRadius: 2,
+    paddingBottom: 5,
+    backgroundColor: "#F9F9F9",
+    borderWidth: 1,
+    borderColor: "#EDEEF1",
     justifyContent: "center",
     alignItems: "center",
   },
-  arrow: { fontSize: 28, lineHeight: 30, color: "#2563EB", fontWeight: "700" },
+  arrow: { fontSize: 22, lineHeight: 10, color: "#0A0A0A", fontWeight: "600" },
   weekRow: { flexDirection: "row", marginBottom: 10 },
   weekDay: {
     width: "14.2857%",
     textAlign: "center",
-    color: "#9CA3AF",
+    color: "#464255",
     fontWeight: "600",
+    textTransform: "uppercase",
   },
   grid: { flexDirection: "row", flexWrap: "wrap" },
   emptyCell: { width: "14.2857%", aspectRatio: 1, padding: 3 },
@@ -184,4 +187,8 @@ const styles = StyleSheet.create({
   dayText: { fontSize: 15, color: "#1F2937", fontWeight: "600" },
   selectedText: { color: "#FFF" },
   disabledText: { color: "#9CA3AF" },
+
+  calenderDateCon: {
+    backgroundColor: "#F8F8F9", padding: 12, borderRadius: 20,
+  },
 });

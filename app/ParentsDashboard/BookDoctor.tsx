@@ -6,23 +6,23 @@ import OrientationLock from "@/components/ui/ScreenOrientation";
 import { API_BASE_URL } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
 import {
-    AvailabilitySlot,
-    createAppointment,
-    getAccessToken,
-    getLoggedInUserId,
-    getTherapistAvailability,
+  AvailabilitySlot,
+  createAppointment,
+  getAccessToken,
+  getLoggedInUserId,
+  getTherapistAvailability,
 } from "@/services/authService";
 import { processPayment } from "@/services/paymentService";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
-    ActivityIndicator,
-    Image,
-    Pressable,
-    ScrollView,
-    StyleSheet,
-    Text,
-    View,
+  ActivityIndicator,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
 } from "react-native";
 import { globalStyle } from "../../constants/globalStyle";
 
@@ -212,44 +212,48 @@ export default function BookDoctor() {
             <Text style={styles.errorText}>{error}</Text>
           ) : (
             <>
-              <Text style={styles.heading}>Select Date</Text>
-              <Calender
-                selectedDate={selectedDate}
-                availableDates={dates}
-                onDateChange={(date) => {
-                  setSelectedDate(date);
-                  setSelectedSlot(null);
-                }}
-              />
+              <View style={styles.selectDateWrap}>
+                <Text style={styles.heading}>Select Date</Text>
+                <Calender
+                  selectedDate={selectedDate}
+                  availableDates={dates}
+                  onDateChange={(date) => {
+                    setSelectedDate(date);
+                    setSelectedSlot(null);
+                  }}
+                />
+              </View>
 
-              <Text style={styles.heading}>Select Time</Text>
-              <View style={styles.timeContainer}>
-                {slotsForSelectedDate.map((slot) => {
-                  const disabled = isPastTime(slot);
-                  const isSelected = selectedSlot?._id === slot._id;
-                  return (
-                    <Pressable
-                      key={slot._id}
-                      disabled={disabled}
-                      onPress={() => setSelectedSlot(slot)}
-                      style={[
-                        styles.timeButton,
-                        isSelected && styles.selectedTime,
-                        disabled && styles.disabledTime,
-                      ]}
-                    >
-                      <Text
+              <View style={styles.selectTimeWrap}>
+                <Text style={styles.heading}>Select Time</Text>
+                <View style={styles.timeContainer}>
+                  {slotsForSelectedDate.map((slot) => {
+                    const disabled = isPastTime(slot);
+                    const isSelected = selectedSlot?._id === slot._id;
+                    return (
+                      <Pressable
+                        key={slot._id}
+                        disabled={disabled}
+                        onPress={() => setSelectedSlot(slot)}
                         style={[
-                          styles.timeText,
-                          isSelected && styles.selectedTimeText,
-                          disabled && styles.disabledTimeText,
+                          styles.timeButton,
+                          isSelected && styles.selectedTime,
+                          disabled && styles.disabledTime,
                         ]}
                       >
-                        {slot.time}
-                      </Text>
-                    </Pressable>
-                  );
-                })}
+                        <Text
+                          style={[
+                            styles.timeText,
+                            isSelected && styles.selectedTimeText,
+                            disabled && styles.disabledTimeText,
+                          ]}
+                        >
+                          {slot.time}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
               </View>
               {!slotsForSelectedDate.length ? (
                 <Text style={styles.noSlots}>
@@ -297,7 +301,7 @@ export default function BookDoctor() {
 
 const styles = StyleSheet.create({
   PastbookingBtn: { marginTop: 20 },
-  container: { padding: 20, flexGrow: 1, paddingBottom: 85,},
+  container: { padding: 20, flexGrow: 1, paddingBottom: 85, },
   profileContainer: { alignItems: "center", marginBottom: 24 },
   avatar: { width: 88, height: 88, borderRadius: 44 },
   placeholder: {
@@ -316,11 +320,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   heading: {
-    color: "#1F2937",
-    fontSize: 18,
-    fontWeight: "700",
-    marginBottom: 10,
-    marginTop: 14,
+    color: "#000000",
+    fontSize: 13,
+    fontWeight: "600",
+    marginBottom: 13,
   },
   timeContainer: {
     flexDirection: "row",
@@ -352,4 +355,7 @@ const styles = StyleSheet.create({
   bookingMessage: { textAlign: "center", fontSize: 15, marginBottom: 12 },
   bookingError: { color: "#DC2626" },
   bookingSuccess: { color: "#16A34A" },
+
+  selectDateWrap: { backgroundColor: "#fff", padding: 17, borderRadius: 10, boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)", },
+  selectTimeWrap: {marginTop: 27, marginBottom: 27, backgroundColor: "#fff", padding: 17, borderRadius: 10, boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)",},
 });
