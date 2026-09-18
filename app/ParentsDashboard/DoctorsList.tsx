@@ -10,17 +10,18 @@ import {
   getTherapists,
   Therapist,
 } from "@/services/authService";
-import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
+  Image,
   StyleSheet,
   Text,
   View,
 } from "react-native";
 import { doctorStyles } from "../../constants/globalStyle";
+const stethoscopeIcon = require("../../assets/images/stethoscope-icon.png");
 
 export default function DoctorList() {
   const [therapists, setTherapists] = useState<
@@ -61,9 +62,13 @@ export default function DoctorList() {
       <OrientationLock variant="portrait-up" />
       <View style={doctorStyles.doctorWrap}>
         <Header title="Doctor Booking" />
-        <View>
-          <Ionicons name={"happy-outline"} size={20} color="#1386E7" />
-          <Text>Doctor List</Text>
+        <View style={styles.titleWrap}>
+          <Image
+            source={stethoscopeIcon}
+            style={{ width: 17, height: 17 }}
+            resizeMode="contain"
+          />
+          <Text style={styles.titleInfo}>Doctor List</Text>
         </View>
         {/* <Text>Doctor List</Text> */}
         <View style={doctorStyles.cardCon}>
@@ -120,6 +125,19 @@ export default function DoctorList() {
 }
 
 const styles = StyleSheet.create({
+  titleWrap: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 8,
+    width: "100%",
+    paddingHorizontal: 16,
+    paddingTop: 20,
+  },
+  titleInfo: {
+    color: "#212121",
+    fontSize: 16,
+    fontWeight: 600,
+  },
   listContent: {
     flexGrow: 1,
     paddingVertical: 16,
