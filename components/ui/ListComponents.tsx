@@ -13,6 +13,8 @@ import {
 interface DoctorListCardProps {
   image?: ImageSourcePropType;
   name: string;
+  category?: string;
+  experience?: number | string;
   availability: AvailabilitySlot[];
   onBookNow: (slot: AvailabilitySlot) => void;
   appointmentBooking: () => void;
@@ -38,6 +40,8 @@ function dateValue(date: string) {
 export default function DoctorListCard({
   image,
   name,
+  category = "Therapist",
+  experience,
   availability,
   onBookNow,
   appointmentBooking,
@@ -72,6 +76,11 @@ export default function DoctorListCard({
     setShowAllSlots(false);
   };
 
+  const experienceText =
+    experience !== undefined && experience !== null && experience !== ""
+      ? `${experience}+ Years`
+      : "0+ Years";
+
   return (
     <View style={styles.card}>
       <View style={styles.topSection}>
@@ -92,9 +101,11 @@ export default function DoctorListCard({
         </View>
 
         <View style={styles.details}>
-          <Text style={styles.experience}><span style={styles.experienceSpan}>20+ Years</span> Experience</Text>
+          <Text style={styles.experience}>
+            <Text style={styles.experienceSpan}>{experienceText}</Text> Experience
+          </Text>
           <Text style={styles.name}>{name}</Text>
-          <Text style={styles.specialty}>Therapist</Text>
+          <Text style={styles.specialty}>{category || "Therapist"}</Text>
 
           {dates.length ? (
         <>

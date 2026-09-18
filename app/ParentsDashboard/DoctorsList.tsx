@@ -75,6 +75,8 @@ export default function Bookings() {
                 : undefined
             }
             name={item.name}
+            category={item.roleData?.therapist_category || "Therapist"}
+            experience={item.roleData?.yearsOfExperience ?? 0}
             availability={item.availability}
             onBookNow={(slot) =>
               console.log(`Book ${item.name} on ${slot.date} at ${slot.time}`)
@@ -86,6 +88,8 @@ export default function Bookings() {
                   therapistId: String(item.userId),
                   therapistName: item.name,
                   profileImg: item.profileImg || "",
+                  therapistCategory: item.roleData?.therapist_category || "Therapist",
+                  yearsOfExperience: String(item.roleData?.yearsOfExperience ?? 0),
                 },
               })
             }

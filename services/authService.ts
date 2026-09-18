@@ -15,6 +15,26 @@ export type LoginResponse = {
   message?: string;
 };
 
+export type TherapistRoleData = {
+  _id?: string;
+  teacherId?: number;
+  userId?: number;
+  user?: string;
+  organizationId?: number;
+  organizationAdminId?: number;
+  zonalAdminId?: number;
+  adminId?: number;
+  therapist_category?: string;
+  yearsOfExperience?: number;
+  phone?: string | null;
+  specialization?: string[];
+  qualifications?: string[];
+  licenseNumber?: string | null;
+  languages?: string[];
+  cliniqueName?: string | null;
+  [key: string]: any;
+};
+
 export type Therapist = {
   _id: string;
   userId: number;
@@ -23,6 +43,8 @@ export type Therapist = {
   flag: number;
   profileImg?: string | null;
   phone?: string;
+  roleData?: TherapistRoleData;
+  relatedData?: Record<string, any>;
 };
 
 export type AvailabilitySlot = {
