@@ -59,8 +59,7 @@ export default function Bookings() {
   return (
     <>
       <OrientationLock variant="portrait" />
-      <View style={globalStyle.container}>
-        <Header title="Doctor List" />
+        <Header title="History" />
         <FlatList
           data={appointments}
           keyExtractor={(item) => item._id}
@@ -120,7 +119,6 @@ export default function Bookings() {
           showsVerticalScrollIndicator={false}
         />
         <Footer />
-      </View>
     </>
   );
 }

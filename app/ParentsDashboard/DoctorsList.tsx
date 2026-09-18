@@ -1,3 +1,4 @@
+import DoctorListHeader from "@/components/ui/DoctorListHeader";
 import Footer from "@/components/ui/Footer";
 import Header from "@/components/ui/Header";
 import DoctorListCard from "@/components/ui/ListComponents";
@@ -17,12 +18,12 @@ import {
   FlatList,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 import { doctorStyles } from "../../constants/globalStyle";
+const stethoscopeIcon = require("../../assets/images/stethoscope-icon.png");
 
-
-export default function DoctorList() {
+export default function Bookings() {
   const [therapists, setTherapists] = useState<
     (Therapist & { availability: AvailabilitySlot[] })[]
   >([]);
@@ -58,87 +59,105 @@ export default function DoctorList() {
 
   return (
     <>
-      <OrientationLock variant="portrait-up" />
-      <View style={doctorStyles.doctorWrap}>
-        <Header title="Doctor booking" />
-        <Text>Doctor List</Text>
-        <View style={doctorStyles.cardCon}>
-          <FlatList
-            contentContainerStyle={styles.listContent}
-            data={therapists}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <View style={styles.cardWrapper}>
-                <DoctorListCard
-                  image={
-                    item.profileImg
-                      ? {
-                        uri: `${API_BASE_URL.replace(/\/api$/, "")}${item.profileImg}`,
-                      }
-                      : undefined
-                  }
-                  name={item.name}
-                  availability={item.availability}
-                  onBookNow={(slot) =>
-                    console.log(`Book ${item.name} on ${slot.date} at ${slot.time}`)
-                  }
-                  appointmentBooking={() =>
-                    router.push({
-                      pathname: ROUTES.AUTH.BOOKDOCTOR,
-                      params: {
-                        therapistId: String(item.userId),
-                        therapistName: item.name,
-                        profileImg: item.profileImg || "",
-                      },
-                    })
-                  }
-                />
-              </View>
-            )}
-            ListEmptyComponent={
-              <View style={styles.statusContainer}>
-                {isLoading ? (
-                  <ActivityIndicator size="large" color="#2563EB" />
-                ) : (
-                  <Text style={styles.statusText}>
-                    {error || "No therapists are available right now."}
-                  </Text>
-                )}
-              </View>
-            }
-            showsVerticalScrollIndicator={false}
-          />
-        </View>
+      <OrientationLock variant="portrait" />
+        <Header title="Doctor Booking" />
+        <DoctorListHeader />
+        <FlatList
+          contentContainerStyle={styles.listContent}
+          data={therapists}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+              <DoctorListCard
+                image={
+                  item.profileImg
+                    ? {
+                      uri: `${API_BASE_URL.replace(/\/api$/, "")}${item.profileImg}`,
+                    }
+                    : undefined
+                }
+                name={item.name}
+                availability={item.availability}
+                onBookNow={(slot) =>
+                  console.log(`Book ${item.name} on ${slot.date} at ${slot.time}`)
+                }
+                appointmentBooking={() =>
+                  router.push({
+                    pathname: ROUTES.AUTH.BOOKDOCTOR,
+                    params: {
+                      therapistId: String(item.userId),
+                      therapistName: item.name,
+                      profileImg: item.profileImg || "",
+                    },
+                  })
+                }
+              />
+          )}
+          ListEmptyComponent={
+            <View style={styles.statusContainer}>
+              {isLoading ? (
+                <ActivityIndicator size="large" color="#2563EB" />
+              ) : (
+                <Text style={styles.statusText}>
+                  {error || "No therapists are available right now."}
+                </Text>
+              )}
+            </View>
+          }
+          showsVerticalScrollIndicator={false}
+        />
         <Footer />
-      </View>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  listContent: {
-    flexGrow: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 0,
-    width: "100%",
+  listContent: { flexGrow: 1, padding: 10, backgroundColor: "#fff"},
+  heading: {
+    color: "#111827",
+    fontSize: 27,
+    fontWeight: "700",
+    marginBottom: 18,
   },
-  cardWrapper: {
-    width: "100%",
-    alignSelf: "stretch",
-    paddingHorizontal: 16,
-    marginBottom: 16,
+  card: {
+    backgroundColor: "#FFF",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 14,
+    elevation: 3,
+    boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.08)",
   },
-
+  sessionText: { color: "#4B5563", fontSize: 16 },
+  doctorName: { color: "#111827", fontWeight: "700" },
+  dateTime: { color: "#6B7280", fontSize: 15, marginTop: 8 },
+  status: {
+    alignSelf: "flex-start",
+    borderRadius: 16,
+    marginTop: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
+  pending: { backgroundColor: "#DBEAFE" },
+  completed: { backgroundColor: "#DCFCE7" },
+  cancelled: { backgroundColor: "#FEE2E2" },
+  statusText: {
+    color: "#1F2937",
+    fontSize: 13,
+    fontWeight: "700",
+    textTransform: "capitalize",
+  },
+  joinButton: {
+    alignItems: "center",
+    backgroundColor: "#16A34A",
+    borderRadius: 9,
+    marginTop: 14,
+    paddingVertical: 11,
+  },
+  joinButtonText: { color: "#FFF", fontSize: 15, fontWeight: "700" },
   statusContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 24,
+    padding: 36,
   },
-
-  statusText: {
-    color: "#4B5563",
-    fontSize: 16,
-    textAlign: "center",
-  },
+  emptyText: { color: "#6B7280", fontSize: 16, textAlign: "center" },
 });
