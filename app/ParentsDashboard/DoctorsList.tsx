@@ -125,6 +125,7 @@ export default function DoctorList() {
 }
 
 const styles = StyleSheet.create({
+  cardCon:{height: 2000},
   titleWrap: {
     flexDirection: "row",
     alignItems: "center",
@@ -139,6 +140,7 @@ const styles = StyleSheet.create({
     fontWeight: 600,
   },
   listContent: {
+    height: "85%", 
     flexGrow: 1,
     paddingVertical: 16,
     paddingHorizontal: 0,

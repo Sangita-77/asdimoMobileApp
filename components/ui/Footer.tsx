@@ -1,29 +1,3 @@
-// import OrientationLock from "@/components/ui/ScreenOrientation";
-// import React from "react";
-// import { Text, StyleSheet, View} from "react-native";
-
-// export default function footer() {
-//   return (
-//     <>
-//     <OrientationLock variant="portrait" />
-//     <View style={styles.HeaderContainerWrap}>
-//        <Text style={styles.HeaderText}>Footer</Text>
-//     </View>
-//     </>
-//   );
-// }
-// const styles = StyleSheet.create({
-//   HeaderContainerWrap:{
-//     backgroundColor: "#00A0ED",
-//     width: "100%",
-//     padding: 15,
-//   },
-//   HeaderText:{
-//    color: "#fff",
-//    fontSize: 20,
-//    fontWeight: 500,
-//   },
-// });
 import OrientationLock from "@/components/ui/ScreenOrientation";
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -91,34 +65,17 @@ export default function Footer() {
 }
 
 const styles = StyleSheet.create({
-  // footerContainer: {
-  //   width: "100%",
-  //   height: 72,
-  //   backgroundColor: "#00A0ED",
-  //   borderTopLeftRadius: 30,
-  //   borderTopRightRadius: 30,
-
-  //   flexDirection: "row",
-  //   alignItems: "center",
-  //   justifyContent: "space-around",
-
-  //   paddingHorizontal: 8,
-  // },
   footerContainer: {
-  position: "absolute",
-  bottom: 0,
-  left: 0,
-  right: 0,
-  height: 72,
-  backgroundColor: "#00A0ED",
-  borderTopLeftRadius: 30,
-  borderTopRightRadius: 30,
-  flexDirection: "row",
-  alignItems: "center",
-  justifyContent: "space-around",
-  paddingHorizontal: 8,
-  flex: 1,
-},
+    height: 72,
+    width: "100%",
+    backgroundColor: "#00A0ED",
+    borderTopLeftRadius: 30,
+    borderTopRightRadius: 30,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-around",
+    paddingHorizontal: 8,
+  },
 
   menuItem: {
     flex: 1,
