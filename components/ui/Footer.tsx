@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
   //   paddingHorizontal: 8,
   // },
   footerContainer: {
-  position: "absolute",
+  position: "relative",
   bottom: 0,
   left: 0,
   right: 0,
@@ -117,7 +117,8 @@ const styles = StyleSheet.create({
   alignItems: "center",
   justifyContent: "space-around",
   paddingHorizontal: 8,
-  flex: 1,
+  // flex: 1,
+  width: "100%",
 },
 
   menuItem: {

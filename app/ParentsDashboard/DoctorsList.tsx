@@ -1,3 +1,4 @@
+import DoctorListHeader from "@/components/ui/DoctorListHeader";
 import Footer from "@/components/ui/Footer";
 import Header from "@/components/ui/Header";
 import DoctorListCard from "@/components/ui/ListComponents";
@@ -15,10 +16,9 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Image,
   StyleSheet,
   Text,
-  View,
+  View
 } from "react-native";
 import { doctorStyles } from "../../constants/globalStyle";
 const stethoscopeIcon = require("../../assets/images/stethoscope-icon.png");
@@ -62,15 +62,15 @@ export default function DoctorList() {
       <OrientationLock variant="portrait-up" />
       <View style={doctorStyles.doctorWrap}>
         <Header title="Doctor Booking" />
-        <View style={styles.titleWrap}>
+        {/* <View style={styles.titleWrap}>
           <Image
             source={stethoscopeIcon}
             style={{ width: 17, height: 17 }}
             resizeMode="contain"
           />
           <Text style={styles.titleInfo}>Doctor List</Text>
-        </View>
-        {/* <Text>Doctor List</Text> */}
+        </View> */}
+        <DoctorListHeader />
         <View style={doctorStyles.cardCon}>
           <FlatList
             contentContainerStyle={styles.listContent}
@@ -125,19 +125,19 @@ export default function DoctorList() {
 }
 
 const styles = StyleSheet.create({
-  titleWrap: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    width: "100%",
-    paddingHorizontal: 16,
-    paddingTop: 20,
-  },
-  titleInfo: {
-    color: "#212121",
-    fontSize: 16,
-    fontWeight: 600,
-  },
+  // titleWrap: {
+  //   flexDirection: "row",
+  //   alignItems: "center",
+  //   gap: 8,
+  //   width: "100%",
+  //   paddingHorizontal: 16,
+  //   paddingTop: 20,
+  // },
+  // titleInfo: {
+  //   color: "#212121",
+  //   fontSize: 16,
+  //   fontWeight: 600,
+  // },
   listContent: {
     flexGrow: 1,
     paddingVertical: 16,
