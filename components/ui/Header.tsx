@@ -1,31 +1,71 @@
 import OrientationLock from "@/components/ui/ScreenOrientation";
-import React from "react";
-import { Text, StyleSheet, View, useWindowDimensions  } from "react-native";
+import {
+  useWindowDimensions,
+  Text,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+} from "react-native";
 import Svg, { Path } from "react-native-svg";
+import { router } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 interface HeaderProps {
   title: string;
+  showBack?: boolean;
 }
 
-export default function Header({ title }: HeaderProps) {
+export default function Header({
+  title,
+  showBack = true,
+}: HeaderProps) {
   const { width } = useWindowDimensions();
+
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    }
+  };
+
   return (
     <>
       <OrientationLock variant="portrait" />
 
       <View>
         <View style={styles.HeaderContainerWrap}>
-          <Text style={[styles.HeaderText, { width }]}>
+          {showBack && (
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={handleBack}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name="arrow-back"
+                size={26}
+                color="#fff"
+              />
+            </TouchableOpacity>
+          )}
+
+          <Text
+            style={[
+              styles.HeaderText,
+              {
+                width: showBack ? width : width,
+                paddingLeft: showBack ? 60 : 20,
+              },
+            ]}
+          >
             {title}
           </Text>
         </View>
-    
-          <Svg
-            width={width}
-            height={20}
-            viewBox="0 0 1024 20"
-            preserveAspectRatio="none"
-          >
+
+        <Svg
+          width={width}
+          height={20}
+          viewBox="0 0 1024 20"
+          preserveAspectRatio="none"
+        >
           <Path
             fill="#00A0ED"
             d="
@@ -62,12 +102,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#00A0ED",
     width: "100%",
     paddingVertical: 10,
+    position: "relative",
   },
+
   HeaderText: {
     color: "#fff",
     fontSize: 20,
-    paddingTop: 20,
-    paddingLeft: 20,
+    paddingTop: 15 ,
     fontWeight: "500",
+  },
+
+  backButton: {
+    position: "absolute",
+    left: 20,
+    top: 22,
+    width: 35,
+    height: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 10,
   },
 });
