@@ -189,7 +189,7 @@ export default function BookDoctor() {
     <>
       <OrientationLock variant="portrait" />
       <View style={globalStyle.container}>
-        <Header title="Book Appointment" />
+        <Header title="Doctor Profile" showBack={true} />
         <ScrollView contentContainerStyle={styles.container}>
           <View style={styles.profileContainer}>
             {imageUri ? (
@@ -297,7 +297,7 @@ export default function BookDoctor() {
 
 const styles = StyleSheet.create({
   PastbookingBtn: { marginTop: 20 },
-  container: { padding: 20, flexGrow: 1 },
+  container: { padding: 20, flexGrow: 1, paddingBottom: 85,},
   profileContainer: { alignItems: "center", marginBottom: 24 },
   avatar: { width: 88, height: 88, borderRadius: 44 },
   placeholder: {
