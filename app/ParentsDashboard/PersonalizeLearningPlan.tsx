@@ -1,6 +1,6 @@
 import CompoLoginBack from "@/components/ui/CompoLoginBack";
-import { View, Text, StyleSheet, FlatList, Pressable } from "react-native";
-import { styles as globalStyle } from "@/constants/globalStyle";
+import { globalStyle } from "@/constants/globalStyle";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const plans = [
   { id: "1", title: "Attention & Memory" },

@@ -16,10 +16,10 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { styles as globalStyle } from "../../constants/globalStyle";
+import { globalStyle } from "../../constants/globalStyle";
 // import LottieView from "lottie-react-native";
 // import { pauseGameSound, resumeGameSound } from "../components/SoundCompo/GameSound";
-import { loadGameSound, pauseGameSound, resumeGameSound, } from "@/components/SoundCompo/GameSound";
+import { pauseGameSound, resumeGameSound } from "@/components/SoundCompo/GameSound";
 import { commonStyles } from "../../constants/globalStyle";
 
 export default function Index() {

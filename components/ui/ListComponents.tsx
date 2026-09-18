@@ -98,10 +98,10 @@ export default function DoctorListCard({
           {dates.length ? (
         <>
           <Pressable style={styles.dateBar} onPress={selectNextDate}>
-            <Ionicons name="calendar-outline" size={20} color="#1682E7" />
+            <Ionicons name="calendar-outline" size={15} color="#1386E7" />
             <Text style={styles.dateText}>{formatDate(selectedDate)}</Text>
             {dates.length > 1 ? (
-              <Ionicons name="chevron-forward" size={22} color="#1682E7" />
+              <Ionicons name="chevron-forward" size={13} color="#1386E7" />
             ) : null}
           </Pressable>
 
@@ -125,8 +125,8 @@ export default function DoctorListCard({
                 </Text>
                 <Ionicons
                   name={showAllSlots ? "chevron-up" : "chevron-down"}
-                  size={19}
-                  color="#1682E7"
+                  size={12}
+                  color="#1386E7"
                 />
               </Pressable>
             ) : null}
@@ -150,25 +150,25 @@ export default function DoctorListCard({
 }
 
 const styles = StyleSheet.create({
-  button: { backgroundColor: "#2563EB", paddingHorizontal: 17, paddingVertical: 9, borderRadius: 8, }, 
-  buttonText: { color: "#FFF", fontWeight: "600", fontSize: 15, },
-  card: { backgroundColor: "#FFF", borderRadius: 15, borderWidth: 1, borderColor: "#e7e6e6", padding: 12, marginVertical: 10, elevation: 4, boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.1)", },
-  topSection: { flexDirection: "row", marginBottom: 16 },
+  button: { backgroundColor: "#1386E7", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, }, 
+  buttonText: { color: "#FFF", fontWeight: "600", fontSize: 11, lineHeight: 14,},
+  card: { backgroundColor: "#FFF", borderRadius: 15, borderWidth: 1, borderColor: "#e7e6e6", padding: 12, marginVertical: 8, elevation: 4, boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.1)", },
+  topSection: { flexDirection: "row", },
   image: { width: 70, height: 70, borderRadius: 10 },
   avatarPlaceholder: { width: 95, height: 95, borderRadius: 10, backgroundColor: "#1682E7", justifyContent: "center", alignItems: "center", },
   avatarLetter: { color: "#FFF", fontSize: 40, fontWeight: "700" },
-  availabilityStatus: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 5, },
+  availabilityStatus: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 7, },
   statusDot: { width: 4, height: 4, borderRadius: 6, backgroundColor: "#49AD3D", marginRight: 4, },
   statusText: { color: "#49AD3D", fontSize: 11, fontWeight: "400" },
-  details: { flex: 1, paddingLeft: 18, paddingTop: 4 },
+  details: { flex: 1, paddingLeft: 11, paddingTop: 4 },
   name: { color: "#000000", fontSize: 13, fontWeight: "600", lineHeight: 20, marginTop: -5, },
   specialty: { color: "#74798B", fontSize: 12, lineHeight: 18 },
-  dateBar: { flexDirection: "row", alignItems: "center", backgroundColor: "#EDF7FF", borderRadius: 8, minHeight: 40, paddingHorizontal: 16, },
-  dateText: { flex: 1, color: "#1682E7", fontSize: 12, fontWeight: "600", marginLeft: 6, },
-  slotsRow: { flexDirection: "row", flexWrap: "wrap", gap: 10, marginTop: 14 },
-  slotButton: { borderWidth: 2, borderColor: "#95CBF8", borderRadius: 8, paddingHorizontal: 16, paddingVertical: 5, },
-  slotText: { color: "#1682E7", fontSize: 16, fontWeight: "700" },
-  moreButton: { flexDirection: "row", alignItems: "center", borderWidth: 2, borderColor: "#95CBF8", borderRadius: 8, paddingHorizontal: 10, paddingVertical: 10, gap: 4, },
-  moreText: { color: "#1682E7", fontSize: 16, fontWeight: "700" },
-  noSlots: { color: "#73798D", fontSize: 15, marginTop: 4 },
+  dateBar: { flexDirection: "row", alignItems: "center", backgroundColor: "#EFF7FE", borderRadius: 4, minHeight: 20, paddingHorizontal: 6, paddingVertical: 2, marginTop: 8, },
+  dateText: { flex: 1, color: "#1682E7", fontSize: 11, fontWeight: "600", marginLeft: 6, },
+  slotsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
+  slotButton: { borderWidth: 2, borderColor: "#95CBF8", borderRadius: 4, paddingHorizontal: 9, paddingVertical: 3, minWidth: 55,},
+  slotText: { color: "#1682E7", fontSize: 11,  lineHeight: 13, fontWeight: "600",  textAlign: "center",},
+  moreButton: { flexDirection: "row", alignItems: "center", borderWidth: 2, borderColor: "#95CBF8", borderRadius: 4, paddingLeft: 9, paddingRight: 6, paddingVertical: 3, gap: 4, },
+  moreText: { color: "#1682E7", fontSize: 11, fontWeight: "600" },
+  noSlots: { color: "#73798D", fontSize: 11, marginTop: 4 },
 });

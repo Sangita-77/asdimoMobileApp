@@ -16,7 +16,7 @@ import {
     Text,
     View,
 } from "react-native";
-import { styles as globalStyle } from "../../constants/globalStyle";
+import { globalStyle } from "../../constants/globalStyle";
 
 function formatDate(date: string) {
   const [day, month, year] = date.split("-").map(Number);

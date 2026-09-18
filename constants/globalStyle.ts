@@ -2,7 +2,7 @@ import { StyleSheet } from "react-native";
 
 // const { width, height} = useWindowDimensions();
 
-export const styles = StyleSheet.create({
+export const globalStyle = StyleSheet.create({
   container: { flex: 1, justifyContent: "center", alignItems: "center", backgroundColor: "#f0f0f0d0",},
   container2: { flex: 1, justifyContent: "center", alignItems: "center",},
 
@@ -28,6 +28,6 @@ export const getDynamicStyles = (width: number) =>
   });
 
 export const doctorStyles = StyleSheet.create({
-  doctorWrap: {flex: 1, justifyContent: "flex-start", alignItems: "center", backgroundColor: "#f0f0f0d0",},
+  doctorWrap: {flex: 1, justifyContent: "flex-start", alignItems: "center", backgroundColor: "#ffffff",},
   cardCon: {width: "100%", maxWidth: 500, margin: 0, overflowY: "scroll",},
 });

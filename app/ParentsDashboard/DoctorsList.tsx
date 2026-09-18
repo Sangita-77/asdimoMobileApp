@@ -10,6 +10,7 @@ import {
   getTherapists,
   Therapist,
 } from "@/services/authService";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import {
@@ -19,7 +20,6 @@ import {
   Text,
   View,
 } from "react-native";
-// import { styles as globalStyle } from "../../constants/globalStyle";
 import { doctorStyles } from "../../constants/globalStyle";
 
 export default function DoctorList() {
@@ -61,7 +61,11 @@ export default function DoctorList() {
       <OrientationLock variant="portrait-up" />
       <View style={doctorStyles.doctorWrap}>
         <Header title="Doctor Booking" />
-        <Text>Doctor List</Text>
+        <View>
+          <Ionicons name={"happy-outline"} size={20} color="#1386E7" />
+          <Text>Doctor List</Text>
+        </View>
+        {/* <Text>Doctor List</Text> */}
         <View style={doctorStyles.cardCon}>
           <FlatList
             contentContainerStyle={styles.listContent}
@@ -126,7 +130,6 @@ const styles = StyleSheet.create({
     width: "100%",
     alignSelf: "stretch",
     paddingHorizontal: 16,
-    marginBottom: 16,
   },
 
   statusContainer: {
