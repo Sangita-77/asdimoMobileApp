@@ -13,6 +13,8 @@ import {
 interface DoctorListCardProps {
   image?: ImageSourcePropType;
   name: string;
+  category?: string;
+  experience?: number | string;
   availability: AvailabilitySlot[];
   onBookNow: (slot: AvailabilitySlot) => void;
   appointmentBooking: () => void;
@@ -38,6 +40,8 @@ function dateValue(date: string) {
 export default function DoctorListCard({
   image,
   name,
+  category = "Therapist",
+  experience,
   availability,
   onBookNow,
   appointmentBooking,
@@ -72,6 +76,11 @@ export default function DoctorListCard({
     setShowAllSlots(false);
   };
 
+  const experienceText =
+    experience !== undefined && experience !== null && experience !== ""
+      ? `${experience}+ Years`
+      : "0+ Years";
+
   return (
     <View style={styles.card}>
       <View style={styles.topSection}>
@@ -92,8 +101,11 @@ export default function DoctorListCard({
         </View>
 
         <View style={styles.details}>
+          <Text style={styles.experience}>
+            <Text style={styles.experienceSpan}>{experienceText}</Text> Experience
+          </Text>
           <Text style={styles.name}>{name}</Text>
-          <Text style={styles.specialty}>Therapist</Text>
+          <Text style={styles.specialty}>{category || "Therapist"}</Text>
 
           {dates.length ? (
         <>
@@ -150,9 +162,11 @@ export default function DoctorListCard({
 }
 
 const styles = StyleSheet.create({
+  experienceSpan:{fontSize: 15, fontWeight: "600"},
+  experience:{backgroundColor: "#abd8ff", width: 140, borderRadius: 4, color: "#054375", fontSize: 10, textAlign: "center", position: "absolute", right: 0, top: -23, padding: 2,},
   button: { backgroundColor: "#1386E7", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, }, 
   buttonText: { color: "#FFF", fontWeight: "600", fontSize: 11, lineHeight: 14,},
-  card: { backgroundColor: "#FFF", borderRadius: 15, borderWidth: 0, borderColor: "#e7e6e6", padding: 12, marginVertical: 8, elevation: 4, boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.1)", },
+  card: { backgroundColor: "#FFF", borderRadius: 15, borderWidth: 0, borderColor: "#e7e6e6", padding: 12, marginVertical: 15, elevation: 4, boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.44)", },
   topSection: { flexDirection: "row", },
   image: { width: 70, height: 70, borderRadius: 10 },
   avatarPlaceholder: { width: 95, height: 95, borderRadius: 10, backgroundColor: "#1682E7", justifyContent: "center", alignItems: "center", },

@@ -98,7 +98,7 @@ export default function Header({
 }
 
 const styles = StyleSheet.create({
-  HeaderContainer:{backgroundColor: "#ffffff",},
+  HeaderContainer:{backgroundColor: "#00A0ED",},
   HeaderContainerWrap: {
     backgroundColor: "#00A0ED",
     width: "100%",

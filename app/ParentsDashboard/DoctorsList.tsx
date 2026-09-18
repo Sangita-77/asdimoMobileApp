@@ -20,7 +20,6 @@ import {
   Text,
   View
 } from "react-native";
-import { doctorStyles } from "../../constants/globalStyle";
 const stethoscopeIcon = require("../../assets/images/stethoscope-icon.png");
 
 export default function Bookings() {
@@ -67,30 +66,34 @@ export default function Bookings() {
           data={therapists}
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
-              <DoctorListCard
-                image={
-                  item.profileImg
-                    ? {
-                      uri: `${API_BASE_URL.replace(/\/api$/, "")}${item.profileImg}`,
-                    }
-                    : undefined
+          <DoctorListCard
+            image={
+              item.profileImg
+                ? {
+                  uri: `${API_BASE_URL.replace(/\/api$/, "")}${item.profileImg}`,
                 }
-                name={item.name}
-                availability={item.availability}
-                onBookNow={(slot) =>
-                  console.log(`Book ${item.name} on ${slot.date} at ${slot.time}`)
-                }
-                appointmentBooking={() =>
-                  router.push({
-                    pathname: ROUTES.AUTH.BOOKDOCTOR,
-                    params: {
-                      therapistId: String(item.userId),
-                      therapistName: item.name,
-                      profileImg: item.profileImg || "",
-                    },
-                  })
-                }
-              />
+                : undefined
+            }
+            name={item.name}
+            category={item.roleData?.therapist_category || "Therapist"}
+            experience={item.roleData?.yearsOfExperience ?? 0}
+            availability={item.availability}
+            onBookNow={(slot) =>
+              console.log(`Book ${item.name} on ${slot.date} at ${slot.time}`)
+            }
+            appointmentBooking={() =>
+              router.push({
+                pathname: ROUTES.AUTH.BOOKDOCTOR,
+                params: {
+                  therapistId: String(item.userId),
+                  therapistName: item.name,
+                  profileImg: item.profileImg || "",
+                  therapistCategory: item.roleData?.therapist_category || "Therapist",
+                  yearsOfExperience: String(item.roleData?.yearsOfExperience ?? 0),
+                },
+              })
+            }
+          />
           )}
           ListEmptyComponent={
             <View style={styles.statusContainer}>

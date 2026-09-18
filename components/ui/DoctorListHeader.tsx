@@ -200,7 +200,7 @@ const DoctorListHeader = () => {
 export default DoctorListHeader;
 
 const styles = StyleSheet.create({
-    container: { width: "100%", paddingHorizontal: 16, paddingTop: 28, paddingBottom: 0, backgroundColor: "#fff", gap: 16, },
+    container: { width: "100%", paddingHorizontal: 16, paddingTop: 28, paddingBottom: 10, backgroundColor: "#fff", gap: 16, },
     titleWrap: { flexDirection: "row", alignItems: "center", gap: 8, width: "100%", },
     titleInfo: { color: "#212121", fontSize: 16, fontWeight: 600, },
     tabsContainer: { flexDirection: "row", justifyContent: "space-between", columnGap: 10, },
