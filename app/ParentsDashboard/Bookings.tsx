@@ -59,7 +59,6 @@ export default function Bookings() {
   return (
     <>
       <OrientationLock variant="portrait" />
-      <View style={globalStyle.container}>
         <Header title="History" />
         <FlatList
           data={appointments}
@@ -120,7 +119,6 @@ export default function Bookings() {
           showsVerticalScrollIndicator={false}
         />
         <Footer />
-      </View>
     </>
   );
 }

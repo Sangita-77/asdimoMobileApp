@@ -23,7 +23,7 @@ import {
 import { doctorStyles } from "../../constants/globalStyle";
 const stethoscopeIcon = require("../../assets/images/stethoscope-icon.png");
 
-export default function DoctorList() {
+export default function Bookings() {
   const [therapists, setTherapists] = useState<
     (Therapist & { availability: AvailabilitySlot[] })[]
   >([]);
@@ -59,109 +59,105 @@ export default function DoctorList() {
 
   return (
     <>
-      <OrientationLock variant="portrait-up" />
-      <View style={doctorStyles.doctorWrap}>
+      <OrientationLock variant="portrait" />
         <Header title="Doctor Booking" />
-        {/* <View style={styles.titleWrap}>
-          <Image
-            source={stethoscopeIcon}
-            style={{ width: 17, height: 17 }}
-            resizeMode="contain"
-          />
-          <Text style={styles.titleInfo}>Doctor List</Text>
-        </View> */}
         <DoctorListHeader />
-        <View style={doctorStyles.cardCon}>
-          <FlatList
-            contentContainerStyle={styles.listContent}
-            data={therapists}
-            keyExtractor={(item) => item._id}
-            renderItem={({ item }) => (
-              <View style={styles.cardWrapper}>
-                <DoctorListCard
-                  image={
-                    item.profileImg
-                      ? {
-                        uri: `${API_BASE_URL.replace(/\/api$/, "")}${item.profileImg}`,
-                      }
-                      : undefined
-                  }
-                  name={item.name}
-                  availability={item.availability}
-                  onBookNow={(slot) =>
-                    console.log(`Book ${item.name} on ${slot.date} at ${slot.time}`)
-                  }
-                  appointmentBooking={() =>
-                    router.push({
-                      pathname: ROUTES.AUTH.BOOKDOCTOR,
-                      params: {
-                        therapistId: String(item.userId),
-                        therapistName: item.name,
-                        profileImg: item.profileImg || "",
-                      },
-                    })
-                  }
-                />
-              </View>
-            )}
-            ListEmptyComponent={
-              <View style={styles.statusContainer}>
-                {isLoading ? (
-                  <ActivityIndicator size="large" color="#2563EB" />
-                ) : (
-                  <Text style={styles.statusText}>
-                    {error || "No therapists are available right now."}
-                  </Text>
-                )}
-              </View>
-            }
-            showsVerticalScrollIndicator={false}
-          />
-        </View>
+        <FlatList
+          contentContainerStyle={styles.listContent}
+          data={therapists}
+          keyExtractor={(item) => item._id}
+          renderItem={({ item }) => (
+              <DoctorListCard
+                image={
+                  item.profileImg
+                    ? {
+                      uri: `${API_BASE_URL.replace(/\/api$/, "")}${item.profileImg}`,
+                    }
+                    : undefined
+                }
+                name={item.name}
+                availability={item.availability}
+                onBookNow={(slot) =>
+                  console.log(`Book ${item.name} on ${slot.date} at ${slot.time}`)
+                }
+                appointmentBooking={() =>
+                  router.push({
+                    pathname: ROUTES.AUTH.BOOKDOCTOR,
+                    params: {
+                      therapistId: String(item.userId),
+                      therapistName: item.name,
+                      profileImg: item.profileImg || "",
+                    },
+                  })
+                }
+              />
+          )}
+          ListEmptyComponent={
+            <View style={styles.statusContainer}>
+              {isLoading ? (
+                <ActivityIndicator size="large" color="#2563EB" />
+              ) : (
+                <Text style={styles.statusText}>
+                  {error || "No therapists are available right now."}
+                </Text>
+              )}
+            </View>
+          }
+          showsVerticalScrollIndicator={false}
+        />
         <Footer />
-      </View>
     </>
   );
 }
 
 const styles = StyleSheet.create({
-  cardCon:{height: 2000},
-  titleWrap: {
-    flexDirection: "row",
+  listContent: { flexGrow: 1, padding: 20 },
+  heading: {
+    color: "#111827",
+    fontSize: 27,
+    fontWeight: "700",
+    marginBottom: 18,
+  },
+  card: {
+    backgroundColor: "#FFF",
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 14,
+    elevation: 3,
+    boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.08)",
+  },
+  sessionText: { color: "#4B5563", fontSize: 16 },
+  doctorName: { color: "#111827", fontWeight: "700" },
+  dateTime: { color: "#6B7280", fontSize: 15, marginTop: 8 },
+  status: {
+    alignSelf: "flex-start",
+    borderRadius: 16,
+    marginTop: 12,
+    paddingHorizontal: 12,
+    paddingVertical: 5,
+  },
+  pending: { backgroundColor: "#DBEAFE" },
+  completed: { backgroundColor: "#DCFCE7" },
+  cancelled: { backgroundColor: "#FEE2E2" },
+  statusText: {
+    color: "#1F2937",
+    fontSize: 13,
+    fontWeight: "700",
+    textTransform: "capitalize",
+  },
+  joinButton: {
     alignItems: "center",
-    gap: 8,
-    width: "100%",
-    paddingHorizontal: 16,
-    paddingTop: 20,
+    backgroundColor: "#16A34A",
+    borderRadius: 9,
+    marginTop: 14,
+    paddingVertical: 11,
   },
-  titleInfo: {
-    color: "#212121",
-    fontSize: 16,
-    fontWeight: 600,
-  },
-  listContent: {
-    height: "85%", 
-    flexGrow: 1,
-    paddingVertical: 16,
-    paddingHorizontal: 0,
-    width: "100%",
-  },
-  cardWrapper: {
-    width: "100%",
-    alignSelf: "stretch",
-    paddingHorizontal: 16,
-  },
-
+  joinButtonText: { color: "#FFF", fontSize: 15, fontWeight: "700" },
   statusContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 24,
+    padding: 36,
   },
-
-  statusText: {
-    color: "#4B5563",
-    fontSize: 16,
-    textAlign: "center",
-  },
+  emptyText: { color: "#6B7280", fontSize: 16, textAlign: "center" },
 });
