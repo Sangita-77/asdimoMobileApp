@@ -28,6 +28,6 @@ export const getDynamicStyles = (width: number) =>
   });
 
 export const doctorStyles = StyleSheet.create({
-  doctorWrap: {flex: 1, justifyContent: "flex-start", alignItems: "center", backgroundColor: "#ffffff",},
+  doctorWrap: {flex: 1, justifyContent: "flex-start", alignItems: "center", backgroundColor: "#ffffff", paddingBottom: 85,},
   cardCon: {width: "100%", maxWidth: 500, margin: 0, overflowY: "scroll",},
 });
