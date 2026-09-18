@@ -1,11 +1,14 @@
+import { useState } from "react";
 import {
   StyleSheet,
   Text,
   TextInput,
   TextInputProps,
+  TouchableOpacity,
   View,
   useWindowDimensions,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { Dropdown } from "react-native-element-dropdown";
 
 type Option = {
@@ -18,6 +21,8 @@ type InputProps = TextInputProps & {
   error?: string;
   variant?: "full" | "half" | "third" | "fixed" | "otp";
   icon?: any;
+  rightIcon?: React.ReactNode;
+  isPassword?: boolean;
   type?: "text" | "select";
   options?: Option[];
   selectedValue?: string;
@@ -31,6 +36,8 @@ export default function Input({
   label,
   error,
   icon,
+  rightIcon,
+  isPassword,
   placeholder,
   variant = "full",
   type = "text",
@@ -41,9 +48,11 @@ export default function Input({
   onResend,
   style,
   editable = true,
+  secureTextEntry,
   ...props
 }: InputProps) {
   const { width } = useWindowDimensions();
+  const [showPassword, setShowPassword] = useState(false);
 
   const containerStyles = {
     full: styles.fullContainer,
@@ -55,6 +64,8 @@ export default function Input({
     },
     otp: styles.otpContainer,
   };
+
+  const isSecure = isPassword ? !showPassword : secureTextEntry;
 
   return (
     <View style={[styles.container, containerStyles[variant]]}>
@@ -101,11 +112,29 @@ export default function Input({
 
           <TextInput
             {...props}
+            secureTextEntry={isSecure}
             placeholder={placeholder}
             editable={editable}
             placeholderTextColor="#999"
             style={[styles.input, variant === "otp" && styles.otpInput, style]}
           />
+
+          {isPassword ? (
+            <TouchableOpacity
+              onPress={() => setShowPassword((prev) => !prev)}
+              style={styles.eyeIconContainer}
+              activeOpacity={0.7}
+              hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+            >
+              <Ionicons
+                name={showPassword ? "eye-outline" : "eye-off-outline"}
+                size={22}
+                color="#888"
+              />
+            </TouchableOpacity>
+          ) : rightIcon ? (
+            <View style={styles.rightIconContainer}>{rightIcon}</View>
+          ) : null}
         </View>
       )}
 
@@ -288,5 +317,18 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#111827",
     paddingVertical: 6,
+  },
+
+  eyeIconContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 8,
+    height: "100%",
+  },
+
+  rightIconContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 8,
   },
 });

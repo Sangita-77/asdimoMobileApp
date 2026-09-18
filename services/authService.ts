@@ -193,7 +193,20 @@ export async function isAuthenticated() {
   return Boolean(accessToken || authState === "true");
 }
 
+function extractUserFlag(data: any): number | null {
+  const user = data?.data?.user ?? data?.user ?? data?.data ?? data;
+  const rawFlag =
+    user?.flag ??
+    data?.user?.flag ??
+    data?.data?.user?.flag ??
+    data?.data?.flag ??
+    data?.flag ??
+    data?.result?.user?.flag;
+  return toFiniteNumber(rawFlag);
+}
+
 export async function loginUser(email: string, password: string) {
+  await clearAuthTokens();
   const response = await fetch(`${API_BASE_URL}${AUTH_ENDPOINTS.login}`, {
     method: "POST",
     headers: {
@@ -206,6 +219,12 @@ export async function loginUser(email: string, password: string) {
 
   if (!response.ok) {
     throw new Error(data?.message || "Login failed");
+  }
+
+  const userFlag = extractUserFlag(data);
+
+  if (userFlag !== 2 && userFlag !== 4) {
+    throw new Error("You are not register as Parent.");
   }
 
   const accessToken = extractValue(data as Record<string, any>, [
@@ -231,20 +250,10 @@ export async function loginUser(email: string, password: string) {
 
   if (
     response.ok &&
-    (accessToken || refreshToken || data?.user || data?.message)
+    (accessToken || refreshToken || data?.user || data?.data?.user || data?.message)
   ) {
     await saveAuthTokens(accessToken || "", refreshToken || "");
   }
-
-  const userFlag = [
-    data?.user?.flag,
-    data?.data?.user?.flag,
-    data?.data?.flag,
-    data?.flag,
-    data?.result?.user?.flag,
-  ]
-    .map((flag) => (typeof flag === "string" ? Number(flag) : flag))
-    .find((flag) => typeof flag === "number" && Number.isFinite(flag));
 
   if (typeof userFlag === "number") {
     await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
@@ -253,8 +262,10 @@ export async function loginUser(email: string, password: string) {
   const userId = [
     data?.user?.userId,
     data?.user?.id,
+    data?.user?._id,
     data?.data?.user?.userId,
     data?.data?.user?.id,
+    data?.data?.user?._id,
     data?.data?.parent?.userId,
     data?.data?.parentId,
     data?.data?.userId,
@@ -276,6 +287,7 @@ export async function loginUser(email: string, password: string) {
  * The API verifies the token and returns the same session fields as password login.
  */
 export async function googleLogin(idToken: string) {
+  await clearAuthTokens();
   const response = await fetch(`${API_BASE_URL}${AUTH_ENDPOINTS.googleLogin}`, {
     method: "POST",
     headers: {
@@ -288,6 +300,12 @@ export async function googleLogin(idToken: string) {
 
   if (!response.ok) {
     throw new Error(data?.message || "Google login failed");
+  }
+
+  const userFlag = extractUserFlag(data);
+
+  if (userFlag !== 2 && userFlag !== 4) {
+    throw new Error("You are not register as Parent.");
   }
 
   const accessToken = extractValue(data as Record<string, any>, [
@@ -307,16 +325,15 @@ export async function googleLogin(idToken: string) {
 
   await saveAuthTokens(accessToken, refreshToken || "");
 
-  const user = data?.data?.user ?? data?.user;
-  const userFlag = toFiniteNumber(user?.flag);
-  if (userFlag !== null) {
+  if (typeof userFlag === "number") {
     await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
   }
 
-  const userId = [user?._id, user?.userId, user?.id]
+  const user = data?.data?.user ?? data?.user;
+  const userId = [user?.userId, user?.id, user?._id, data?.data?.userId, data?.userId]
     .map(toFiniteNumber)
     .find((value): value is number => value !== null);
-  if (userId !== undefined) {
+  if (userId !== undefined && userId !== null) {
     await AsyncStorage.setItem(USER_ID_KEY, String(userId));
   }
 
@@ -329,6 +346,7 @@ export async function googleSignup(
   idToken: string,
   userData: Pick<ParentRegistrationPayload, "flag">,
 ) {
+  await clearAuthTokens();
   const response = await fetch(
     `${API_BASE_URL}${AUTH_ENDPOINTS.googleSignup}`,
     {
@@ -363,16 +381,16 @@ export async function googleSignup(
 
   await saveAuthTokens(accessToken, refreshToken || "");
 
-  const user = data?.data?.user ?? data?.user;
-  const userFlag = toFiniteNumber(user?.flag);
-  if (userFlag !== null) {
+  const userFlag = extractUserFlag(data) ?? userData.flag;
+  if (userFlag !== null && typeof userFlag === "number") {
     await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
   }
 
-  const userId = [user?._id, user?.userId, user?.id]
+  const user = data?.data?.user ?? data?.user;
+  const userId = [user?.userId, user?.id, user?._id, data?.data?.userId, data?.userId]
     .map(toFiniteNumber)
     .find((value): value is number => value !== null);
-  if (userId !== undefined) {
+  if (userId !== undefined && userId !== null) {
     await AsyncStorage.setItem(USER_ID_KEY, String(userId));
   }
 
@@ -386,6 +404,7 @@ export async function googleSignup(
  * The API validates the Facebook token before creating the app session.
  */
 export async function facebookLogin(facebookAccessToken: string) {
+  await clearAuthTokens();
   const response = await fetch(
     `${API_BASE_URL}${AUTH_ENDPOINTS.facebookLogin}`,
     {
@@ -401,6 +420,12 @@ export async function facebookLogin(facebookAccessToken: string) {
 
   if (!response.ok) {
     throw new Error(data?.message || "Facebook login failed");
+  }
+
+  const userFlag = extractUserFlag(data);
+
+  if (userFlag !== 2 && userFlag !== 4) {
+    throw new Error("You are not register as Parent.");
   }
 
   const accessToken = extractValue(data as Record<string, any>, [
@@ -420,16 +445,15 @@ export async function facebookLogin(facebookAccessToken: string) {
 
   await saveAuthTokens(accessToken, refreshToken || "");
 
-  const user = data?.data?.user ?? data?.user;
-  const userFlag = toFiniteNumber(user?.flag);
-  if (userFlag !== null) {
+  if (typeof userFlag === "number") {
     await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
   }
 
-  const userId = [user?._id, user?.userId, user?.id]
+  const user = data?.data?.user ?? data?.user;
+  const userId = [user?.userId, user?.id, user?._id, data?.data?.userId, data?.userId]
     .map(toFiniteNumber)
     .find((value): value is number => value !== null);
-  if (userId !== undefined) {
+  if (userId !== undefined && userId !== null) {
     await AsyncStorage.setItem(USER_ID_KEY, String(userId));
   }
 
@@ -441,6 +465,7 @@ export async function facebookSignup(
   facebookAccessToken: string,
   userData: Pick<ParentRegistrationPayload, "flag">,
 ) {
+  await clearAuthTokens();
   const response = await fetch(
     `${API_BASE_URL}${AUTH_ENDPOINTS.facebookSignup}`,
     {
@@ -475,16 +500,16 @@ export async function facebookSignup(
 
   await saveAuthTokens(accessToken, refreshToken || "");
 
-  const user = data?.data?.user ?? data?.user;
-  const userFlag = toFiniteNumber(user?.flag);
-  if (userFlag !== null) {
+  const userFlag = extractUserFlag(data) ?? userData.flag;
+  if (userFlag !== null && typeof userFlag === "number") {
     await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
   }
 
-  const userId = [user?._id, user?.userId, user?.id]
+  const user = data?.data?.user ?? data?.user;
+  const userId = [user?.userId, user?.id, user?._id, data?.data?.userId, data?.userId]
     .map(toFiniteNumber)
     .find((value): value is number => value !== null);
-  if (userId !== undefined) {
+  if (userId !== undefined && userId !== null) {
     await AsyncStorage.setItem(USER_ID_KEY, String(userId));
   }
 

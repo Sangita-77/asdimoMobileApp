@@ -734,6 +734,12 @@ export default function Index() {
                     Sign in to Your Account{" "}
                   </Text>
 
+                  {signInErrors.loginError ? (
+                    <Text style={[styles.formError, { textAlign: "center", marginBottom: 12 }]}>
+                      {signInErrors.loginError}
+                    </Text>
+                  ) : null}
+
                   <View style={styles.ContentBox}>
                     <View style={styles.socialConnection}>
                       <Button
@@ -796,10 +802,11 @@ export default function Index() {
                           error={signInErrors.email}
                           onChangeText={(text) => {
                             setSignInEmail(text);
-                            if (signInErrors.email) {
+                            if (signInErrors.email || signInErrors.loginError) {
                               setSignInErrors((current) => ({
                                 ...current,
                                 email: "",
+                                loginError: "",
                               }));
                             }
                           }}
@@ -808,21 +815,20 @@ export default function Index() {
                           label=""
                           variant="fixed"
                           placeholder="Enter Password"
-                          secureTextEntry
+                          isPassword
                           autoCapitalize="none"
                           autoCorrect={false}
                           textContentType="password"
                           autoComplete="password"
                           value={signInPassword}
-                          error={
-                            signInErrors.password || signInErrors.loginError
-                          }
+                          error={signInErrors.password}
                           onChangeText={(text) => {
                             setSignInPassword(text);
-                            if (signInErrors.password) {
+                            if (signInErrors.password || signInErrors.loginError) {
                               setSignInErrors((current) => ({
                                 ...current,
                                 password: "",
+                                loginError: "",
                               }));
                             }
                           }}
@@ -845,6 +851,11 @@ export default function Index() {
                     globalStyle.signinText,
                     { fontSize: Math.max(15, Math.min(width * 0.035, 24)), }, ]} 
                   >Create Your Account</Text>
+                  {signInErrors.loginError ? (
+                    <Text style={[styles.formError, { textAlign: "center", marginBottom: 12 }]}>
+                      {signInErrors.loginError}
+                    </Text>
+                  ) : null}
                   <View style={styles.ContentBox}>
                     <Form type="step">
                       <StepOne />
