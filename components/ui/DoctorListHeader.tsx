@@ -28,8 +28,14 @@ interface DoctorListHeaderProps {
     onCategoryChange?: (category: string) => void;
     selectedDate?: string;
     onDateChange?: (date: string) => void;
+    selectedLanguage?: string;
+    onLanguageChange?: (language: string) => void;
+    selectedDistance?: string;
+    onDistanceChange?: (distance: string) => void;
+    onClearFilters?: () => void;
     categoriesList?: string[];
     datesList?: string[];
+    languagesList?: string[];
 }
 
 const defaultCategories = [
@@ -47,6 +53,14 @@ const defaultDates = [
     "This Week",
 ];
 
+const defaultLanguages = [
+    "All Languages",
+    "English",
+    "Hindi",
+    "Marathi",
+    "Bengali",
+];
+
 const distances = [
     "Any Distance",
     "Within 5 km",
@@ -61,17 +75,24 @@ const DoctorListHeader = ({
     onCategoryChange,
     selectedDate = "Any Date",
     onDateChange,
+    selectedLanguage = "All Languages",
+    onLanguageChange,
+    selectedDistance = "Distance",
+    onDistanceChange,
+    onClearFilters,
     categoriesList = defaultCategories,
     datesList = defaultDates,
+    languagesList = defaultLanguages,
 }: DoctorListHeaderProps) => {
-    const [distance, setDistance] = useState("Distance");
+    const [distance, setDistance] = useState(selectedDistance);
     const [dropdown, setDropdown] = useState<
-        "category" | "date" | "distance" | null
+        "category" | "date" | "language" | "distance" | null
     >(null);
 
     const getOptions = () => {
         if (dropdown === "category") return categoriesList;
         if (dropdown === "date") return datesList;
+        if (dropdown === "language") return languagesList;
         if (dropdown === "distance") return distances;
 
         return [];
@@ -84,16 +105,41 @@ const DoctorListHeader = ({
         if (dropdown === "date") {
             onDateChange?.(value);
         }
+        if (dropdown === "language") {
+            onLanguageChange?.(value);
+        }
         if (dropdown === "distance") {
-            setDistance(value === "Any Distance" ? "Distance" : value);
+            const nextDistance = value === "Any Distance" ? "Distance" : value;
+            setDistance(nextDistance);
+            onDistanceChange?.(nextDistance);
         }
         setDropdown(null);
     };
+
+    const handleClearAll = () => {
+        setDistance("Distance");
+        setDropdown(null);
+        onCategoryChange?.("All Categories");
+        onDateChange?.("Any Date");
+        onLanguageChange?.("All Languages");
+        onDistanceChange?.("Distance");
+        onClearFilters?.();
+    };
+
+    const hasActiveFilters =
+        (selectedCategory && selectedCategory !== "All Categories" && selectedCategory !== "Category") ||
+        (selectedDate && selectedDate !== "Any Date" && selectedDate !== "Date") ||
+        (selectedLanguage && selectedLanguage !== "All Languages" && selectedLanguage !== "Language") ||
+        (distance !== "Distance" && distance !== "Any Distance");
 
     const displayCategory =
         selectedCategory === "All Categories" ? "Category" : selectedCategory;
     const displayDate =
         selectedDate === "Any Date" ? "Date" : selectedDate;
+    const displayLanguage =
+        !selectedLanguage || selectedLanguage === "All Languages"
+            ? "Language"
+            : selectedLanguage;
 
     return (
         <View style={styles.container}>
@@ -139,15 +185,25 @@ const DoctorListHeader = ({
             </View>
 
             {/* -------- Dropdowns */}
-            <View style={styles.filtersContainer}>
-
+            <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.filtersContainer}
+            >
+                {/* Category Filter */}
                 <TouchableOpacity
-                    style={styles.dropdownButton}
+                    style={[
+                        styles.dropdownButton,
+                        selectedCategory !== "All Categories" && styles.activeDropdownButton,
+                    ]}
                     onPress={() => setDropdown("category")}
                     activeOpacity={0.8}
                 >
                     <Text
-                        style={styles.dropdownText}
+                        style={[
+                            styles.dropdownText,
+                            selectedCategory !== "All Categories" && styles.activeDropdownText,
+                        ]}
                         numberOfLines={1}
                     >
                         {displayCategory}
@@ -156,45 +212,115 @@ const DoctorListHeader = ({
                     <Ionicons
                         name="chevron-down"
                         size={10}
-                        color="#000000"
+                        color={selectedCategory !== "All Categories" ? "#00A0ED" : "#000000"}
                     />
                 </TouchableOpacity>
 
+                {/* Date Filter */}
                 <TouchableOpacity
-                    style={styles.dropdownButton}
+                    style={[
+                        styles.dropdownButton,
+                        selectedDate !== "Any Date" && styles.activeDropdownButton,
+                    ]}
                     onPress={() => setDropdown("date")}
                     activeOpacity={0.8}
                 >
-                    <Text style={styles.dropdownText} numberOfLines={1}>
+                    <Text
+                        style={[
+                            styles.dropdownText,
+                            selectedDate !== "Any Date" && styles.activeDropdownText,
+                        ]}
+                        numberOfLines={1}
+                    >
                         {displayDate}
                     </Text>
 
                     <Ionicons
                         name="chevron-down"
                         size={10}
-                        color="#000000"
+                        color={selectedDate !== "Any Date" ? "#00A0ED" : "#000000"}
                     />
                 </TouchableOpacity>
 
+                {/* Language Filter */}
+                <TouchableOpacity
+                    style={[
+                        styles.dropdownButton,
+                        selectedLanguage !== "All Languages" && styles.activeDropdownButton,
+                    ]}
+                    onPress={() => setDropdown("language")}
+                    activeOpacity={0.8}
+                >
+                    <Text
+                        style={[
+                            styles.dropdownText,
+                            selectedLanguage !== "All Languages" && styles.activeDropdownText,
+                        ]}
+                        numberOfLines={1}
+                    >
+                        {displayLanguage}
+                    </Text>
+
+                    <Ionicons
+                        name="chevron-down"
+                        size={10}
+                        color={selectedLanguage !== "All Languages" ? "#00A0ED" : "#000000"}
+                    />
+                </TouchableOpacity>
+
+                {/* Distance Filter */}
                 {activeTab !== "Video Appointment" && (
                     <TouchableOpacity
-                        style={styles.dropdownButton}
+                        style={[
+                            styles.dropdownButton,
+                            distance !== "Distance" && distance !== "Any Distance" && styles.activeDropdownButton,
+                        ]}
                         onPress={() => setDropdown("distance")}
                         activeOpacity={0.8}
                     >
-                        <Text style={styles.dropdownText}>
+                        <Text
+                            style={[
+                                styles.dropdownText,
+                                distance !== "Distance" && distance !== "Any Distance" && styles.activeDropdownText,
+                            ]}
+                            numberOfLines={1}
+                        >
                             {distance}
                         </Text>
 
                         <Ionicons
                             name="chevron-down"
                             size={10}
-                            color="#000000"
+                            color={distance !== "Distance" && distance !== "Any Distance" ? "#00A0ED" : "#000000"}
                         />
                     </TouchableOpacity>
                 )}
 
-            </View>
+                {/* Clear All Filters Button */}
+                <TouchableOpacity
+                    style={[
+                        styles.clearFilterButton,
+                        !hasActiveFilters && styles.clearFilterButtonDisabled,
+                    ]}
+                    onPress={handleClearAll}
+                    activeOpacity={0.8}
+                    disabled={!hasActiveFilters}
+                >
+                    <Ionicons
+                        name="refresh-outline"
+                        size={12}
+                        color={hasActiveFilters ? "#E53935" : "#9E9E9E"}
+                    />
+                    <Text
+                        style={[
+                            styles.clearFilterText,
+                            !hasActiveFilters && styles.clearFilterTextDisabled,
+                        ]}
+                    >
+                        Clear All
+                    </Text>
+                </TouchableOpacity>
+            </ScrollView>
 
             {/* ------- Dropdown Modal */}
             <Modal
@@ -240,9 +366,15 @@ const styles = StyleSheet.create({
     activeTab: { backgroundColor: "#00A0ED", borderColor: "#00A0ED", },
     tabText: { fontSize: 9.5, color: "#4D4D4D", textAlign: "center", },
     activeTabText: { color: "#fff", fontWeight: "500", },
-    filtersContainer: { flexDirection: "row", alignItems: "center", },
-    dropdownButton: { height: 30, borderWidth: 1, borderColor: "#CCCCCC", borderRadius: 8, paddingLeft: 10, paddingRight: 5, flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginRight: 8, minWidth: 68, },
-    dropdownText: { fontSize: 10, color: "#4D4D4D", marginRight: 8, },
+    filtersContainer: { flexDirection: "row", alignItems: "center", paddingVertical: 2, },
+    dropdownButton: { height: 30, borderWidth: 1, borderColor: "#CCCCCC", borderRadius: 8, paddingLeft: 10, paddingRight: 6, flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginRight: 8, minWidth: 68, backgroundColor: "#fff", },
+    activeDropdownButton: { borderColor: "#00A0ED", backgroundColor: "#F0F9FF", },
+    dropdownText: { fontSize: 10, color: "#4D4D4D", marginRight: 6, },
+    activeDropdownText: { color: "#00A0ED", fontWeight: "600", },
+    clearFilterButton: { height: 30, borderWidth: 1, borderColor: "#FFCDD2", backgroundColor: "#FFEBEE", borderRadius: 8, paddingHorizontal: 9, flexDirection: "row", alignItems: "center", gap: 4, marginRight: 8, },
+    clearFilterButtonDisabled: { borderColor: "#E0E0E0", backgroundColor: "#F5F5F5", },
+    clearFilterText: { fontSize: 10, color: "#E53935", fontWeight: "600", },
+    clearFilterTextDisabled: { color: "#9E9E9E", fontWeight: "400", },
     modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.15)", justifyContent: "center", alignItems: "center", },
     menuContainer: { width: 220, backgroundColor: "#fff", borderRadius: 10, paddingVertical: 6, elevation: 5, shadowColor: "#000",
                     shadowOffset: { width: 0, height: 3, },

@@ -103,6 +103,18 @@ function matchesCategoryFilter(therapistCategory: string | undefined, selectedCa
   return (therapistCategory || "").trim().toLowerCase() === selectedCategory.trim().toLowerCase();
 }
 
+function matchesLanguageFilter(languages: string[] | undefined, selectedLanguage: string): boolean {
+  if (!selectedLanguage || selectedLanguage === "All Languages" || selectedLanguage === "Languages" || selectedLanguage === "Language") {
+    return true;
+  }
+  if (!Array.isArray(languages) || languages.length === 0) {
+    return false;
+  }
+  return languages.some(
+    (lang) => lang.trim().toLowerCase() === selectedLanguage.trim().toLowerCase()
+  );
+}
+
 export default function Bookings() {
   const [therapists, setTherapists] = useState<
     (Therapist & { availability: AvailabilitySlot[] })[]
@@ -113,6 +125,7 @@ export default function Bookings() {
   const [activeTab, setActiveTab] = useState<TabType>("All");
   const [selectedCategory, setSelectedCategory] = useState<string>("All Categories");
   const [selectedDate, setSelectedDate] = useState<string>("Any Date");
+  const [selectedLanguage, setSelectedLanguage] = useState<string>("All Languages");
 
   const loadTherapists = useCallback(async () => {
     try {
@@ -171,7 +184,29 @@ export default function Bookings() {
     return ["Any Date", "Today", "Tomorrow", "This Week", ...sortedDates];
   }, [therapists]);
 
-  // Filtered therapists based on active tab medium, category, and date
+  // Languages list extracted from therapist roleData
+  const languagesList = useMemo(() => {
+    const set = new Set<string>();
+    therapists.forEach((t) => {
+      const langs = t.roleData?.languages;
+      if (Array.isArray(langs)) {
+        langs.forEach((lang) => {
+          if (lang && typeof lang === "string" && lang.trim()) {
+            set.add(lang.trim());
+          }
+        });
+      }
+    });
+    return ["All Languages", ...Array.from(set)];
+  }, [therapists]);
+
+  const handleClearFilters = useCallback(() => {
+    setSelectedCategory("All Categories");
+    setSelectedDate("Any Date");
+    setSelectedLanguage("All Languages");
+  }, []);
+
+  // Filtered therapists based on active tab medium, category, date, and language
   const filteredTherapists = useMemo(() => {
     return therapists
       .map((therapist) => {
@@ -196,6 +231,12 @@ export default function Bookings() {
         );
         if (!matchesCategory) return false;
 
+        const matchesLanguage = matchesLanguageFilter(
+          therapist.roleData?.languages,
+          selectedLanguage
+        );
+        if (!matchesLanguage) return false;
+
         if (activeTab === "All") {
           if (selectedDate && selectedDate !== "Any Date" && selectedDate !== "Date") {
             return therapist.availability.length > 0;
@@ -209,7 +250,7 @@ export default function Bookings() {
 
         return therapist.totalMediumSlots > 0;
       });
-  }, [therapists, activeTab, selectedCategory, selectedDate]);
+  }, [therapists, activeTab, selectedCategory, selectedDate, selectedLanguage]);
 
   return (
     <>
@@ -222,8 +263,12 @@ export default function Bookings() {
           onCategoryChange={setSelectedCategory}
           selectedDate={selectedDate}
           onDateChange={setSelectedDate}
+          selectedLanguage={selectedLanguage}
+          onLanguageChange={setSelectedLanguage}
+          onClearFilters={handleClearFilters}
           categoriesList={categoriesList}
           datesList={datesList}
+          languagesList={languagesList}
         />
         <FlatList
           contentContainerStyle={styles.listContent}
@@ -241,6 +286,7 @@ export default function Bookings() {
             name={item.name}
             category={item.roleData?.therapist_category || "Therapist"}
             experience={item.roleData?.yearsOfExperience ?? 0}
+            languages={item.roleData?.languages}
             availability={item.availability}
             onBookNow={(slot) =>
               router.push({

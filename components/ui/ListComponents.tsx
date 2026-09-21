@@ -15,6 +15,7 @@ interface DoctorListCardProps {
   name: string;
   category?: string;
   experience?: number | string;
+  languages?: string[];
   availability: AvailabilitySlot[];
   onBookNow: (slot: AvailabilitySlot) => void;
   appointmentBooking: () => void;
@@ -42,6 +43,7 @@ export default function DoctorListCard({
   name,
   category = "Therapist",
   experience,
+  languages,
   availability,
   onBookNow,
   appointmentBooking,
@@ -83,6 +85,11 @@ export default function DoctorListCard({
       ? `${experience}+ Years`
       : "0+ Years";
 
+  const languagesText =
+    Array.isArray(languages) && languages.length > 0
+      ? languages.join(", ")
+      : "";
+
   return (
     <View style={styles.card}>
       <View style={styles.topSection}>
@@ -120,6 +127,11 @@ export default function DoctorListCard({
           </Text>
           <Text style={styles.name}>{name}</Text>
           <Text style={styles.specialty}>{category || "Therapist"}</Text>
+          {Boolean(languagesText) && (
+            <Text style={styles.languagesText} numberOfLines={1}>
+              Languages: <Text style={styles.languagesSpan}>{languagesText}</Text>
+            </Text>
+          )}
 
           {dates.length ? (
         <>
@@ -193,6 +205,8 @@ const styles = StyleSheet.create({
   details: { flex: 1, paddingLeft: 11, paddingTop: 4 },
   name: { color: "#000000", fontSize: 13, fontWeight: "600", lineHeight: 20, marginTop: -5, },
   specialty: { color: "#74798B", fontSize: 12, lineHeight: 18 },
+  languagesText: { color: "#74798B", fontSize: 10, lineHeight: 14, marginTop: 2, },
+  languagesSpan: { color: "#1682E7", fontWeight: "500", },
   dateBar: { flexDirection: "row", alignItems: "center", backgroundColor: "#EFF7FE", borderRadius: 4, minHeight: 20, paddingHorizontal: 6, paddingVertical: 2, marginTop: 8, },
   dateText: { flex: 1, color: "#1682E7", fontSize: 11, fontWeight: "600", marginLeft: 6, },
   slotsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
