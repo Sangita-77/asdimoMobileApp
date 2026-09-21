@@ -87,6 +87,8 @@ export default function DoctorListCard({
     }
   };
 
+  const isAvailable = availableSlots.length > 0;
+
   const experienceText =
     experience !== undefined && experience !== null && experience !== ""
       ? `${experience}+ Years`
@@ -106,8 +108,20 @@ export default function DoctorListCard({
             </View>
           )}
           <View style={styles.availabilityStatus}>
-            <View style={styles.statusDot} />
-            <Text style={styles.statusText}>Available</Text>
+            <View
+              style={[
+                styles.statusDot,
+                !isAvailable && styles.unavailableDot,
+              ]}
+            />
+            <Text
+              style={[
+                styles.statusText,
+                !isAvailable && styles.unavailableText,
+              ]}
+            >
+              {isAvailable ? "Available" : "Unavailable"}
+            </Text>
           </View>
         </View>
 
@@ -213,6 +227,8 @@ const styles = StyleSheet.create({
   availabilityStatus: { flexDirection: "row", alignItems: "center", justifyContent: "center", marginTop: 7, },
   statusDot: { width: 4, height: 4, borderRadius: 6, backgroundColor: "#49AD3D", marginRight: 4, },
   statusText: { color: "#49AD3D", fontSize: 11, fontWeight: "400" },
+  unavailableDot: { backgroundColor: "#E53935", },
+  unavailableText: { color: "#E53935", },
   details: { flex: 1, paddingLeft: 11, paddingTop: 4 },
   name: { color: "#000000", fontSize: 18, fontWeight: "600", lineHeight: 20, marginTop: -5, },
   specialty: { color: "#74798B", fontSize: 12, lineHeight: 18 },
