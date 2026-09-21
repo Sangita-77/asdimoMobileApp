@@ -12,12 +12,12 @@ import {
 } from "react-native";
 const stethoscopeIcon = require("../../assets/images/stethoscope-icon.png");
 
-export type TabType = "All" | "At Home" | "Video Appointment" | "At Clinic";
+export type TabType = "All" | "At Home" | "Video Call" | "At Clinic";
 
 export const DOCTOR_TABS: TabType[] = [
     "All",
     "At Home",
-    "Video Appointment",
+    "Video Call",
     "At Clinic",
 ];
 
@@ -269,7 +269,7 @@ const DoctorListHeader = ({
                 </TouchableOpacity>
 
                 {/* Distance Filter */}
-                {activeTab !== "Video Appointment" && (
+                {activeTab !== "Video Call" && (
                     <TouchableOpacity
                         style={[
                             styles.dropdownButton,
@@ -362,18 +362,18 @@ const styles = StyleSheet.create({
     titleWrap: { flexDirection: "row", alignItems: "center", gap: 8, width: "100%", },
     titleInfo: { color: "#212121", fontSize: 16, fontWeight: "600", },
     tabsContainer: { flexDirection: "row", justifyContent: "space-between", columnGap: 6, },
-    tab: { flex: 1, height: 35, borderWidth: 1, borderColor: "#CCCCCC", borderRadius: 4, alignItems: "center", justifyContent: "center", backgroundColor: "#fff", paddingHorizontal: 2, boxShadow: "0px 1.28px 2.56px rgba(0, 0, 0, 0.1)" },
+    tab: { flex: 1, height: 40, borderWidth: 1, borderColor: "#CCCCCC", borderRadius: 4, alignItems: "center", justifyContent: "center", backgroundColor: "#fff", paddingHorizontal: 2, boxShadow: "0px 1.28px 2.56px rgba(0, 0, 0, 0.1)" },
     activeTab: { backgroundColor: "#00A0ED", borderColor: "#00A0ED", },
-    tabText: { fontSize: 9.5, color: "#4D4D4D", textAlign: "center", },
+    tabText: { fontSize: 13, color: "#4D4D4D", textAlign: "center", },
     activeTabText: { color: "#fff", fontWeight: "500", },
     filtersContainer: { flexDirection: "row", alignItems: "center", paddingVertical: 2, },
-    dropdownButton: { height: 30, borderWidth: 1, borderColor: "#CCCCCC", borderRadius: 8, paddingLeft: 10, paddingRight: 6, flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginRight: 8, minWidth: 68, backgroundColor: "#fff", },
+    dropdownButton: { height: 35, borderWidth: 1, borderColor: "#CCCCCC", borderRadius: 8, paddingLeft: 10, paddingRight: 6, flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginRight: 8, minWidth: 68, backgroundColor: "#fff",},
     activeDropdownButton: { borderColor: "#00A0ED", backgroundColor: "#F0F9FF", },
-    dropdownText: { fontSize: 10, color: "#4D4D4D", marginRight: 6, },
+    dropdownText: { fontSize: 13, color: "#4D4D4D", marginRight: 6},
     activeDropdownText: { color: "#00A0ED", fontWeight: "600", },
-    clearFilterButton: { height: 30, borderWidth: 1, borderColor: "#FFCDD2", backgroundColor: "#FFEBEE", borderRadius: 8, paddingHorizontal: 9, flexDirection: "row", alignItems: "center", gap: 4, marginRight: 8, },
+    clearFilterButton: { height: 35, borderWidth: 1, borderColor: "#FFCDD2", backgroundColor: "#FFEBEE", borderRadius: 8, paddingHorizontal: 9, flexDirection: "row", alignItems: "center", gap: 4, marginRight: 8,},
     clearFilterButtonDisabled: { borderColor: "#E0E0E0", backgroundColor: "#F5F5F5", },
-    clearFilterText: { fontSize: 10, color: "#E53935", fontWeight: "600", },
+    clearFilterText: { fontSize: 13, color: "#E53935", fontWeight: "600", },
     clearFilterTextDisabled: { color: "#9E9E9E", fontWeight: "400", },
     modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.15)", justifyContent: "center", alignItems: "center", },
     menuContainer: { width: 220, backgroundColor: "#fff", borderRadius: 10, paddingVertical: 6, elevation: 5, shadowColor: "#000",

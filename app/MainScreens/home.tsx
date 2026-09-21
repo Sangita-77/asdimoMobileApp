@@ -41,7 +41,7 @@ const cards = [
     image: require('../../assets/images/appointment-img01.png'),
     cardbtn: require('../../assets/images/landingGreenArrow.webp'),
     colors: ['#9060ED', '#7344D7'] as const,
-    route: ROUTES.AUTH.DOCTORSLIST,
+    route: ROUTES.AUTH.NEWAPPOINTMENT,
   },
   {
     title: 'Games',

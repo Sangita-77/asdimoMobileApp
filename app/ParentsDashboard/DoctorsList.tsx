@@ -46,7 +46,7 @@ function matchesTabMedium(slot: AvailabilitySlot, tab: TabType): boolean {
   if (tab === "At Home") {
     return medium === "home";
   }
-  if (tab === "Video Appointment") {
+  if (tab === "Video Call") {
     return (
       medium === "online" ||
       medium === "room" ||
