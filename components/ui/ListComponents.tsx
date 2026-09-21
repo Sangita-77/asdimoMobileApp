@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
   experience:{backgroundColor: "#abd8ff", width: 140, borderRadius: 4, color: "#054375", fontSize: 10, textAlign: "center", position: "absolute", right: 0, top: -23, padding: 2,},
   button: { backgroundColor: "#1386E7", paddingHorizontal: 8, paddingVertical: 8, borderRadius: 4, }, 
   buttonText: { color: "#FFF", fontWeight: "600", fontSize: 14, lineHeight: 14,},
-  card: { backgroundColor: "#FFF", borderRadius: 15, borderWidth: 0, borderColor: "#e7e6e6", padding: 12, marginVertical: 15, elevation: 4, boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.44)", },
+  card: { backgroundColor: "#FFF", borderRadius: 15, borderWidth: 0, borderColor: "#e7e6e6", padding: 12, marginVertical: 15, elevation: 4, boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.44)", minHeight: 160,},
   topSection: { flexDirection: "row", },
   image: { width: 70, height: 70, borderRadius: 10 },
   avatarPlaceholder: { width: 95, height: 95, borderRadius: 10, backgroundColor: "#1682E7", justifyContent: "center", alignItems: "center", },

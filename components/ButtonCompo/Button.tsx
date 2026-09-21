@@ -8,11 +8,19 @@ import {
   TextStyle,
 } from "react-native";
 
+export type ButtonVariant =
+  | "transparent"
+  | "white"
+  | "solid"
+  | "border"
+  | "green"
+  | "blue";
+
 type ButtonProps = {
   text: string;
   onPress?: () => void;
   textSize?: "sm" | "md" | "lg";
-  variant?: "transparent" | "white" | "solid" | "border" | "blue" ;
+  variant?: "transparent" | "white" | "solid" | "border" | "blue"  | "green";
   icon?: React.ReactNode;
   disabled?: boolean;
   style?: ViewStyle;
@@ -45,6 +53,7 @@ export default function Button({
         variant === "transparent" && styles.transparentButton,
         variant === "border" && styles.transparentButton,
         variant === "blue" && styles.blueButton,
+        variant === "green" && styles.greenButton,
 
         width === "full" && styles.fullWidth,
         width === "half" && styles.halfWidth,
@@ -65,6 +74,8 @@ export default function Button({
             variant === "white" && styles.whiteText,
             variant === "transparent" && styles.transparentText,
             variant === "blue" && styles.solidText,
+            variant === "green" && styles.solidText,
+
 
             textSize === "sm" && styles.sm,
             textSize === "md" && styles.md,
@@ -85,12 +96,13 @@ export default function Button({
 }
 
 const styles = StyleSheet.create({
-  button: { height: 55, borderRadius: 50, justifyContent: "center", alignItems: "center", paddingHorizontal: 20, },
+  button: { borderRadius: 50, justifyContent: "center", alignItems: "center", paddingHorizontal: 18,  paddingVertical: 10,},
   solid: { backgroundColor: "#763DFF",  color: "#FFF",},
-  blueButton:{backgroundColor: "#007CDD",  color: "#FFF", height: 75,},
+  blueButton:{backgroundColor: "#007CDD",  color: "#FFF"},
   white: { backgroundColor: "#fff", color: "#000", },
   transparent: { backgroundColor: "transparent", borderWidth: 0, borderColor: "#4F46E5", },
   solidButton: { backgroundColor: "#763DFF", },
+  greenButton: { backgroundColor: "#16A34A", },
   whiteButton: { backgroundColor: "#FFF", },
   transparentButton: { backgroundColor: "transparent", borderWidth: 1, borderColor: "#763DFF", }, 
   solidText: { color: "#FFF", },
