@@ -16,6 +16,7 @@ export const AUTH_ENDPOINTS = {
   register: "/auth/register",
   addChildInformation: "/auth/add-child-information",
   getAllUsers: "/auth/getAllUsers",
+  getAllUsersById: "/auth/getAllUsersById",
   getTherapistAvailability: "/therapists/get_availability",
   appointments: "/appointments",
   getAppointmentsById: "/appointments/getAppointmentsById",

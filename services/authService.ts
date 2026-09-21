@@ -41,10 +41,17 @@ export type Therapist = {
   name: string;
   email?: string;
   flag: number;
+  status?: number;
   profileImg?: string | null;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  address?: string;
   phone?: string;
+  country?: string | null;
   roleData?: TherapistRoleData;
   relatedData?: Record<string, any>;
+  [key: string]: any;
 };
 
 export type AvailabilitySlot = {
@@ -630,6 +637,16 @@ export async function getLoggedInUserId() {
   }
 
   return tokenUserId;
+}
+
+export async function getUserById(userId: number) {
+  const response = await postAuthEndpoint<{
+    success: boolean;
+    data: Therapist;
+    message?: string;
+  }>(AUTH_ENDPOINTS.getAllUsersById, { userId }, true);
+
+  return response.data;
 }
 
 export async function getTherapistAvailability(therapistId: number) {
