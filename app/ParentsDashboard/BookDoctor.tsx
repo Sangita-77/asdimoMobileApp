@@ -4,7 +4,9 @@ import Footer from "@/components/ui/Footer";
 import Header from "@/components/ui/Header";
 import OrientationLock from "@/components/ui/ScreenOrientation";
 import { API_BASE_URL } from "@/constants/config";
-import { ROUTES } from "@/constants/routes";
+// import { ROUTES } from "@/constants/routes";
+import MyList, { ListItem } from "@/components/ui/IconTitleText";
+
 import {
   AvailabilitySlot,
   createAppointment,
@@ -15,6 +17,7 @@ import {
 import { processPayment } from "@/services/paymentService";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AntDesign } from "@expo/vector-icons";
 import {
   ActivityIndicator,
   Image,
@@ -25,6 +28,7 @@ import {
   View,
 } from "react-native";
 import { globalStyle } from "../../constants/globalStyle";
+
 
 function toDateValue(date: string) {
   const [day, month, year] = date.split("-").map(Number);
@@ -47,6 +51,21 @@ function isPastTime(slot: AvailabilitySlot) {
   selectedDate.setHours(hours, minutes, 0, 0);
   return selectedDate <= now;
 }
+
+const Specialities: ListItem[] = [
+  {
+    icon: "home-outline",
+    title: "Clinique",
+    text: "City Care",
+  },
+  {
+    icon: "language",
+    title: "Languages",
+    text: "English",
+  },
+];
+
+
 
 export default function BookDoctor() {
   const {
@@ -185,26 +204,16 @@ export default function BookDoctor() {
     : "";
   const name = therapistName || "Therapist";
 
+
+
+
   return (
     <>
       <OrientationLock variant="portrait" />
       <View style={globalStyle.container}>
         <Header title="Doctor Profile" showBack={true} />
         <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.profileContainer}>
-            {imageUri ? (
-              <Image source={{ uri: imageUri }} style={styles.avatar} />
-            ) : (
-              <View style={styles.placeholder}>
-                <Text style={styles.placeholderText}>
-                  {name.charAt(0).toUpperCase()}
-                </Text>
-              </View>
-            )}
-            <Text style={styles.doctorName}>{name}</Text>
-          </View>
-
-          {isLoading ? (
+         {isLoading ? (
             <View style={styles.statusContainer}>
               <ActivityIndicator size="large" color="#2563EB" />
             </View>
@@ -212,89 +221,116 @@ export default function BookDoctor() {
             <Text style={styles.errorText}>{error}</Text>
           ) : (
             <>
-              <View style={styles.selectDateWrap}>
-                <Text style={styles.heading}>Select Date</Text>
-                <Calender
-                  selectedDate={selectedDate}
-                  availableDates={dates}
-                  onDateChange={(date) => {
-                    setSelectedDate(date);
-                    setSelectedSlot(null);
-                  }}
-                />
-              </View>
-
-              <View style={styles.selectTimeWrap}>
-                <Text style={styles.heading}>Select Time</Text>
-                <View style={styles.timeContainer}>
-                  {slotsForSelectedDate.map((slot) => {
-                    const disabled = isPastTime(slot);
-                    const isSelected = selectedSlot?._id === slot._id;
-                    return (
-                      <Pressable
-                        key={slot._id}
-                        disabled={disabled}
-                        onPress={() => setSelectedSlot(slot)}
-                        style={[
-                          styles.timeButton,
-                          isSelected && styles.selectedTime,
-                          disabled && styles.disabledTime,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.timeText,
-                            isSelected && styles.selectedTimeText,
-                            disabled && styles.disabledTimeText,
-                          ]}
-                        >
-                          {slot.time}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
+              <View style={styles.profileContainer}>
+                {imageUri ? (
+                  <Image source={{ uri: imageUri }} style={styles.avatar} />
+                ) : (
+                  <View style={styles.placeholder}>
+                    <Text style={styles.placeholderText}> {name.charAt(0).toUpperCase()} </Text>
+                  </View>
+                )}
+                <View>
+                  <Text style={styles.doctorName}>{name}</Text>
+                  <Text style={globalStyle.smallText2}>Therapist</Text>
+                  <View style={styles.profileContainer}>
+                    <MyList items={Specialities} />
+                  </View>
                 </View>
               </View>
-              {!slotsForSelectedDate.length ? (
-                <Text style={styles.noSlots}>
-                  No available time slots for this date.
-                </Text>
-              ) : null}
+              <Text style={styles.doctorName}>About {name}</Text>
+               <Text style={globalStyle.smallText2}>{name} is a dedicated specialist in disorders and autism with over 8 years of experience.</Text>
+                  <Text style={styles.doctorName}>Select Date</Text>
+                  <View style={styles.selectDateWrap}>
+                    <Calender
+                      selectedDate={selectedDate}
+                      availableDates={dates}
+                      onDateChange={(date) => {
+                        setSelectedDate(date);
+                        setSelectedSlot(null);
+                      }}
+                    />
+                  </View>
 
-              {bookingMessage ? (
-                <Text
-                  style={[
-                    styles.bookingMessage,
-                    isBookingError
-                      ? styles.bookingError
-                      : styles.bookingSuccess,
-                  ]}
-                >
-                  {bookingMessage}
-                </Text>
-              ) : null}
-              <Button
-                text={isBooking ? "Booking..." : "Book Appointment"}
-                textSize="lg"
-                width="full"
-                disabled={!selectedSlot || isBooking}
-                onPress={handleBookAppointment}
-              />
-            </>
+                  <View style={styles.selectTimeWrap}>
+                    <Text style={styles.doctorName}>Select Time</Text>
+                    <View style={styles.timeContainer}>
+                      {slotsForSelectedDate.map((slot) => {
+                        const disabled = isPastTime(slot);
+                        const isSelected = selectedSlot?._id === slot._id;
+                        return (
+                          <Pressable
+                            key={slot._id}
+                            disabled={disabled}
+                            onPress={() => setSelectedSlot(slot)}
+                            style={[
+                              styles.timeButton,
+                              isSelected && styles.selectedTime,
+                              disabled && styles.disabledTime,
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.timeText,
+                                isSelected && styles.selectedTimeText,
+                                disabled && styles.disabledTimeText,
+                              ]}
+                            >
+                              {slot.time}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                  </View>
+                  {!slotsForSelectedDate.length ? (
+                    <Text style={styles.noSlots}>
+                      No available time slots for this date.
+                    </Text>
+                  ) : null}
+
+                  {bookingMessage ? (
+                    <Text
+                      style={[
+                        styles.bookingMessage,
+                        isBookingError
+                          ? styles.bookingError
+                          : styles.bookingSuccess,
+                      ]}
+                    >
+                      {bookingMessage}
+                    </Text>
+                  ) : null}
+                  <Button
+                    text={isBooking ? "Booking..." : "Book Appointment"}
+                    textSize="lg"
+                    width="full"
+                    icon={
+                      <AntDesign
+                        name="calendar"
+                        size={24}
+                        color="white"
+                      />
+                    }
+                    variant="blue"
+                    disabled={!selectedSlot || isBooking}
+                    onPress={handleBookAppointment}
+                  />
+
+                {/* <Button
+                  style={styles.PastbookingBtn}
+                  text="Bookings"
+                  textSize="lg"
+                  width="full"
+                  onPress={() => {
+                    router.push(ROUTES.AUTH.BOOKINGS);
+                  }}
+                /> */}
+          </>
           )}
-          <Button
-            style={styles.PastbookingBtn}
-            text="Bookings"
-            textSize="lg"
-            width="full"
-            onPress={() => {
-              router.push(ROUTES.AUTH.BOOKINGS);
-            }}
-          />
         </ScrollView>
-
-        <Footer />
+  
       </View>
+      <Footer />
     </>
   );
 }
@@ -302,35 +338,19 @@ export default function BookDoctor() {
 const styles = StyleSheet.create({
   PastbookingBtn: { marginTop: 20 },
   container: { padding: 20, flexGrow: 1, paddingBottom: 85, },
-  profileContainer: { alignItems: "center", marginBottom: 24 },
-  avatar: { width: 88, height: 88, borderRadius: 44 },
+  profileContainer: { alignItems: "center", flex: 1, flexDirection: "row", gap: 15,},
+  avatar: { width: 125, height: 140, borderRadius: 20 },
   placeholder: {
-    width: 88,
-    height: 88,
+    width: 125,
+    height: 140,
     borderRadius: 44,
     backgroundColor: "#2563EB",
     justifyContent: "center",
     alignItems: "center",
   },
   placeholderText: { color: "#FFF", fontSize: 34, fontWeight: "700" },
-  doctorName: {
-    color: "#111827",
-    fontSize: 21,
-    fontWeight: "700",
-    marginTop: 10,
-  },
-  heading: {
-    color: "#000000",
-    fontSize: 13,
-    fontWeight: "600",
-    marginBottom: 13,
-  },
-  timeContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 12,
-    paddingBottom: 20,
-  },
+  doctorName: { color: "#000000", fontSize: 16, fontWeight: "600", marginTop: 10, },
+  timeContainer: { flexDirection: "row", flexWrap: "wrap", gap: 12, paddingTop: 15, },
   timeButton: {
     paddingVertical: 10,
     paddingHorizontal: 18,

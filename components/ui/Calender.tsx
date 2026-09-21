@@ -141,8 +141,8 @@ export default function CustomCalendar({
 
 const styles = StyleSheet.create({
   card: {
-    backgroundColor: "#FFF",
-    elevation: 4,
+    backgroundColor: "#ffffff",
+    marginTop : 10,
   },
   header: {
     flexDirection: "row",
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 18,
   },
-  month: { fontSize: 18, fontWeight: "600", color: "#464255" },
+  month: { fontSize: 20, fontWeight: "600", color: "#464255" },
   arrowButton: {
     width: 21,
     height: 21,
@@ -182,13 +182,13 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "transparent",
   },
-  selected: { backgroundColor: "#2563EB" },
+  selected: { backgroundColor: "#2563EB", height: 30,},
   disabledDay: { opacity: 0.42 },
   dayText: { fontSize: 15, color: "#1F2937", fontWeight: "600" },
   selectedText: { color: "#FFF" },
   disabledText: { color: "#9CA3AF" },
 
   calenderDateCon: {
-    backgroundColor: "#F8F8F9", padding: 12, borderRadius: 20,
+    backgroundColor: "#ffffff", padding: 12, borderRadius: 20, boxShadow: "none",
   },
 });

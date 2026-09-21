@@ -12,7 +12,7 @@ type ButtonProps = {
   text: string;
   onPress?: () => void;
   textSize?: "sm" | "md" | "lg";
-  variant?: "transparent" | "white" | "solid" | "border";
+  variant?: "transparent" | "white" | "solid" | "border" | "blue" ;
   icon?: React.ReactNode;
   disabled?: boolean;
   style?: ViewStyle;
@@ -44,6 +44,7 @@ export default function Button({
         variant === "white" && styles.whiteButton,
         variant === "transparent" && styles.transparentButton,
         variant === "border" && styles.transparentButton,
+        variant === "blue" && styles.blueButton,
 
         width === "full" && styles.fullWidth,
         width === "half" && styles.halfWidth,
@@ -63,6 +64,7 @@ export default function Button({
             variant === "solid" && styles.solidText,
             variant === "white" && styles.whiteText,
             variant === "transparent" && styles.transparentText,
+            variant === "blue" && styles.solidText,
 
             textSize === "sm" && styles.sm,
             textSize === "md" && styles.md,
@@ -85,14 +87,13 @@ export default function Button({
 const styles = StyleSheet.create({
   button: { height: 55, borderRadius: 50, justifyContent: "center", alignItems: "center", paddingHorizontal: 20, },
   solid: { backgroundColor: "#763DFF",  color: "#FFF",},
+  blueButton:{backgroundColor: "#007CDD",  color: "#FFF", height: 75,},
   white: { backgroundColor: "#fff", color: "#000", },
   transparent: { backgroundColor: "transparent", borderWidth: 0, borderColor: "#4F46E5", },
   solidButton: { backgroundColor: "#763DFF", },
   whiteButton: { backgroundColor: "#FFF", },
   transparentButton: { backgroundColor: "transparent", borderWidth: 1, borderColor: "#763DFF", }, 
-solidText: {
-  color: "#FFF",
-},
+  solidText: { color: "#FFF", },
 
 whiteText: {
   color: "#111827",
