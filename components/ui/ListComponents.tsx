@@ -72,10 +72,21 @@ export default function DoctorListCard({
   );
   const displayedSlots = showAllSlots ? slotsForDate : slotsForDate.slice(0, 3);
   const hasMoreSlots = slotsForDate.length > 3;
+  const [selectedDateIndex, setSelectedDateIndex] = useState(0);
+  const selectPreviousDate = () => {
+    if (selectedDateIndex > 0) {
+      const newIndex = selectedDateIndex - 1;
+      setSelectedDateIndex(newIndex);
+      setSelectedDate(dates[newIndex]);
+    }
+  };
+
   const selectNextDate = () => {
-    const currentIndex = dates.indexOf(selectedDate);
-    setSelectedDate(dates[(currentIndex + 1) % dates.length]);
-    setShowAllSlots(false);
+    if (selectedDateIndex < dates.length - 1) {
+      const newIndex = selectedDateIndex + 1;
+      setSelectedDateIndex(newIndex);
+      setSelectedDate(dates[newIndex]);
+    }
   };
 
   const isAvailable = availableSlots.length > 0;
@@ -135,13 +146,39 @@ export default function DoctorListCard({
 
           {dates.length ? (
         <>
-          <Pressable style={styles.dateBar} onPress={selectNextDate}>
+        <View style={styles.dateBar}>
+          {/* Previous Date */}
+          <Pressable
+            style={styles.arrowButton}
+            onPress={selectPreviousDate}
+            disabled={selectedDateIndex === 0}
+          >
+            <Ionicons
+              name="chevron-back"
+              size={16}
+              color={selectedDateIndex === 0 ? "#B8B8B8" : "#1386E7"}
+            />
+          </Pressable>
+
+          <Pressable style={styles.dateContent}>
             <Ionicons name="calendar-outline" size={15} color="#1386E7" />
             <Text style={styles.dateText}>{formatDate(selectedDate)}</Text>
-            {dates.length > 1 ? (
-              <Ionicons name="chevron-forward" size={13} color="#1386E7" />
-            ) : null}
           </Pressable>
+
+          <Pressable
+            style={styles.arrowButton}
+            onPress={selectNextDate}
+            disabled={selectedDateIndex === dates.length - 1}
+          >
+            <Ionicons
+              name="chevron-forward"
+              size={16}
+              color={
+                selectedDateIndex === dates.length - 1 ? "#B8B8B8" : "#1386E7"
+              }
+            />
+          </Pressable>
+        </View>
 
           <View style={styles.slotsRow}>
             {displayedSlots.map((slot) => (
@@ -188,10 +225,12 @@ export default function DoctorListCard({
 }
 
 const styles = StyleSheet.create({
+  arrowButton: { width: 30, height: 30, alignItems: "center", justifyContent: "center", },
+  dateContent: { flex: 1, flexDirection: "row", alignItems: "center", justifyContent: "center", gap: 6, },
   experienceSpan:{fontSize: 15, fontWeight: "600"},
   experience:{backgroundColor: "#abd8ff", width: 140, borderRadius: 4, color: "#054375", fontSize: 10, textAlign: "center", position: "absolute", right: 0, top: -23, padding: 2,},
-  button: { backgroundColor: "#1386E7", paddingHorizontal: 8, paddingVertical: 4, borderRadius: 4, }, 
-  buttonText: { color: "#FFF", fontWeight: "600", fontSize: 11, lineHeight: 14,},
+  button: { backgroundColor: "#1386E7", paddingHorizontal: 8, paddingVertical: 8, borderRadius: 4, }, 
+  buttonText: { color: "#FFF", fontWeight: "600", fontSize: 14, lineHeight: 14,},
   card: { backgroundColor: "#FFF", borderRadius: 15, borderWidth: 0, borderColor: "#e7e6e6", padding: 12, marginVertical: 15, elevation: 4, boxShadow: "0px 6px 14px rgba(0, 0, 0, 0.44)", },
   topSection: { flexDirection: "row", },
   image: { width: 70, height: 70, borderRadius: 10 },
@@ -203,15 +242,17 @@ const styles = StyleSheet.create({
   unavailableDot: { backgroundColor: "#E53935", },
   unavailableText: { color: "#E53935", },
   details: { flex: 1, paddingLeft: 11, paddingTop: 4 },
-  name: { color: "#000000", fontSize: 13, fontWeight: "600", lineHeight: 20, marginTop: -5, },
+  name: { color: "#000000", fontSize: 18, fontWeight: "600", lineHeight: 20, marginTop: -5, },
   specialty: { color: "#74798B", fontSize: 12, lineHeight: 18 },
+
   languagesText: { color: "#74798B", fontSize: 10, lineHeight: 14, marginTop: 2, },
   languagesSpan: { color: "#1682E7", fontWeight: "500", },
   dateBar: { flexDirection: "row", alignItems: "center", backgroundColor: "#EFF7FE", borderRadius: 4, minHeight: 20, paddingHorizontal: 6, paddingVertical: 2, marginTop: 8, },
   dateText: { flex: 1, color: "#1682E7", fontSize: 11, fontWeight: "600", marginLeft: 6, },
+
   slotsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
   slotButton: { borderWidth: 2, borderColor: "#95CBF8", borderRadius: 4, paddingHorizontal: 9, paddingVertical: 3, minWidth: 55,},
-  slotText: { color: "#1682E7", fontSize: 11,  lineHeight: 13, fontWeight: "600",  textAlign: "center",},
+  slotText: { color: "#1682E7", fontSize: 14,  lineHeight: 20, fontWeight: "600",  textAlign: "center",},
   moreButton: { flexDirection: "row", alignItems: "center", borderWidth: 2, borderColor: "#95CBF8", borderRadius: 4, paddingLeft: 9, paddingRight: 6, paddingVertical: 3, gap: 4, },
   moreText: { color: "#1682E7", fontSize: 11, fontWeight: "600" },
   noSlots: { color: "#73798D", fontSize: 11, marginTop: 4 },
