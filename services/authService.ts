@@ -53,7 +53,9 @@ export type AvailabilitySlot = {
   date: string;
   time: string;
   isBooked: boolean;
-  zoomLink?: string;
+  medium?: "home" | "center" | "online" | "room" | string;
+  zoomLink?: string | null;
+  zoomMeetingId?: string | null;
 };
 
 type GetUsersResponse = {

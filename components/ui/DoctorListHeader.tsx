@@ -4,6 +4,7 @@ import {
     Image,
     Modal,
     Pressable,
+    ScrollView,
     StyleSheet,
     Text,
     TouchableOpacity,
@@ -11,25 +12,41 @@ import {
 } from "react-native";
 const stethoscopeIcon = require("../../assets/images/stethoscope-icon.png");
 
-type TabType = "At Home" | "Video Appointment" | "At Clinic";
+export type TabType = "All" | "At Home" | "Video Appointment" | "At Clinic";
 
-const tabs: TabType[] = [
+export const DOCTOR_TABS: TabType[] = [
+    "All",
     "At Home",
     "Video Appointment",
     "At Clinic",
 ];
-const categories = [
+
+interface DoctorListHeaderProps {
+    activeTab?: TabType;
+    onTabChange?: (tab: TabType) => void;
+    selectedCategory?: string;
+    onCategoryChange?: (category: string) => void;
+    selectedDate?: string;
+    onDateChange?: (date: string) => void;
+    categoriesList?: string[];
+    datesList?: string[];
+}
+
+const defaultCategories = [
     "All Categories",
+    "Psychologist",
     "Physiotherapy",
     "Disorders & Autism Specialist",
     "Therapist",
 ];
-const dates = [
+
+const defaultDates = [
     "Any Date",
     "Today",
     "Tomorrow",
     "This Week",
 ];
+
 const distances = [
     "Any Distance",
     "Within 5 km",
@@ -37,20 +54,24 @@ const distances = [
     "Within 25 km",
 ];
 
-const DoctorListHeader = () => {
-    const [activeTab, setActiveTab] = useState<TabType>("At Home");
-
-    const [category, setCategory] = useState("Categories");
-    const [date, setDate] = useState("Date");
+const DoctorListHeader = ({
+    activeTab = "All",
+    onTabChange,
+    selectedCategory = "All Categories",
+    onCategoryChange,
+    selectedDate = "Any Date",
+    onDateChange,
+    categoriesList = defaultCategories,
+    datesList = defaultDates,
+}: DoctorListHeaderProps) => {
     const [distance, setDistance] = useState("Distance");
-
     const [dropdown, setDropdown] = useState<
         "category" | "date" | "distance" | null
     >(null);
 
     const getOptions = () => {
-        if (dropdown === "category") return categories;
-        if (dropdown === "date") return dates;
+        if (dropdown === "category") return categoriesList;
+        if (dropdown === "date") return datesList;
         if (dropdown === "distance") return distances;
 
         return [];
@@ -58,16 +79,21 @@ const DoctorListHeader = () => {
 
     const selectOption = (value: string) => {
         if (dropdown === "category") {
-            setCategory(value === "All Categories" ? "Categories" : value);
+            onCategoryChange?.(value);
         }
         if (dropdown === "date") {
-            setDate(value === "Any Date" ? "Date" : value);
+            onDateChange?.(value);
         }
         if (dropdown === "distance") {
             setDistance(value === "Any Distance" ? "Distance" : value);
         }
         setDropdown(null);
     };
+
+    const displayCategory =
+        selectedCategory === "All Categories" ? "Category" : selectedCategory;
+    const displayDate =
+        selectedDate === "Any Date" ? "Date" : selectedDate;
 
     return (
         <View style={styles.container}>
@@ -84,7 +110,7 @@ const DoctorListHeader = () => {
 
             {/* -------- Appointment Tabs */}
             <View style={styles.tabsContainer}>
-                {tabs.map((tab) => {
+                {DOCTOR_TABS.map((tab) => {
                     const isActive = activeTab === tab;
 
                     return (
@@ -95,13 +121,15 @@ const DoctorListHeader = () => {
                                 styles.tab,
                                 isActive && styles.activeTab,
                             ]}
-                            onPress={() => setActiveTab(tab)}
+                            onPress={() => onTabChange?.(tab)}
                         >
                             <Text
                                 style={[
                                     styles.tabText,
                                     isActive && styles.activeTabText,
                                 ]}
+                                numberOfLines={1}
+                                adjustsFontSizeToFit
                             >
                                 {tab}
                             </Text>
@@ -122,7 +150,7 @@ const DoctorListHeader = () => {
                         style={styles.dropdownText}
                         numberOfLines={1}
                     >
-                        {category}
+                        {displayCategory}
                     </Text>
 
                     <Ionicons
@@ -137,8 +165,8 @@ const DoctorListHeader = () => {
                     onPress={() => setDropdown("date")}
                     activeOpacity={0.8}
                 >
-                    <Text style={styles.dropdownText}>
-                        {date}
+                    <Text style={styles.dropdownText} numberOfLines={1}>
+                        {displayDate}
                     </Text>
 
                     <Ionicons
@@ -148,21 +176,23 @@ const DoctorListHeader = () => {
                     />
                 </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={styles.dropdownButton}
-                    onPress={() => setDropdown("distance")}
-                    activeOpacity={0.8}
-                >
-                    <Text style={styles.dropdownText}>
-                        {distance}
-                    </Text>
+                {activeTab !== "Video Appointment" && (
+                    <TouchableOpacity
+                        style={styles.dropdownButton}
+                        onPress={() => setDropdown("distance")}
+                        activeOpacity={0.8}
+                    >
+                        <Text style={styles.dropdownText}>
+                            {distance}
+                        </Text>
 
-                    <Ionicons
-                        name="chevron-down"
-                        size={10}
-                        color="#000000"
-                    />
-                </TouchableOpacity>
+                        <Ionicons
+                            name="chevron-down"
+                            size={10}
+                            color="#000000"
+                        />
+                    </TouchableOpacity>
+                )}
 
             </View>
 
@@ -178,17 +208,19 @@ const DoctorListHeader = () => {
                     onPress={() => setDropdown(null)}
                 >
                     <View style={styles.menuContainer}>
-                        {getOptions().map((option) => (
-                            <TouchableOpacity
-                                key={option}
-                                style={styles.menuItem}
-                                onPress={() => selectOption(option)}
-                            >
-                                <Text style={styles.menuText}>
-                                    {option}
-                                </Text>
-                            </TouchableOpacity>
-                        ))}
+                        <ScrollView style={{ maxHeight: 260 }} showsVerticalScrollIndicator={false}>
+                            {getOptions().map((option) => (
+                                <TouchableOpacity
+                                    key={option}
+                                    style={styles.menuItem}
+                                    onPress={() => selectOption(option)}
+                                >
+                                    <Text style={styles.menuText}>
+                                        {option}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
                     </View>
                 </Pressable>
             </Modal>
@@ -202,11 +234,11 @@ export default DoctorListHeader;
 const styles = StyleSheet.create({
     container: { width: "100%", paddingHorizontal: 16, paddingTop: 28, paddingBottom: 10, backgroundColor: "#fff", gap: 16, },
     titleWrap: { flexDirection: "row", alignItems: "center", gap: 8, width: "100%", },
-    titleInfo: { color: "#212121", fontSize: 16, fontWeight: 600, },
-    tabsContainer: { flexDirection: "row", justifyContent: "space-between", columnGap: 10, },
-    tab: { flex: 1, height: 35, borderWidth: 1, borderColor: "#CCCCCC", borderRadius: 4, alignItems: "center", justifyContent: "center", backgroundColor: "#fff", boxShadow: "0px 1.28px 2.56px rgba(0, 0, 0, 0.1)" },
+    titleInfo: { color: "#212121", fontSize: 16, fontWeight: "600", },
+    tabsContainer: { flexDirection: "row", justifyContent: "space-between", columnGap: 6, },
+    tab: { flex: 1, height: 35, borderWidth: 1, borderColor: "#CCCCCC", borderRadius: 4, alignItems: "center", justifyContent: "center", backgroundColor: "#fff", paddingHorizontal: 2, boxShadow: "0px 1.28px 2.56px rgba(0, 0, 0, 0.1)" },
     activeTab: { backgroundColor: "#00A0ED", borderColor: "#00A0ED", },
-    tabText: { fontSize: 10, color: "#4D4D4D", },
+    tabText: { fontSize: 9.5, color: "#4D4D4D", textAlign: "center", },
     activeTabText: { color: "#fff", fontWeight: "500", },
     filtersContainer: { flexDirection: "row", alignItems: "center", },
     dropdownButton: { height: 30, borderWidth: 1, borderColor: "#CCCCCC", borderRadius: 8, paddingLeft: 10, paddingRight: 5, flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginRight: 8, minWidth: 68, },
