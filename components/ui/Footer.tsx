@@ -35,36 +35,38 @@ export default function Footer() {
   return (
     <>
       <OrientationLock variant="portrait" />
-
-      <View style={styles.footerContainer}>
-        {menuItems.map((item, index) => (
-          <TouchableOpacity
-            key={index}
-            style={styles.menuItem}
-            activeOpacity={0.7}
-          >
-            <View
-              style={[
-                styles.iconContainer,
-                item.active && styles.activeIconContainer,
-              ]}
+     <View style={styles.Footer}>
+        <View style={styles.footerContainer}>
+          {menuItems.map((item, index) => (
+            <TouchableOpacity
+              key={index}
+              style={styles.menuItem}
+              activeOpacity={0.7}
             >
-              <Ionicons
-                name={item.icon as any}
-                size={item.active ? 24 : 23}
-                color={item.active ? "#00A0ED" : "#FFFFFF"}
-              />
-            </View>
+              <View
+                style={[
+                  styles.iconContainer,
+                  item.active && styles.activeIconContainer,
+                ]}
+              >
+                <Ionicons
+                  name={item.icon as any}
+                  size={item.active ? 24 : 23}
+                  color={item.active ? "#00A0ED" : "#FFFFFF"}
+                />
+              </View>
 
-            <Text style={styles.menuText}>{item.label}</Text>
-          </TouchableOpacity>
-        ))}
+              <Text style={styles.menuText}>{item.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
       </View>
     </>
   );
 }
 
 const styles = StyleSheet.create({
+  Footer:{ backgroundColor: "#fff", },
   footerContainer: {
     height: 72,
     width: "100%",

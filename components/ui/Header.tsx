@@ -52,7 +52,7 @@ export default function Header({
               styles.HeaderText,
               {
                 width: showBack ? width : width,
-                paddingLeft: showBack ? 60 : 20,
+                paddingLeft: showBack ? 50 : 20,
               },
             ]}
           >
@@ -98,7 +98,7 @@ export default function Header({
 }
 
 const styles = StyleSheet.create({
-  HeaderContainer:{backgroundColor: "#00A0ED",},
+  HeaderContainer:{backgroundColor: "#ffffff",},
   HeaderContainerWrap: {
     backgroundColor: "#00A0ED",
     width: "100%",
@@ -115,7 +115,7 @@ const styles = StyleSheet.create({
 
   backButton: {
     position: "absolute",
-    left: 20,
+    left: 10,
     top: 22,
     width: 35,
     height: 35,
