@@ -23,7 +23,7 @@ type ButtonProps = {
   text: string;
   onPress?: () => void;
   textSize?: "xs" | "sm" | "md" | "lg";
-  variant?: "transparent" | "white" | "solid" | "border" | "blue"  | "green" | "Sky" | "Red";
+  variant?: "transparent" | "white" | "solid" | "border" | "blue"  | "green" | "Sky" | "Red" | "Neon";
   // textSize?: "sm" | "md" | "lg";
   // variant?: "transparent" | "white" | "solid" | "border" | "blue"  | "green";
   icon?: React.ReactNode;
@@ -32,7 +32,7 @@ type ButtonProps = {
   textStyle?: TextStyle;
   iconPosition?: "left" | "right";
   width?: "full" | "half" | "auto";
-};
+}; 
 
 export default function Button({
   text,
@@ -61,6 +61,7 @@ export default function Button({
         variant === "green" && styles.greenButton,
         variant === "Sky" && styles.SkyButton,
         variant === "Red" && styles.RedButton,
+        variant === "Neon" && styles.NeonButton,
 
 
         width === "full" && styles.fullWidth,
@@ -70,7 +71,7 @@ export default function Button({
         style,
       ]}
     >
-      <View style={styles.content}>
+      <View style={styles.content}> 
         {icon && iconPosition === "left" && (
           <View style={styles.icon}>{icon}</View>
         )}
@@ -83,8 +84,9 @@ export default function Button({
             variant === "transparent" && styles.transparentText,
             variant === "blue" && styles.solidText,
             variant === "green" && styles.solidText,
-            variant === "Sky" && styles.BlackText,
-            variant === "Red" && styles.BlackText,
+            variant === "Sky" && styles.BlueText,
+            variant === "Red" && styles.RedText,
+            variant === "Neon" && styles.NeonText,
 
 
 
@@ -116,11 +118,15 @@ const styles = StyleSheet.create({
   transparent: { backgroundColor: "transparent", borderWidth: 0, borderColor: "#4F46E5", },
   solidButton: { backgroundColor: "#763DFF", },
   greenButton: { backgroundColor: "#16A34A", },
-  RedButton:  {backgroundColor: "#f08a62", paddingHorizontal: 10,  paddingVertical: 5,},
+  NeonButton: { backgroundColor: "#DBF5DB", },
+  RedButton:  {backgroundColor: "#fdc5d8", paddingHorizontal: 10,  paddingVertical: 5,},
   whiteButton: { backgroundColor: "#FFF", },
   transparentButton: { backgroundColor: "transparent", borderWidth: 1, borderColor: "#763DFF", }, 
   solidText: { color: "#FFF", },
   BlackText: { color: "#000", },
+  NeonText: {color: "#16A34A",},
+  RedText: {color: "#a31635",},
+  BlueText: {color: "#007CDD",},
 whiteText: {
   color: "#111827",
 },

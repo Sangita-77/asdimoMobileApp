@@ -11,6 +11,7 @@ export const ROUTES = {
     BOOKDOCTOR: "/ParentsDashboard/BookDoctor",
     NEWAPPOINTMENT: "/ParentsDashboard/Appointment",
     BOOKINGHISTORY: "/ParentsDashboard/BookingHistory",
+    BOOKINGDETAILS: "/ParentsDashboard/BookingDetails",
   },
 
   APP: {
