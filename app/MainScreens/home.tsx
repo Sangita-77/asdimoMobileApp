@@ -121,11 +121,13 @@ function LandingScreen() {
           What would you like to explore today?
         </Text>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.cardsContainer}
-        >
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.cardsScroll}
+            contentContainerStyle={styles.cardsContainer}
+            nestedScrollEnabled
+          >
           {cards.map((card, index) => (
             <LinearGradient
               key={index}
@@ -167,7 +169,6 @@ function LandingScreen() {
               }
               onPress={() => {
                 playClickSound();
-
                 transition.current?.cover(() => {
                   router.push(card.route);
                 });
@@ -198,11 +199,17 @@ function LandingScreen() {
 const styles = StyleSheet.create({
   title: { fontSize: 27, lineHeight: 27, fontWeight: '700', marginBottom: 5, color: '#272727', textAlign: 'center', },
 
-  cardsContainer: {
-    gap: 12,
+  cardsScroll: {
     width: '100%',
+    flexGrow: 0,
+  },
+
+  cardsContainer: {
+    flexDirection: 'row',
+    gap: 12,
     paddingBottom: 13,
     paddingLeft: 5,
+    paddingRight: 20,
   },
 
   card: {

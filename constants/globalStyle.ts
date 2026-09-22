@@ -16,7 +16,6 @@ export const globalStyle = StyleSheet.create({
   safeArea: { flex: 1, },
   listContent:{ flexGrow: 1, padding: 16,},
   signinText: { color: "#000", textAlign: "center", fontWeight: "bold", marginBottom: 10, },
-  // FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
 });
 
 export const commonStyles = StyleSheet.create({
@@ -31,4 +30,5 @@ export const getDynamicStyles = (width: number) =>
 export const doctorStyles = StyleSheet.create({
   doctorWrap: {flex: 1, justifyContent: "flex-start", alignItems: "center", backgroundColor: "#ffffff", paddingBottom: 85,},
   cardCon: {width: "100%", maxWidth: 500, margin: 0, overflowY: "scroll",},
+  heading: { color: "#111827", fontSize: 18, fontWeight: "700",},
 });

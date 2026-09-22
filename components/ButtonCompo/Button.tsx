@@ -14,13 +14,15 @@ export type ButtonVariant =
   | "solid"
   | "border"
   | "green"
-  | "blue";
+  | "blue"
+  | "Sky"
+  | "Red";
 
 type ButtonProps = {
   text: string;
   onPress?: () => void;
-  textSize?: "sm" | "md" | "lg";
-  variant?: "transparent" | "white" | "solid" | "border" | "blue"  | "green";
+  textSize?: "xs" | "sm" | "md" | "lg";
+  variant?: "transparent" | "white" | "solid" | "border" | "blue"  | "green" | "Sky" | "Red";
   icon?: React.ReactNode;
   disabled?: boolean;
   style?: ViewStyle;
@@ -54,6 +56,8 @@ export default function Button({
         variant === "border" && styles.transparentButton,
         variant === "blue" && styles.blueButton,
         variant === "green" && styles.greenButton,
+        variant === "Sky" && styles.SkyButton,
+        variant === "Red" && styles.RedButton,
 
         width === "full" && styles.fullWidth,
         width === "half" && styles.halfWidth,
@@ -75,8 +79,11 @@ export default function Button({
             variant === "transparent" && styles.transparentText,
             variant === "blue" && styles.solidText,
             variant === "green" && styles.solidText,
+            variant === "Sky" && styles.BlackText,
+            variant === "Red" && styles.BlackText,
 
 
+            textSize === "xs" && styles.xs,
             textSize === "sm" && styles.sm,
             textSize === "md" && styles.md,
             textSize === "lg" && styles.lg,
@@ -98,15 +105,17 @@ export default function Button({
 const styles = StyleSheet.create({
   button: { borderRadius: 50, justifyContent: "center", alignItems: "center", paddingHorizontal: 18,  paddingVertical: 10,},
   solid: { backgroundColor: "#763DFF",  color: "#FFF",},
-  blueButton:{backgroundColor: "#007CDD",  color: "#FFF"},
+  blueButton:{backgroundColor: "#007CDD",  color: "#FFF" },
+  SkyButton:{backgroundColor: "#DBEAFE",  color: "#FFF", paddingHorizontal: 10,  paddingVertical: 5,},
   white: { backgroundColor: "#fff", color: "#000", },
   transparent: { backgroundColor: "transparent", borderWidth: 0, borderColor: "#4F46E5", },
   solidButton: { backgroundColor: "#763DFF", },
   greenButton: { backgroundColor: "#16A34A", },
+  RedButton:  {backgroundColor: "#f08a62", paddingHorizontal: 10,  paddingVertical: 5,},
   whiteButton: { backgroundColor: "#FFF", },
   transparentButton: { backgroundColor: "transparent", borderWidth: 1, borderColor: "#763DFF", }, 
   solidText: { color: "#FFF", },
-
+  BlackText: { color: "#000", },
 whiteText: {
   color: "#111827",
 },
@@ -135,6 +144,10 @@ icon: {
 
 text: {
   fontWeight: "600",
+},
+
+xs: {
+  fontSize: 12,
 },
 
 sm: {

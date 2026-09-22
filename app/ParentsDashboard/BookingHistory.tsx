@@ -1,29 +1,20 @@
 import Footer from "@/components/ui/Footer";
 import Header from "@/components/ui/Header";
 import OrientationLock from "@/components/ui/ScreenOrientation";
-import {
-    Appointment,
-    getLoggedInUserId,
-    getParentAppointments,
-} from "@/services/authService";
+import { Appointment, getLoggedInUserId, getParentAppointments, } from "@/services/authService";
 import { useCallback, useEffect, useState } from "react";
-import {
-    ActivityIndicator,
-    FlatList,
-    Linking,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
-} from "react-native";
-import { globalStyle } from "../../constants/globalStyle";
+import { ActivityIndicator, FlatList, Linking, Pressable, StyleSheet, Text, View, } from "react-native";
+import DoctorListCard from "@/components/ui/ListComponents";
+import { doctorStyles, globalStyle } from "../../constants/globalStyle";
 
 function formatDate(date: string) {
   const [day, month, year] = date.split("-").map(Number);
+
   if (!day || !month || !year) return date;
   return new Date(year, month - 1, day).toLocaleDateString("en-IN", {
+    weekday: "short",
     day: "numeric",
-    month: "long",
+    month: "short",
     year: "numeric",
   });
 }
@@ -64,7 +55,12 @@ export default function Bookings() {
           data={appointments}
           keyExtractor={(item) => item._id}
           contentContainerStyle={styles.listContent}
-          ListHeaderComponent={<Text style={styles.heading}>Bookings</Text>}
+          ListHeaderComponent={
+            <>
+              <Text style={doctorStyles.heading}>Booking History</Text>
+              <Text style={globalStyle.smallText2}>Here are the details of your Booking History.</Text>
+            </>
+          }
           ListEmptyComponent={
             <View style={styles.statusContainer}>
               {isLoading ? (
@@ -81,6 +77,16 @@ export default function Bookings() {
             const canJoin =
               normalizedStatus === "approved" && Boolean(item.zoomLink);
             return (
+              <> 
+              <DoctorListCard
+              slotVariant="compact"
+              name={item.teacherUser?.name || "Therapist"}
+              category="Therapist"
+              AppointDate={`${formatDate(item.date)} · ${item.time}`}
+              AppointStatus={item.status}
+              AppoinStatusVar="Sky"
+              />
+{/* 
               <View style={styles.card}>
                 <Text style={styles.sessionText}>
                   Session with{" "}
@@ -113,7 +119,8 @@ export default function Bookings() {
                     <Text style={styles.joinButtonText}>Join Meeting</Text>
                   </Pressable>
                 ) : null}
-              </View>
+              </View> */}
+              </>
             );
           }}
           showsVerticalScrollIndicator={false}
@@ -124,13 +131,7 @@ export default function Bookings() {
 }
 
 const styles = StyleSheet.create({
-  listContent: { flexGrow: 1, padding: 20 },
-  heading: {
-    color: "#111827",
-    fontSize: 27,
-    fontWeight: "700",
-    marginBottom: 18,
-  },
+  listContent: { flexGrow: 1, padding: 20, backgroundColor: "#fff", },
   card: {
     backgroundColor: "#FFF",
     borderRadius: 16,

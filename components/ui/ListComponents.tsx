@@ -9,20 +9,29 @@ import {
   Text,
   View,
 } from "react-native";
+import Button, { ButtonVariant, } from "../ButtonCompo/Button";
+type SlotVariant = "default" | "compact";
 
 interface DoctorListCardProps {
   image?: ImageSourcePropType;
-  name: string;
+  name?: string;
   category?: string;
   experience?: number | string;
   languages?: string[];
-  availability: AvailabilitySlot[];
-  onBookNow: (slot: AvailabilitySlot) => void;
-  appointmentBooking: () => void;
+  availability?: AvailabilitySlot[];
+  onBookNow?: (slot: AvailabilitySlot) => void;
+  appointmentBooking?: () => void;
+  slotVariant?: SlotVariant;
+  AppointDate?: string;
+  AppointStatus?: string;
+  Zoomlink?: () => void;
+  ViewDetails?: () => void;
+  AppoinStatusVar?: ButtonVariant;
 }
 
 function formatDate(date: string) {
   const [day, month, year] = date.split("-").map(Number);
+
   if (!day || !month || !year) return date;
 
   return new Date(year, month - 1, day).toLocaleDateString("en-IN", {
@@ -40,70 +49,89 @@ function dateValue(date: string) {
 
 export default function DoctorListCard({
   image,
-  name,
+  name = "Doctor",
   category = "Therapist",
   experience,
-  languages,
-  availability,
-  onBookNow,
-  appointmentBooking,
+  languages = [],
+  availability = [],
+  onBookNow = () => {},
+  appointmentBooking = () => {},
+  slotVariant = "default",
+  AppointDate,
+  AppointStatus,
+  Zoomlink,
+  ViewDetails,
+  AppoinStatusVar = "Red",
 }: DoctorListCardProps) {
   const availableSlots = useMemo(
     () => availability.filter((slot) => !slot.isBooked),
-    [availability],
+    [availability]
   );
+
   const dates = useMemo(
     () =>
       [...new Set(availableSlots.map((slot) => slot.date))].sort(
-        (a, b) => dateValue(a) - dateValue(b),
+        (a, b) => dateValue(a) - dateValue(b)
       ),
-    [availableSlots],
+    [availableSlots]
   );
+
   const [selectedDate, setSelectedDate] = useState(dates[0] || "");
+  const [selectedDateIndex, setSelectedDateIndex] = useState(0);
   const [showAllSlots, setShowAllSlots] = useState(false);
 
   useEffect(() => {
     setSelectedDate(dates[0] || "");
+    setSelectedDateIndex(0);
     setShowAllSlots(false);
   }, [dates]);
 
   const slotsForDate = availableSlots.filter(
-    (slot) => slot.date === selectedDate,
+    (slot) => slot.date === selectedDate
   );
-  const displayedSlots = showAllSlots ? slotsForDate : slotsForDate.slice(0, 3);
+
+  const displayedSlots = showAllSlots
+    ? slotsForDate
+    : slotsForDate.slice(0, 3);
+
   const hasMoreSlots = slotsForDate.length > 3;
-  const [selectedDateIndex, setSelectedDateIndex] = useState(0);
+
   const selectPreviousDate = () => {
     if (selectedDateIndex > 0) {
       const newIndex = selectedDateIndex - 1;
+
       setSelectedDateIndex(newIndex);
       setSelectedDate(dates[newIndex]);
+      setShowAllSlots(false);
     }
   };
 
   const selectNextDate = () => {
     if (selectedDateIndex < dates.length - 1) {
       const newIndex = selectedDateIndex + 1;
+
       setSelectedDateIndex(newIndex);
       setSelectedDate(dates[newIndex]);
+      setShowAllSlots(false);
     }
   };
 
   const isAvailable = availableSlots.length > 0;
 
   const experienceText =
-    experience !== undefined && experience !== null && experience !== ""
+    experience !== undefined &&
+    experience !== null &&
+    experience !== ""
       ? `${experience}+ Years`
       : "0+ Years";
 
   const languagesText =
-    Array.isArray(languages) && languages.length > 0
-      ? languages.join(", ")
-      : "";
+    languages.length > 0 ? languages.join(", ") : "";
 
   return (
     <View style={styles.card}>
       <View style={styles.topSection}>
+        {/* IMAGE */}
         <View>
           {image ? (
             <Image source={image} style={styles.image} />
@@ -114,6 +142,7 @@ export default function DoctorListCard({
               </Text>
             </View>
           )}
+
           <View style={styles.availabilityStatus}>
             <View
               style={[
@@ -121,6 +150,7 @@ export default function DoctorListCard({
                 !isAvailable && styles.unavailableDot,
               ]}
             />
+
             <Text
               style={[
                 styles.statusText,
@@ -132,94 +162,158 @@ export default function DoctorListCard({
           </View>
         </View>
 
+        {/* DETAILS */}
         <View style={styles.details}>
           <Text style={styles.experience}>
-            <Text style={styles.experienceSpan}>{experienceText}</Text> Experience
+            <Text style={styles.experienceSpan}>
+              {experienceText}
+            </Text>{" "}
+            Experience
           </Text>
+
           <Text style={styles.name}>{name}</Text>
-          <Text style={styles.specialty}>{category || "Therapist"}</Text>
-          {Boolean(languagesText) && (
+
+          <Text style={styles.specialty}>
+            {category || "Therapist"}
+          </Text>
+
+         {slotVariant === "default" ? (
+          <>
+          {languagesText ? (
             <Text style={styles.languagesText} numberOfLines={1}>
-              Languages: <Text style={styles.languagesSpan}>{languagesText}</Text>
+              Languages:{" "}
+              <Text style={styles.languagesSpan}>
+                {languagesText}
+              </Text>
+            </Text>
+          ) : null}
+
+          {/* DATE + SLOTS */}
+          {dates.length > 0 ? (
+            <>
+              <View style={styles.dateBar}>
+                <Pressable
+                  style={styles.arrowButton}
+                  onPress={selectPreviousDate}
+                  disabled={selectedDateIndex === 0}
+                >
+                  <Ionicons
+                    name="chevron-back"
+                    size={16}
+                    color={
+                      selectedDateIndex === 0
+                        ? "#B8B8B8"
+                        : "#1386E7"
+                    }
+                  />
+                </Pressable>
+
+                <Pressable style={styles.dateContent}>
+                  <Ionicons
+                    name="calendar-outline"
+                    size={15}
+                    color="#1386E7"
+                  />
+
+                  <Text style={styles.dateText}>
+                    {formatDate(selectedDate)}
+                  </Text>
+                </Pressable>
+
+                <Pressable
+                  style={styles.arrowButton}
+                  onPress={selectNextDate}
+                  disabled={
+                    selectedDateIndex === dates.length - 1
+                  }
+                >
+                  <Ionicons
+                    name="chevron-forward"
+                    size={16}
+                    color={
+                      selectedDateIndex === dates.length - 1
+                        ? "#B8B8B8"
+                        : "#1386E7"
+                    }
+                  />
+                </Pressable>
+              </View>
+
+              <View style={styles.slotsRow}>
+                {displayedSlots.map((slot) => (
+                  <Pressable
+                    key={slot._id}
+                    style={styles.slotButton}
+                    onPress={() => onBookNow(slot)}
+                  >
+                    <Text style={styles.slotText}>
+                      {slot.time}
+                    </Text>
+                  </Pressable>
+                ))}
+
+                {hasMoreSlots && (
+                  <Pressable
+                    style={styles.moreButton}
+                    onPress={() =>
+                      setShowAllSlots((current) => !current)
+                    }
+                  >
+                    <Text style={styles.moreText}>
+                      {showAllSlots ? "Less" : "More"}
+                    </Text>
+
+                    <Ionicons
+                      name={
+                        showAllSlots
+                          ? "chevron-up"
+                          : "chevron-down"
+                      }
+                      size={12}
+                      color="#1386E7"
+                    />
+                  </Pressable>
+                )}
+
+                <Pressable
+                  style={styles.button}
+                  onPress={appointmentBooking}
+                >
+                  <Text style={styles.buttonText}>
+                    Book Now
+                  </Text>
+                </Pressable>
+              </View>
+            </>
+          ) : (
+            <Text style={styles.noSlots}>
+              No available slots at the moment.
             </Text>
           )}
-
-          {dates.length ? (
-        <>
-        <View style={styles.dateBar}>
-          {/* Previous Date */}
-          <Pressable
-            style={styles.arrowButton}
-            onPress={selectPreviousDate}
-            disabled={selectedDateIndex === 0}
-          >
-            <Ionicons
-              name="chevron-back"
-              size={16}
-              color={selectedDateIndex === 0 ? "#B8B8B8" : "#1386E7"}
-            />
-          </Pressable>
-
-          <Pressable style={styles.dateContent}>
-            <Ionicons name="calendar-outline" size={15} color="#1386E7" />
-            <Text style={styles.dateText}>{formatDate(selectedDate)}</Text>
-          </Pressable>
-
-          <Pressable
-            style={styles.arrowButton}
-            onPress={selectNextDate}
-            disabled={selectedDateIndex === dates.length - 1}
-          >
-            <Ionicons
-              name="chevron-forward"
-              size={16}
-              color={
-                selectedDateIndex === dates.length - 1 ? "#B8B8B8" : "#1386E7"
-              }
-            />
-          </Pressable>
-        </View>
-
-          <View style={styles.slotsRow}>
-            {displayedSlots.map((slot) => (
-              <Pressable
-                key={slot._id}
-                style={styles.slotButton}
-                onPress={() => onBookNow(slot)}
-              >
-                <Text style={styles.slotText}>{slot.time}</Text>
-              </Pressable>
-            ))}
-            {hasMoreSlots ? (
-              <Pressable
-                style={styles.moreButton}
-                onPress={() => setShowAllSlots((current) => !current)}
-              >
-                <Text style={styles.moreText}>
-                  {showAllSlots ? "Less" : "More"}
-                </Text>
-                <Ionicons
-                  name={showAllSlots ? "chevron-up" : "chevron-down"}
-                  size={12}
-                  color="#1386E7"
-                />
-              </Pressable>
-            ) : null}
-            <View>
-              <Pressable style={styles.button} onPress={appointmentBooking}>
-                <Text style={styles.buttonText}>Book Now</Text>
-              </Pressable>
-            </View>
+         </> 
+          ) : (
+            <>
+          <View style={styles.compactSlotsRow}>
+              <View style={styles.AppointdateBar}>
+                  <Ionicons name="calendar-outline" size={15} color="#1386E7" />
+                  <Text style={styles.dateText}>
+                    {AppointDate}
+                  </Text>
+              </View>
+              <View style={styles.StatusButton}>
+                <Button text={AppointStatus ?? "Pending"} variant={AppoinStatusVar} textSize="xs"/>
+              </View>
           </View>
-        </>
-      ) : (
-        <Text style={styles.noSlots}>No available slots at the moment.</Text>
-      )}
+          <View style={styles.compactSlotsRow}>
+          <Button text="Join Meeting" variant="green" onPress={Zoomlink} />
+          <Button text="View Details" variant="transparent" onPress={ViewDetails} />
+          </View>
+          </>
+        )}
         </View>
-
+        
       </View>
 
-      
     </View>
   );
 }
@@ -248,7 +342,8 @@ const styles = StyleSheet.create({
   languagesText: { color: "#74798B", fontSize: 10, lineHeight: 14, marginTop: 2, },
   languagesSpan: { color: "#1682E7", fontWeight: "500", },
   dateBar: { flexDirection: "row", alignItems: "center", backgroundColor: "#EFF7FE", borderRadius: 4, minHeight: 20, paddingHorizontal: 6, paddingVertical: 2, marginTop: 8, },
-  dateText: { flex: 1, color: "#1682E7", fontSize: 11, fontWeight: "600", marginLeft: 6, },
+  AppointdateBar:{flexDirection: "row", alignItems: "center", backgroundColor: "#EFF7FE", borderRadius: 4, minHeight: 20, paddingHorizontal: 3, paddingVertical: 2, width: "68%"},
+  dateText: { flex: 1, color: "#1682E7", fontSize: 12, fontWeight: "600", marginLeft: 6, paddingVertical: 10, paddingRight: 10,},
 
   slotsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
   slotButton: { borderWidth: 2, borderColor: "#95CBF8", borderRadius: 4, paddingHorizontal: 9, paddingVertical: 3, minWidth: 55,},
@@ -256,4 +351,12 @@ const styles = StyleSheet.create({
   moreButton: { flexDirection: "row", alignItems: "center", borderWidth: 2, borderColor: "#95CBF8", borderRadius: 4, paddingLeft: 9, paddingRight: 6, paddingVertical: 3, gap: 4, },
   moreText: { color: "#1682E7", fontSize: 11, fontWeight: "600" },
   noSlots: { color: "#73798D", fontSize: 11, marginTop: 4 },
+  StatusButton:{flexDirection: "row", justifyContent: "flex-end"},
+  compactSlotsRow: {
+  flexDirection: "row",
+  flexWrap: "wrap",
+  gap: 8,
+  marginTop: 8,
+  alignItems:"center",
+},
 });

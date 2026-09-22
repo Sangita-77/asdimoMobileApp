@@ -1,12 +1,12 @@
 import Button from "@/components/ButtonCompo/Button";
 import CompoLoginBack from "@/components/ui/CompoLoginBack";
 import Input from "@/components/ui/Input";
-import { globalStyle } from "@/constants/globalStyle";
 import { addChildInformation, getLoggedInUserId } from "@/services/authService";
 import { FontAwesome, MaterialCommunityIcons, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
 import { useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import Form from "../../components/ui/Form";
+import { globalStyle, getDynamicStyles } from "../../constants/globalStyle";
 
 
 export default function Login() {
@@ -101,10 +101,11 @@ export default function Login() {
       setIsSubmitting(false);
     }
   };
-
+  const { width } = useWindowDimensions();
+  const dynamicStyles = getDynamicStyles(width);
   return (
     <CompoLoginBack dinoImage={require("@/assets/images/Diano_Run.gif")}>
-        <View style={globalStyle.FormWrap}>
+        <View style={dynamicStyles.FormWrap}>
         <Text style={globalStyle.signinText}>
           Child Basic Information
         </Text>
