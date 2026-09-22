@@ -18,11 +18,14 @@ export type ButtonVariant =
   | "Sky"
   | "Red";
 
+
 type ButtonProps = {
   text: string;
   onPress?: () => void;
   textSize?: "xs" | "sm" | "md" | "lg";
   variant?: "transparent" | "white" | "solid" | "border" | "blue"  | "green" | "Sky" | "Red";
+  // textSize?: "sm" | "md" | "lg";
+  // variant?: "transparent" | "white" | "solid" | "border" | "blue"  | "green";
   icon?: React.ReactNode;
   disabled?: boolean;
   style?: ViewStyle;
@@ -59,6 +62,7 @@ export default function Button({
         variant === "Sky" && styles.SkyButton,
         variant === "Red" && styles.RedButton,
 
+
         width === "full" && styles.fullWidth,
         width === "half" && styles.halfWidth,
 
@@ -81,6 +85,7 @@ export default function Button({
             variant === "green" && styles.solidText,
             variant === "Sky" && styles.BlackText,
             variant === "Red" && styles.BlackText,
+
 
 
             textSize === "xs" && styles.xs,
