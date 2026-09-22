@@ -139,6 +139,7 @@ export type Appointment = {
   createdAt?: string;
   updatedAt?: string;
   __v?: number;
+  availability?: AvailabilitySlot;
   teacher?: AppointmentTeacher;
   teacherUser?: AppointmentTeacherUser;
   parent?: Record<string, any>;

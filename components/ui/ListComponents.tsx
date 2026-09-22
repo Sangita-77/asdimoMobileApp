@@ -19,6 +19,7 @@ interface DoctorListCardProps {
   experience?: number | string;
   languages?: string[];
   availability?: AvailabilitySlot[];
+  isAvailable?: boolean;
   onBookNow?: (slot: AvailabilitySlot) => void;
   appointmentBooking?: () => void;
   slotVariant?: SlotVariant;
@@ -27,6 +28,11 @@ interface DoctorListCardProps {
   Zoomlink?: () => void;
   ViewDetails?: () => void;
   AppoinStatusVar?: ButtonVariant;
+  actionButtonText?: string;
+  actionButtonVariant?: ButtonVariant;
+  onActionButtonPress?: () => void;
+  showViewDetails?: boolean;
+  onViewDetails?: () => void;
 }
 
 function formatDate(date: string) {
@@ -54,6 +60,7 @@ export default function DoctorListCard({
   experience,
   languages = [],
   availability = [],
+  isAvailable: propIsAvailable,
   onBookNow = () => {},
   appointmentBooking = () => {},
   slotVariant = "default",
@@ -62,6 +69,11 @@ export default function DoctorListCard({
   Zoomlink,
   ViewDetails,
   AppoinStatusVar = "Red",
+  actionButtonText,
+  actionButtonVariant = "green",
+  onActionButtonPress,
+  showViewDetails = true,
+  onViewDetails,
 }: DoctorListCardProps) {
   const availableSlots = useMemo(
     () => availability.filter((slot) => !slot.isBooked),
@@ -116,7 +128,10 @@ export default function DoctorListCard({
     }
   };
 
-  const isAvailable = availableSlots.length > 0;
+  const isAvailable =
+    propIsAvailable !== undefined
+      ? propIsAvailable
+      : availableSlots.length > 0;
 
   const experienceText =
     experience !== undefined &&
@@ -305,8 +320,22 @@ export default function DoctorListCard({
               </View>
           </View>
           <View style={styles.compactSlotsRow}>
-          <Button text="Join Meeting" variant="green" onPress={Zoomlink} />
-          <Button text="View Details" variant="transparent" onPress={ViewDetails} />
+            {actionButtonText && onActionButtonPress ? (
+              <Button
+                text={actionButtonText}
+                variant={actionButtonVariant}
+                onPress={onActionButtonPress}
+              />
+            ) : Zoomlink ? (
+              <Button text="Join Meeting" variant="green" onPress={Zoomlink} />
+            ) : null}
+            {showViewDetails && (onViewDetails || ViewDetails) ? (
+              <Button
+                text="View Details"
+                variant="transparent"
+                onPress={onViewDetails || ViewDetails}
+              />
+            ) : null}
           </View>
           </>
         )}

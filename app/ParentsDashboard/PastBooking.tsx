@@ -14,7 +14,6 @@ import { useCallback, useEffect, useState } from "react";
 import {
   ActivityIndicator,
   FlatList,
-  Linking,
   StyleSheet,
   Text,
   View,
@@ -81,7 +80,7 @@ function getStatusVariant(status?: string): ButtonVariant {
   return "Sky";
 }
 
-export default function Bookings() {
+export default function PastBooking() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
@@ -94,17 +93,23 @@ export default function Bookings() {
       if (!parentId)
         throw new Error("Please sign in again to view your bookings.");
       const list = await getParentAppointments(parentId);
-      list.sort((a, b) => {
+      
+      const past = list.filter(
+        (item) => isPastAppointment(item.date, item.time)
+      );
+
+      past.sort((a, b) => {
         const da = parseAppointmentDate(a.date, a.time)?.getTime() || 0;
         const db = parseAppointmentDate(b.date, b.time)?.getTime() || 0;
         return db - da;
       });
-      setAppointments(list);
+
+      setAppointments(past);
     } catch (loadError) {
       setError(
         loadError instanceof Error
           ? loadError.message
-          : "Unable to load bookings. Please try again.",
+          : "Unable to load past bookings. Please try again.",
       );
     } finally {
       setIsLoading(false);
@@ -131,35 +136,19 @@ export default function Bookings() {
     });
   };
 
-  const handleViewDetails = (item: Appointment) => {
-    const therapistId =
-      item.teacherId || item.teacher?.teacherId || item.teacher?.userId;
-    router.push({
-      pathname: ROUTES.AUTH.BOOKDOCTOR,
-      params: {
-        therapistId: String(therapistId),
-        therapistName: item.teacherUser?.name || "Therapist",
-        profileImg: item.teacherUser?.profileImg || "",
-        therapistCategory: item.teacher?.therapist_category || "Therapist",
-        yearsOfExperience: String(item.teacher?.yearsOfExperience ?? 0),
-        medium: item.availability?.medium || "online",
-      },
-    });
-  };
-
   return (
     <>
       <OrientationLock variant="portrait" />
-      <Header title="History" />
+      <Header title="Past Bookings" />
       <FlatList
         data={appointments}
         keyExtractor={(item) => item._id}
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <>
-            <Text style={doctorStyles.heading}>Booking History</Text>
+            <Text style={doctorStyles.heading}>Past Bookings</Text>
             <Text style={globalStyle.smallText2}>
-              Here are the details of your Booking History.
+              Here is the history of your completed and past appointments.
             </Text>
           </>
         }
@@ -169,54 +158,18 @@ export default function Bookings() {
               <ActivityIndicator size="large" color="#2563EB" />
             ) : (
               <Text style={styles.emptyText}>
-                {error || "No bookings found."}
+                {error || "No past bookings found."}
               </Text>
             )}
           </View>
         }
         renderItem={({ item }) => {
-          const isPast = isPastAppointment(item.date, item.time);
-          const zoom = item.zoomLink || item.availability?.zoomLink;
-          const status = (item.status || "").toLowerCase().trim();
-          const isCancelledOrRejected =
-            status === "cancelled" || status === "rejected";
           const rawImg =
             item.teacherUser?.profileImg ||
             item.teacherUser?.googleProfile?.picture ||
             item.teacherUser?.facebookProfile?.picture;
           const imageSource = formatProfileImage(rawImg);
           const isAvailable = item.availability?.isBooked === false;
-          const medium = (item.availability?.medium || "").toLowerCase().trim();
-
-          let actionButtonText = "Join Meeting";
-          let actionButtonVariant: ButtonVariant = "green";
-          let onActionButtonPress: () => void = () => {};
-          let showViewDetails = true;
-
-          if (isPast) {
-            actionButtonText = "Book Again";
-            actionButtonVariant = "solid";
-            onActionButtonPress = () => handleBookAgain(item);
-            showViewDetails = false;
-          } else if (isCancelledOrRejected || !zoom) {
-            if (medium === "center" || medium === "clinic") {
-              actionButtonText = "Meet at Clinic";
-              actionButtonVariant = "blue";
-              onActionButtonPress = () => handleViewDetails(item);
-            } else if (medium === "home") {
-              actionButtonText = "Meet at Home";
-              actionButtonVariant = "blue";
-              onActionButtonPress = () => handleViewDetails(item);
-            } else {
-              actionButtonText = "Online";
-              actionButtonVariant = "Sky";
-              onActionButtonPress = () => handleViewDetails(item);
-            }
-          } else {
-            actionButtonText = "Join Meeting";
-            actionButtonVariant = "green";
-            onActionButtonPress = () => Linking.openURL(zoom);
-          }
 
           return (
             <DoctorListCard
@@ -229,11 +182,10 @@ export default function Bookings() {
               AppointDate={`${formatDate(item.date)} · ${item.time}`}
               AppointStatus={item.status}
               AppoinStatusVar={getStatusVariant(item.status)}
-              actionButtonText={actionButtonText}
-              actionButtonVariant={actionButtonVariant}
-              onActionButtonPress={onActionButtonPress}
-              showViewDetails={showViewDetails}
-              onViewDetails={() => handleViewDetails(item)}
+              actionButtonText="Book Again"
+              actionButtonVariant="solid"
+              onActionButtonPress={() => handleBookAgain(item)}
+              showViewDetails={false}
             />
           );
         }}
@@ -245,42 +197,7 @@ export default function Bookings() {
 }
 
 const styles = StyleSheet.create({
-  listContent: { flexGrow: 1, padding: 20, backgroundColor: "#fff", },
-  card: {
-    backgroundColor: "#FFF",
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 14,
-    elevation: 3,
-    boxShadow: "0px 2px 6px rgba(0, 0, 0, 0.08)",
-  },
-  sessionText: { color: "#4B5563", fontSize: 16 },
-  doctorName: { color: "#111827", fontWeight: "700" },
-  dateTime: { color: "#6B7280", fontSize: 15, marginTop: 8 },
-  status: {
-    alignSelf: "flex-start",
-    borderRadius: 16,
-    marginTop: 12,
-    paddingHorizontal: 12,
-    paddingVertical: 5,
-  },
-  pending: { backgroundColor: "#DBEAFE" },
-  completed: { backgroundColor: "#DCFCE7" },
-  cancelled: { backgroundColor: "#FEE2E2" },
-  statusText: {
-    color: "#1F2937",
-    fontSize: 13,
-    fontWeight: "700",
-    textTransform: "capitalize",
-  },
-  joinButton: {
-    alignItems: "center",
-    backgroundColor: "#16A34A",
-    borderRadius: 9,
-    marginTop: 14,
-    paddingVertical: 11,
-  },
-  joinButtonText: { color: "#FFF", fontSize: 15, fontWeight: "700" },
+  listContent: { flexGrow: 1, padding: 20, backgroundColor: "#fff" },
   statusContainer: {
     flex: 1,
     alignItems: "center",
