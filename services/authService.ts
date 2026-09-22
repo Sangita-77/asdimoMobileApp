@@ -84,18 +84,69 @@ type CreateAppointmentResponse = {
   data?: { _id: string; status: string };
 };
 
+export type AppointmentTeacher = {
+  _id?: string;
+  teacherId?: number;
+  userId?: number;
+  user?: string;
+  organizationId?: number | null;
+  organizationAdminId?: number | null;
+  zonalAdminId?: number | null;
+  adminId?: number | null;
+  therapist_category?: string;
+  yearsOfExperience?: number;
+  languages?: string[];
+  [key: string]: any;
+};
+
+export type AppointmentTeacherUser = {
+  _id?: string;
+  name?: string;
+  email?: string;
+  flag?: number;
+  status?: number;
+  profileImg?: string | null;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  address?: string;
+  phone?: string | null;
+  country?: string | null;
+  googleProfile?: {
+    name?: string;
+    picture?: string;
+    email?: string;
+  };
+  facebookProfile?: {
+    name?: string;
+    picture?: string;
+    email?: string;
+  };
+  [key: string]: any;
+};
+
 export type Appointment = {
   _id: string;
   parentId: number;
   teacherId: number;
+  availabilityId?: string;
   date: string;
   time: string;
   status: string;
-  zoomLink?: string;
-  teacherUser?: {
-    name?: string;
-    profileImg?: string | null;
-  };
+  reason?: string | null;
+  paymentId?: string | null;
+  zoomLink?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+  teacher?: AppointmentTeacher;
+  teacherUser?: AppointmentTeacherUser;
+  parent?: Record<string, any>;
+  parentUser?: Record<string, any>;
+  organization?: Record<string, any>;
+  zonalAdmin?: Record<string, any>;
+  admin?: Record<string, any>;
+  [key: string]: any;
 };
 
 type GetAppointmentsResponse = {
@@ -676,6 +727,16 @@ export function createAppointment(payload: {
 export async function getParentAppointments(parentId: number) {
   const response = await postAuthEndpoint<GetAppointmentsResponse>(
     AUTH_ENDPOINTS.getAppointmentsById,
+    { parentId },
+    true,
+  );
+
+  return response.data || [];
+}
+
+export async function getAppointmentsForParent(parentId: number) {
+  const response = await postAuthEndpoint<GetAppointmentsResponse>(
+    AUTH_ENDPOINTS.getAppointmentsForParent,
     { parentId },
     true,
   );

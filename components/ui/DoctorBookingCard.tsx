@@ -5,6 +5,11 @@ export type Doctor = {
   name: string;
   specialty: string;
   image?: any;
+  date?: string;
+  time?: string;
+  status?: string;
+  teacherId?: number;
+  rawAppointment?: any;
 };
 
 type Props = {
@@ -25,7 +30,11 @@ export default function DoctorBookingCard({
       onPress={onPress}
     >
       {doctor.image ? (
-        <Image source={doctor.image} style={styles.DBavatar} />
+        <Image
+          source={doctor.image}
+          style={styles.DBavatar}
+          resizeMode="cover"
+        />
       ) : (
         <View style={styles.DBavatarFallback}>
           <Text style={styles.DBavatarLetter}>{firstLetter}</Text>
@@ -39,42 +48,53 @@ export default function DoctorBookingCard({
       <Text style={styles.specialty} numberOfLines={1}>
         {doctor.specialty}
       </Text>
+
+      {doctor.date ? (
+        <View style={styles.dateBadge}>
+          <Text style={styles.dateText} numberOfLines={1}>
+            {doctor.date} {doctor.time ? `· ${doctor.time}` : ""}
+          </Text>
+        </View>
+      ) : null}
     </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   DBcard: {
-    width: 140,
-    height: 155,
+    width: 145,
+    minHeight: 160,
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
     alignItems: "center",
     paddingTop: 12,
+    paddingBottom: 12,
+    paddingHorizontal: 8,
     marginRight: 14,
     marginBottom: 12,
 
     shadowColor: "#000",
     shadowOffset: {
-      width: 5,
-      height: 10,
+      width: 0,
+      height: 4,
     },
     shadowOpacity: 0.08,
-    shadowRadius: 12,
+    shadowRadius: 10,
     elevation: 4,
   },
 
   DBavatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     marginBottom: 8,
+    backgroundColor: "#F3F4F6",
   },
 
   DBavatarFallback: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
+    width: 64,
+    height: 64,
+    borderRadius: 32,
     backgroundColor: "#E8F3FF",
     alignItems: "center",
     justifyContent: "center",
@@ -82,24 +102,40 @@ const styles = StyleSheet.create({
   },
 
   DBavatarLetter: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: "700",
     color: "#1386E7",
   },
 
   name: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: "700",
     color: "#202020",
-    maxWidth: 120,
+    maxWidth: 130,
     textAlign: "center",
   },
 
   specialty: {
-    fontSize: 9,
+    fontSize: 10,
     color: "#8E8E98",
-    marginTop: 4,
-    maxWidth: 120,
+    marginTop: 3,
+    maxWidth: 130,
+    textAlign: "center",
+  },
+
+  dateBadge: {
+    marginTop: 6,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    backgroundColor: "#F0F7FF",
+    borderRadius: 8,
+    maxWidth: 130,
+  },
+
+  dateText: {
+    fontSize: 9,
+    fontWeight: "600",
+    color: "#1386E7",
     textAlign: "center",
   },
 });
