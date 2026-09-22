@@ -16,7 +16,8 @@ export type ButtonVariant =
   | "green"
   | "blue"
   | "Sky"
-  | "Red";
+  | "Red"
+  | "Neon";
 
 
 type ButtonProps = {

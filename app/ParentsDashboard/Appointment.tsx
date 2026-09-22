@@ -213,7 +213,7 @@ export default function BookingsScreen() {
           isLoading={isLoading && !isRefreshing}
           onDoctorPress={handleDoctorPress}
           onButtonPress={() => {
-            router.push(ROUTES.AUTH.DOCTORSLIST);
+            router.push(ROUTES.AUTH.PASTBOOKING);
           }}
         />
 
@@ -228,7 +228,7 @@ export default function BookingsScreen() {
           isLoading={isLoading && !isRefreshing}
           onDoctorPress={handleDoctorPress}
           onButtonPress={() => {
-            router.push(ROUTES.AUTH.BOOKINGHISTORY);
+            router.push(ROUTES.AUTH.UPCOMINGBOOKING);
           }}
         />
       </ScrollView>
