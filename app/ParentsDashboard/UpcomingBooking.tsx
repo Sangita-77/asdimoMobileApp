@@ -6,6 +6,7 @@ import { API_BASE_URL } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
 import {
   Appointment,
+  AvailabilitySlot,
   getLoggedInUserId,
   getParentAppointments,
 } from "@/services/authService";
@@ -79,6 +80,28 @@ function getStatusVariant(status?: string): ButtonVariant {
   if (s === "approved" || s === "completed") return "green";
   if (s === "cancelled" || s === "rejected" || s === "rescheduled") return "Red";
   return "Sky";
+}
+
+function checkTherapistAvailability(
+  availability?: AvailabilitySlot | AvailabilitySlot[]
+): boolean {
+  if (!availability) return false;
+  const slots: AvailabilitySlot[] = Array.isArray(availability)
+    ? availability
+    : [availability];
+
+  if (slots.length === 0) return false;
+
+  const futureSlots = slots.filter((slot) => {
+    if (!slot?.date) return false;
+    return !isPastAppointment(slot.date, slot.time);
+  });
+
+  if (futureSlots.length === 0) {
+    return false;
+  }
+
+  return futureSlots.some((slot) => slot.isBooked === false);
 }
 
 export default function UpcomingBooking() {
@@ -158,7 +181,14 @@ export default function UpcomingBooking() {
           </View>
         }
         renderItem={({ item }) => {
-          const zoom = item.zoomLink || item.availability?.zoomLink;
+          const currentSlot = Array.isArray(item.availability)
+            ? item.availability.find(
+                (s) =>
+                  s._id === item.availabilityId ||
+                  (s.date === item.date && s.time === item.time)
+              )
+            : item.availability;
+          const zoom = item.zoomLink || currentSlot?.zoomLink;
           const status = (item.status || "").toLowerCase().trim();
           const isWaitingApproval =
             status === "cancelled" || status === "rescheduled";
@@ -168,8 +198,8 @@ export default function UpcomingBooking() {
             item.teacherUser?.googleProfile?.picture ||
             item.teacherUser?.facebookProfile?.picture;
           const imageSource = formatProfileImage(rawImg);
-          const isAvailable = item.availability?.isBooked === false;
-          const medium = (item.availability?.medium || "").toLowerCase().trim();
+          const isAvailable = checkTherapistAvailability(item.availability);
+          const medium = (currentSlot?.medium || "").toLowerCase().trim();
 
           let actionButtonText: string | undefined = undefined;
           let actionButtonVariant: ButtonVariant = "green";

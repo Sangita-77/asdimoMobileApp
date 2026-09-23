@@ -6,6 +6,7 @@ import { API_BASE_URL } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
 import {
   Appointment,
+  AvailabilitySlot,
   getLoggedInUserId,
   getParentAppointments,
 } from "@/services/authService";
@@ -81,6 +82,28 @@ function getStatusVariant(status?: string): ButtonVariant {
   return "Sky";
 }
 
+function checkTherapistAvailability(
+  availability?: AvailabilitySlot | AvailabilitySlot[]
+): boolean {
+  if (!availability) return false;
+  const slots: AvailabilitySlot[] = Array.isArray(availability)
+    ? availability
+    : [availability];
+
+  if (slots.length === 0) return false;
+
+  const futureSlots = slots.filter((slot) => {
+    if (!slot?.date) return false;
+    return !isPastAppointment(slot.date, slot.time);
+  });
+
+  if (futureSlots.length === 0) {
+    return false;
+  }
+
+  return futureSlots.some((slot) => slot.isBooked === false);
+}
+
 export default function Bookings() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -118,6 +141,13 @@ export default function Bookings() {
   const handleBookAgain = (item: Appointment) => {
     const therapistId =
       item.teacherId || item.teacher?.teacherId || item.teacher?.userId;
+    const currentSlot = Array.isArray(item.availability)
+      ? item.availability.find(
+          (s) =>
+            s._id === item.availabilityId ||
+            (s.date === item.date && s.time === item.time)
+        )
+      : item.availability;
     router.push({
       pathname: ROUTES.AUTH.BOOKDOCTOR,
       params: {
@@ -126,7 +156,7 @@ export default function Bookings() {
         profileImg: item.teacherUser?.profileImg || "",
         therapistCategory: item.teacher?.therapist_category || "Therapist",
         yearsOfExperience: String(item.teacher?.yearsOfExperience ?? 0),
-        medium: item.availability?.medium || "online",
+        medium: currentSlot?.medium || "online",
       },
     });
   };
@@ -174,14 +204,21 @@ export default function Bookings() {
           const isWaitingApproval =
             !isPast && (status === "cancelled" || status === "rescheduled");
           const isRejected = !isPast && status === "rejected";
-          const zoom = item.zoomLink || item.availability?.zoomLink;
+          const currentSlot = Array.isArray(item.availability)
+            ? item.availability.find(
+                (s) =>
+                  s._id === item.availabilityId ||
+                  (s.date === item.date && s.time === item.time)
+              )
+            : item.availability;
+          const zoom = item.zoomLink || currentSlot?.zoomLink;
           const rawImg =
             item.teacherUser?.profileImg ||
             item.teacherUser?.googleProfile?.picture ||
             item.teacherUser?.facebookProfile?.picture;
           const imageSource = formatProfileImage(rawImg);
-          const isAvailable = item.availability?.isBooked === false;
-          const medium = (item.availability?.medium || "").toLowerCase().trim();
+          const isAvailable = checkTherapistAvailability(item.availability);
+          const medium = (currentSlot?.medium || "").toLowerCase().trim();
 
           let actionButtonText: string | undefined = undefined;
           let actionButtonVariant: ButtonVariant = "green";

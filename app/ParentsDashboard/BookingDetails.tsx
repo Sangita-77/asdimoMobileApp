@@ -158,9 +158,17 @@ export default function BookingDetails() {
   const appointmentDate = appointment?.date || params.appointmentDate || "";
   const appointmentTime = appointment?.time || params.appointmentTime || "";
   const appointmentStatus = appointment?.status || "Confirmed";
-  const zoomLink = appointment?.zoomLink || appointment?.availability?.zoomLink;
+  const availabilitySlot = Array.isArray(appointment?.availability)
+    ? appointment?.availability.find(
+        (s) =>
+          s._id === appointment?.availabilityId ||
+          (s.date === appointment?.date && s.time === appointment?.time)
+      ) || appointment?.availability[0]
+    : appointment?.availability;
+
+  const zoomLink = appointment?.zoomLink || availabilitySlot?.zoomLink;
   const medium =
-    appointment?.availability?.medium?.toLowerCase().trim() ||
+    availabilitySlot?.medium?.toLowerCase().trim() ||
     params.medium?.toLowerCase().trim() ||
     (zoomLink ? "online" : "");
 

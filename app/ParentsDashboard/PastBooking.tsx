@@ -6,6 +6,7 @@ import { API_BASE_URL } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
 import {
   Appointment,
+  AvailabilitySlot,
   getLoggedInUserId,
   getParentAppointments,
 } from "@/services/authService";
@@ -74,10 +75,32 @@ function formatProfileImage(rawImg?: string | null) {
 }
 
 function getStatusVariant(status?: string): ButtonVariant {
-  const s = (status || "").toLowerCase();
+  const s = (status || "").toLowerCase().trim();
   if (s === "approved" || s === "completed") return "green";
-  if (s === "cancelled" || s === "rejected") return "Red";
+  if (s === "cancelled" || s === "rejected" || s === "rescheduled") return "Red";
   return "Sky";
+}
+
+function checkTherapistAvailability(
+  availability?: AvailabilitySlot | AvailabilitySlot[]
+): boolean {
+  if (!availability) return false;
+  const slots: AvailabilitySlot[] = Array.isArray(availability)
+    ? availability
+    : [availability];
+
+  if (slots.length === 0) return false;
+
+  const futureSlots = slots.filter((slot) => {
+    if (!slot?.date) return false;
+    return !isPastAppointment(slot.date, slot.time);
+  });
+
+  if (futureSlots.length === 0) {
+    return false;
+  }
+
+  return futureSlots.some((slot) => slot.isBooked === false);
 }
 
 export default function PastBooking() {
@@ -123,6 +146,13 @@ export default function PastBooking() {
   const handleBookAgain = (item: Appointment) => {
     const therapistId =
       item.teacherId || item.teacher?.teacherId || item.teacher?.userId;
+    const currentSlot = Array.isArray(item.availability)
+      ? item.availability.find(
+          (s) =>
+            s._id === item.availabilityId ||
+            (s.date === item.date && s.time === item.time)
+        )
+      : item.availability;
     router.push({
       pathname: ROUTES.AUTH.BOOKDOCTOR,
       params: {
@@ -131,7 +161,7 @@ export default function PastBooking() {
         profileImg: item.teacherUser?.profileImg || "",
         therapistCategory: item.teacher?.therapist_category || "Therapist",
         yearsOfExperience: String(item.teacher?.yearsOfExperience ?? 0),
-        medium: item.availability?.medium || "online",
+        medium: currentSlot?.medium || "online",
       },
     });
   };
@@ -179,7 +209,7 @@ export default function PastBooking() {
             item.teacherUser?.googleProfile?.picture ||
             item.teacherUser?.facebookProfile?.picture;
           const imageSource = formatProfileImage(rawImg);
-          const isAvailable = item.availability?.isBooked === false;
+          const isAvailable = checkTherapistAvailability(item.availability);
 
           return (
             <DoctorListCard
