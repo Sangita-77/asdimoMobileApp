@@ -219,11 +219,11 @@ export default function UpcomingBooking() {
             actionButtonVariant = "green";
             onActionButtonPress = () => void Linking.openURL(zoom);
           } else if (medium === "center" || medium === "clinic") {
-            actionButtonText = "Meet at Clinic";
+            actionButtonText = "At Clinic";
             actionButtonVariant = "blue";
             onActionButtonPress = () => handleViewDetails(item);
           } else if (medium === "home") {
-            actionButtonText = "Meet at Home";
+            actionButtonText = "At Home";
             actionButtonVariant = "blue";
             onActionButtonPress = () => handleViewDetails(item);
           } else {

@@ -247,12 +247,12 @@ export default function Bookings() {
             onActionButtonPress = () => void Linking.openURL(zoom);
             showViewDetails = true;
           } else if (medium === "center" || medium === "clinic") {
-            actionButtonText = "Meet at Clinic";
+            actionButtonText = "At Clinic";
             actionButtonVariant = "blue";
             onActionButtonPress = () => handleViewDetails(item);
             showViewDetails = true;
           } else if (medium === "home") {
-            actionButtonText = "Meet at Home";
+            actionButtonText = "At Home";
             actionButtonVariant = "blue";
             onActionButtonPress = () => handleViewDetails(item);
             showViewDetails = true;

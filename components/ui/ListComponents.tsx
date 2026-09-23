@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Text,
   View,
+  useWindowDimensions,
 } from "react-native";
 import Button, { ButtonVariant, } from "../ButtonCompo/Button";
 type SlotVariant = "default" | "compact";
@@ -144,6 +145,8 @@ export default function DoctorListCard({
 
   const languagesText =
     languages.length > 0 ? languages.join(", ") : "";
+
+  const { width } = useWindowDimensions();
 
   return (
     <View style={styles.card}>
@@ -303,7 +306,7 @@ export default function DoctorListCard({
               </View>
             </>
           ) : (
-            <Text style={styles.noSlots}>
+            <Text style={styles.specialty}>
               No available slots at the moment.
             </Text>
           )}
@@ -318,7 +321,7 @@ export default function DoctorListCard({
                   </Text>
               </View>
               <View style={styles.StatusButton}>
-                <Button text={AppointStatus ?? "Pending"} variant={AppoinStatusVar} textSize="xs"/>
+                <Button style={{ width: width * 0.3, height: width * 0.09, }} text={AppointStatus ?? "Pending"} variant={AppoinStatusVar} textSize="xs" />
               </View>
           </View>
           {noticeText ? (
@@ -379,7 +382,7 @@ const styles = StyleSheet.create({
   languagesText: { color: "#74798B", fontSize: 10, lineHeight: 14, marginTop: 2, },
   languagesSpan: { color: "#1682E7", fontWeight: "500", },
   dateBar: { flexDirection: "row", alignItems: "center", backgroundColor: "#EFF7FE", borderRadius: 4, minHeight: 20, paddingHorizontal: 6, paddingVertical: 2, marginTop: 8, },
-  AppointdateBar:{flexDirection: "row", alignItems: "center", backgroundColor: "#EFF7FE", borderRadius: 4, minHeight: 20, paddingHorizontal: 3, paddingVertical: 2, width: "68%"},
+  AppointdateBar:{flexDirection: "row", alignItems: "center", backgroundColor: "#EFF7FE", borderRadius: 4, minHeight: 20, paddingHorizontal: 3, paddingVertical: 2, width: "100%"},
   dateText: { flex: 1, color: "#1682E7", fontSize: 12, fontWeight: "600", marginLeft: 6, paddingVertical: 10, paddingRight: 10,},
 
   slotsRow: { flexDirection: "row", flexWrap: "wrap", gap: 8, marginTop: 8 },
@@ -387,8 +390,8 @@ const styles = StyleSheet.create({
   slotText: { color: "#1682E7", fontSize: 14,  lineHeight: 20, fontWeight: "600",  textAlign: "center",},
   moreButton: { flexDirection: "row", alignItems: "center", borderWidth: 2, borderColor: "#95CBF8", borderRadius: 4, paddingLeft: 9, paddingRight: 6, paddingVertical: 3, gap: 4, },
   moreText: { color: "#1682E7", fontSize: 11, fontWeight: "600" },
-  noSlots: { color: "#73798D", fontSize: 11, marginTop: 4 },
   StatusButton:{flexDirection: "row", justifyContent: "flex-end"},
+
   compactSlotsRow: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -410,7 +413,7 @@ const styles = StyleSheet.create({
   },
   noticeText: {
     color: "#DC2626",
-    fontSize: 11,
+    fontSize: 9,
     fontWeight: "600",
     flex: 1,
   },

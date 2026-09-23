@@ -72,6 +72,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     marginRight: 14,
     marginBottom: 12,
+    marginTop: 12,
 
     shadowColor: "#000",
     shadowOffset: {
@@ -133,7 +134,7 @@ const styles = StyleSheet.create({
   },
 
   dateText: {
-    fontSize: 9,
+    fontSize: 11 ,
     fontWeight: "600",
     color: "#1386E7",
     textAlign: "center",
