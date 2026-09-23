@@ -13,6 +13,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
 
+
 WebBrowser.maybeCompleteAuthSession();
 
 SplashScreen.preventAutoHideAsync();
