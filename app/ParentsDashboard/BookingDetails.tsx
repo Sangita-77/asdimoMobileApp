@@ -140,6 +140,7 @@ export default function BookingDetails() {
   // Extract display values from API response with fallback to route params
   const teacher = appointment?.teacher;
   const teacherUser = appointment?.teacherUser;
+  const parentUser = appointment?.parentUser;
   const rawImage =
     teacherUser?.profileImg ||
     teacherUser?.googleProfile?.picture ||
@@ -159,8 +160,8 @@ export default function BookingDetails() {
   const appointmentStatus = appointment?.status || "Confirmed";
   const zoomLink = appointment?.zoomLink || appointment?.availability?.zoomLink;
   const medium =
-    appointment?.availability?.medium?.toLowerCase() ||
-    params.medium?.toLowerCase() ||
+    appointment?.availability?.medium?.toLowerCase().trim() ||
+    params.medium?.toLowerCase().trim() ||
     (zoomLink ? "online" : "");
 
   const teacherUserId =
@@ -205,25 +206,50 @@ export default function BookingDetails() {
     });
   }
 
-  // if (appointment?.childDetails && appointment.childDetails.length > 0) {
-  //   const child = appointment.childDetails[0];
-  //   const childText = `${child.childName || "Child"}${
-  //     child.childAge ? ` (${child.childAge} yrs)` : ""
-  //   }${child.grade ? ` · Grade: ${child.grade}` : ""}`;
-  //   appointmentItems.push({
-  //     icon: "person-outline",
-  //     title: "Child",
-  //     text: childText,
-  //   });
-  // }
+  if (medium === "center" || medium === "clinic") {
+    const clinicName = teacher?.cliniqueName || teacher?.clinicName;
+    if (clinicName && typeof clinicName === "string" && clinicName.trim()) {
+      appointmentItems.push({
+        icon: "business-outline",
+        title: "Clinic Name",
+        text: clinicName.trim(),
+      });
+    }
 
-  if (medium === "clinic" || medium === "center") {
+    const clinicAddressParts = [
+      teacherUser?.address,
+      teacherUser?.city,
+      teacherUser?.pincode,
+    ].filter((p): p is string => Boolean(p && typeof p === "string" && p.trim()));
+
+    const clinicAddress =
+      clinicAddressParts.length > 0
+        ? clinicAddressParts.join(", ")
+        : "Address not available";
+
     appointmentItems.push({
       icon: "location-outline",
-      title: "Location",
-      text: "123 Park street, Kolkata- 700016",
+      title: "Clinic Location",
+      text: clinicAddress,
     });
-  } else if (zoomLink || medium === "online") {
+  } else if (medium === "home") {
+    const homeAddressParts = [
+      parentUser?.address,
+      parentUser?.city,
+      parentUser?.pincode,
+    ].filter((p): p is string => Boolean(p && typeof p === "string" && p.trim()));
+
+    const homeAddress =
+      homeAddressParts.length > 0
+        ? homeAddressParts.join(", ")
+        : "Address not available";
+
+    appointmentItems.push({
+      icon: "location-outline",
+      title: "Home Location",
+      text: homeAddress,
+    });
+  } else if (medium === "online" || zoomLink) {
     appointmentItems.push({
       icon: "videocam-outline",
       title: "Mode",
@@ -363,14 +389,23 @@ export default function BookingDetails() {
                 </View>
               )}
 
-              {zoomLink && !isWaitingApproval && !isRejected && !isPast ? (
+              {(medium === "online" || Boolean(zoomLink)) && !isWaitingApproval && !isRejected && !isPast ? (
                 <View style={styles.zoomContainer}>
                   <Button
-                    text="Join Zoom Meeting"
+                    text="Join Video"
                     variant="green"
                     width="full"
                     textSize="md"
-                    onPress={() => void Linking.openURL(zoomLink)}
+                    onPress={() => {
+                      if (zoomLink) {
+                        void Linking.openURL(zoomLink);
+                      } else {
+                        setStatusMessage({
+                          type: "error",
+                          text: "Video meeting link will be available prior to your consultation time.",
+                        });
+                      }
+                    }}
                   />
                 </View>
               ) : null}
@@ -381,7 +416,7 @@ export default function BookingDetails() {
                     ? "Consultation Completed / Past"
                     : isWaitingApproval
                     ? "Request Waiting for Approval"
-                    : zoomLink
+                    : medium === "online" || zoomLink
                     ? "Please join 5 minutes early"
                     : "Please arrive 15 minutes early"}
                 </Text>
