@@ -33,6 +33,7 @@ interface DoctorListCardProps {
   onActionButtonPress?: () => void;
   showViewDetails?: boolean;
   onViewDetails?: () => void;
+  noticeText?: string;
 }
 
 function formatDate(date: string) {
@@ -74,6 +75,7 @@ export default function DoctorListCard({
   onActionButtonPress,
   showViewDetails = true,
   onViewDetails,
+  noticeText,
 }: DoctorListCardProps) {
   const availableSlots = useMemo(
     () => availability.filter((slot) => !slot.isBooked),
@@ -319,6 +321,12 @@ export default function DoctorListCard({
                 <Button text={AppointStatus ?? "Pending"} variant={AppoinStatusVar} textSize="xs"/>
               </View>
           </View>
+          {noticeText ? (
+            <View style={styles.noticeRow}>
+              <Ionicons name="alert-circle-outline" size={13} color="#DC2626" />
+              <Text style={styles.noticeText}>{noticeText}</Text>
+            </View>
+          ) : null}
           <View style={styles.compactSlotsRow}>
             {actionButtonText && onActionButtonPress ? (
               <Button
@@ -382,10 +390,28 @@ const styles = StyleSheet.create({
   noSlots: { color: "#73798D", fontSize: 11, marginTop: 4 },
   StatusButton:{flexDirection: "row", justifyContent: "flex-end"},
   compactSlotsRow: {
-  flexDirection: "row",
-  flexWrap: "wrap",
-  gap: 8,
-  marginTop: 8,
-  alignItems:"center",
-},
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 8,
+    marginTop: 8,
+    alignItems: "center",
+  },
+  noticeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    marginTop: 6,
+    backgroundColor: "#FEF2F2",
+    paddingHorizontal: 8,
+    paddingVertical: 5,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: "#FECACA",
+  },
+  noticeText: {
+    color: "#DC2626",
+    fontSize: 11,
+    fontWeight: "600",
+    flex: 1,
+  },
 });

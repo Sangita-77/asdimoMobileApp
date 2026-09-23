@@ -75,9 +75,9 @@ function formatProfileImage(rawImg?: string | null) {
 }
 
 function getStatusVariant(status?: string): ButtonVariant {
-  const s = (status || "").toLowerCase();
+  const s = (status || "").toLowerCase().trim();
   if (s === "approved" || s === "completed") return "green";
-  if (s === "cancelled" || s === "rejected") return "Red";
+  if (s === "cancelled" || s === "rejected" || s === "rescheduled") return "Red";
   return "Sky";
 }
 
@@ -122,17 +122,10 @@ export default function UpcomingBooking() {
   }, [loadAppointments]);
 
   const handleViewDetails = (item: Appointment) => {
-    const therapistId =
-      item.teacherId || item.teacher?.teacherId || item.teacher?.userId;
     router.push({
-      pathname: ROUTES.AUTH.BOOKDOCTOR,
+      pathname: ROUTES.AUTH.BOOKINGDETAILS,
       params: {
-        therapistId: String(therapistId),
-        therapistName: item.teacherUser?.name || "Therapist",
-        profileImg: item.teacherUser?.profileImg || "",
-        therapistCategory: item.teacher?.therapist_category || "Therapist",
-        yearsOfExperience: String(item.teacher?.yearsOfExperience ?? 0),
-        medium: item.availability?.medium || "online",
+        appointmentId: item._id,
       },
     });
   };
@@ -167,8 +160,9 @@ export default function UpcomingBooking() {
         renderItem={({ item }) => {
           const zoom = item.zoomLink || item.availability?.zoomLink;
           const status = (item.status || "").toLowerCase().trim();
-          const isCancelledOrRejected =
-            status === "cancelled" || status === "rejected";
+          const isWaitingApproval =
+            status === "cancelled" || status === "rescheduled";
+          const isRejected = status === "rejected";
           const rawImg =
             item.teacherUser?.profileImg ||
             item.teacherUser?.googleProfile?.picture ||
@@ -177,28 +171,35 @@ export default function UpcomingBooking() {
           const isAvailable = item.availability?.isBooked === false;
           const medium = (item.availability?.medium || "").toLowerCase().trim();
 
-          let actionButtonText = "Join Meeting";
+          let actionButtonText: string | undefined = undefined;
           let actionButtonVariant: ButtonVariant = "green";
-          let onActionButtonPress: () => void = () => {};
+          let onActionButtonPress: (() => void) | undefined = undefined;
+          let noticeText: string | undefined = undefined;
 
-          if (isCancelledOrRejected || !zoom) {
-            if (medium === "center" || medium === "clinic") {
-              actionButtonText = "Meet at Clinic";
-              actionButtonVariant = "blue";
-              onActionButtonPress = () => handleViewDetails(item);
-            } else if (medium === "home") {
-              actionButtonText = "Meet at Home";
-              actionButtonVariant = "blue";
-              onActionButtonPress = () => handleViewDetails(item);
-            } else {
-              actionButtonText = "Online";
-              actionButtonVariant = "Sky";
-              onActionButtonPress = () => handleViewDetails(item);
-            }
-          } else {
+          if (isWaitingApproval) {
+            noticeText = "Your request is waiting for approval from admin";
+            actionButtonText = undefined;
+            onActionButtonPress = undefined;
+          } else if (isRejected) {
+            actionButtonText = "Reschedule";
+            actionButtonVariant = "Sky";
+            onActionButtonPress = () => handleViewDetails(item);
+          } else if (zoom) {
             actionButtonText = "Join Meeting";
             actionButtonVariant = "green";
-            onActionButtonPress = () => Linking.openURL(zoom);
+            onActionButtonPress = () => void Linking.openURL(zoom);
+          } else if (medium === "center" || medium === "clinic") {
+            actionButtonText = "Meet at Clinic";
+            actionButtonVariant = "blue";
+            onActionButtonPress = () => handleViewDetails(item);
+          } else if (medium === "home") {
+            actionButtonText = "Meet at Home";
+            actionButtonVariant = "blue";
+            onActionButtonPress = () => handleViewDetails(item);
+          } else {
+            actionButtonText = "Online";
+            actionButtonVariant = "Sky";
+            onActionButtonPress = () => handleViewDetails(item);
           }
 
           return (
@@ -212,6 +213,7 @@ export default function UpcomingBooking() {
               AppointDate={`${formatDate(item.date)} · ${item.time}`}
               AppointStatus={item.status}
               AppoinStatusVar={getStatusVariant(item.status)}
+              noticeText={noticeText}
               actionButtonText={actionButtonText}
               actionButtonVariant={actionButtonVariant}
               onActionButtonPress={onActionButtonPress}

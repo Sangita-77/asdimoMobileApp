@@ -125,6 +125,22 @@ export type AppointmentTeacherUser = {
   [key: string]: any;
 };
 
+export type ChildDetail = {
+  _id?: string;
+  parentId?: number;
+  childName?: string;
+  childGender?: string;
+  childAge?: number;
+  grade?: string;
+  familyType?: string;
+  language?: string;
+  dob?: string;
+  childId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+};
+
 export type Appointment = {
   _id: string;
   parentId: number;
@@ -144,6 +160,7 @@ export type Appointment = {
   teacherUser?: AppointmentTeacherUser;
   parent?: Record<string, any>;
   parentUser?: Record<string, any>;
+  childDetails?: ChildDetail[];
   organization?: Record<string, any>;
   zonalAdmin?: Record<string, any>;
   admin?: Record<string, any>;
@@ -623,6 +640,50 @@ async function postAuthEndpoint<T>(
   return data as T;
 }
 
+async function getAuthEndpoint<T>(
+  endpoint: string,
+  includeAccessToken = false,
+) {
+  const accessToken = includeAccessToken ? await getAccessToken() : null;
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Request failed. Please try again.");
+  }
+
+  return data as T;
+}
+
+async function patchAuthEndpoint<T>(
+  endpoint: string,
+  body: Record<string, unknown>,
+  includeAccessToken = false,
+) {
+  const accessToken = includeAccessToken ? await getAccessToken() : null;
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Request failed. Please try again.");
+  }
+
+  return data as T;
+}
+
 export function verifySignupEmail(email: string) {
   return postAuthEndpoint<{ message?: string }>(AUTH_ENDPOINTS.verifyEmail, {
     email,
@@ -743,6 +804,57 @@ export async function getAppointmentsForParent(parentId: number) {
   );
 
   return response.data || [];
+}
+
+export async function getAppointmentById(appointmentId: string) {
+  const response = await getAuthEndpoint<{
+    success: boolean;
+    message?: string;
+    data: Appointment;
+  }>(`/appointments/${appointmentId}`, true);
+
+  return response.data;
+}
+
+export async function getTeacherAvailableSlots(teacherUserId: number | string) {
+  const response = await getAuthEndpoint<{
+    success: boolean;
+    data: AvailabilitySlot[];
+    message?: string;
+  }>(`/appointments/available-slots/${teacherUserId}`, true);
+
+  return response.data || [];
+}
+
+export async function cancelAppointment(appointmentId: string, reason: string) {
+  const response = await patchAuthEndpoint<{
+    success: boolean;
+    message?: string;
+    data?: any;
+  }>(`/appointments/cancel/${appointmentId}`, { reason: reason.trim() }, true);
+
+  return response;
+}
+
+export async function rescheduleAppointment(
+  appointmentId: string,
+  payload: { date: string; time: string; reason: string },
+) {
+  const response = await patchAuthEndpoint<{
+    success: boolean;
+    message?: string;
+    data?: any;
+  }>(
+    `/appointments/reschedule/${appointmentId}`,
+    {
+      date: payload.date,
+      time: payload.time,
+      reason: payload.reason.trim(),
+    },
+    true,
+  );
+
+  return response;
 }
 
 export async function refreshToken() {

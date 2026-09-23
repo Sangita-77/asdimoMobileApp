@@ -73,7 +73,7 @@ export default function Button({
       ]}
     >
       <View style={styles.content}> 
-        {icon && iconPosition === "left" && (
+        {Boolean(icon) && iconPosition === "left" && (
           <View style={styles.icon}>{icon}</View>
         )}
 
@@ -102,7 +102,7 @@ export default function Button({
           {text}
         </Text>
 
-        {icon && iconPosition === "right" && (
+        {Boolean(icon) && iconPosition === "right" && (
           <View style={styles.icon}>{icon}</View>
         )}
       </View>

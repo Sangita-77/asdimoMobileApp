@@ -136,6 +136,16 @@ export default function PastBooking() {
     });
   };
 
+  const handleViewDetails = (item: Appointment) => {
+    router.push({
+      pathname: ROUTES.AUTH.BOOKINGDETAILS,
+      params: {
+        appointmentId: item._id,
+        from: "PastBooking",
+      },
+    });
+  };
+
   return (
     <>
       <OrientationLock variant="portrait" />
@@ -185,7 +195,8 @@ export default function PastBooking() {
               actionButtonText="Book Again"
               actionButtonVariant="solid"
               onActionButtonPress={() => handleBookAgain(item)}
-              showViewDetails={false}
+              showViewDetails={true}
+              onViewDetails={() => handleViewDetails(item)}
             />
           );
         }}
