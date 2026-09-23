@@ -206,8 +206,8 @@ export default function BookingDetails() {
     });
   }
 
-  if (medium === "center" || medium === "clinic") {
-    const clinicName = teacher?.cliniqueName || teacher?.clinicName;
+  if (medium === "center" || medium === "home") {
+    const clinicName = teacher?.cliniqueName || teacher?.cliniqueName;
     if (clinicName && typeof clinicName === "string" && clinicName.trim()) {
       appointmentItems.push({
         icon: "business-outline",
