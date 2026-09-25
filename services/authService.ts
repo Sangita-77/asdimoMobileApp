@@ -391,7 +391,7 @@ export async function googleLogin(
   userData?: Pick<ParentRegistrationPayload, "flag"> | { flag?: number },
 ) {
   await clearAuthTokens();
-  const response = await fetch(`${API_BASE_URL}${AUTH_ENDPOINTS.googleLogin}`, {
+  const response = await fetch(`${API_BASE_URL}${AUTH_ENDPOINTS.googleLoginMain}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

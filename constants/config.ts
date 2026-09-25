@@ -6,7 +6,8 @@ export const API_BASE_URL =
 
 export const AUTH_ENDPOINTS = {
   login: "/auth/login",
-  googleLogin: "/auth/googleLogin",
+  // googleLogin: "/auth/googleLogin",
+  googleLoginMain: "/auth/googleLoginMain",
   facebookLogin: "/auth/facebookLogin",
   googleSignup: "/auth/googleSignup",
   facebookSignup: "/auth/facebookSignup",
