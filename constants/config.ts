@@ -11,6 +11,7 @@ export const AUTH_ENDPOINTS = {
   googleSignup: "/auth/googleSignup",
   facebookSignup: "/auth/facebookSignup",
   refreshToken: "/auth/refresh-token",
+  logout: "/auth/logout",
   verifyEmail: "/auth/send-email-otp",
   validateOtp: "/auth/validate-email-otp",
   register: "/auth/register",

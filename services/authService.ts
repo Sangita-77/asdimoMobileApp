@@ -386,23 +386,26 @@ export async function loginUser(email: string, password: string) {
  * Exchanges a Google-issued OpenID Connect ID token for an AsDimo session.
  * The API verifies the token and returns the same session fields as password login.
  */
-export async function googleLogin(idToken: string) {
+export async function googleLogin(
+  idToken: string,
+  userData?: Pick<ParentRegistrationPayload, "flag"> | { flag?: number },
+) {
   await clearAuthTokens();
   const response = await fetch(`${API_BASE_URL}${AUTH_ENDPOINTS.googleLogin}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ idToken }),
+    body: JSON.stringify({ idToken, ...(userData || {}) }),
   });
 
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data?.message || "Google login failed");
+    throw new Error(data?.message || "Google authentication failed");
   }
 
-  const userFlag = extractUserFlag(data);
+  const userFlag = extractUserFlag(data) ?? userData?.flag;
 
   if (userFlag !== 2 && userFlag !== 4) {
     throw new Error("You are not register as Parent.");
@@ -420,7 +423,7 @@ export async function googleLogin(idToken: string) {
   ]);
 
   if (!accessToken) {
-    throw new Error("Google login did not return an access token");
+    throw new Error("Google authentication did not return an access token");
   }
 
   await saveAuthTokens(accessToken, refreshToken || "");
@@ -444,58 +447,12 @@ export async function googleLogin(idToken: string) {
 
 export async function googleSignup(
   idToken: string,
-  userData: Pick<ParentRegistrationPayload, "flag">,
+  userData?: Pick<ParentRegistrationPayload, "flag"> | { flag?: number },
 ) {
-  await clearAuthTokens();
-  const response = await fetch(
-    `${API_BASE_URL}${AUTH_ENDPOINTS.googleSignup}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ idToken, ...userData }),
-    },
-  );
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data?.message || "Google signup failed");
-  }
-
-  const accessToken = extractValue(data as Record<string, any>, [
-    "accessToken",
-    "token",
-    "data.accessToken",
-    "data.token",
-  ]);
-  const refreshToken = extractValue(data as Record<string, any>, [
-    "refreshToken",
-    "data.refreshToken",
-  ]);
-
-  if (!accessToken) {
-    throw new Error("Google signup did not return an access token");
-  }
-
-  await saveAuthTokens(accessToken, refreshToken || "");
-
-  const userFlag = extractUserFlag(data) ?? userData.flag;
-  if (userFlag !== null && typeof userFlag === "number") {
-    await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
-  }
-
-  const user = data?.data?.user ?? data?.user;
-  const userId = [user?.userId, user?.id, user?._id, data?.data?.userId, data?.userId]
-    .map(toFiniteNumber)
-    .find((value): value is number => value !== null);
-  if (userId !== undefined && userId !== null) {
-    await AsyncStorage.setItem(USER_ID_KEY, String(userId));
-  }
-
-  return data as LoginResponse;
+  return googleLogin(idToken, userData);
 }
+
+//////////////// google signup /////////////////////
 
 //////////////// google signup /////////////////////
 
@@ -908,3 +865,30 @@ export async function refreshToken() {
 
   return data as LoginResponse;
 }
+
+export async function logoutUser(customRefreshToken?: string) {
+  try {
+    const accessToken = await getAccessToken();
+    const refreshToken = customRefreshToken || (await getRefreshToken());
+
+    if (accessToken) {
+      await fetch(`${API_BASE_URL}${AUTH_ENDPOINTS.logout}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          refreshToken: refreshToken || null,
+        }),
+      }).catch((error) => {
+        console.warn("Logout API call error:", error);
+      });
+    }
+  } catch (error) {
+    console.warn("Logout error:", error);
+  } finally {
+    await clearAuthTokens();
+  }
+}
+

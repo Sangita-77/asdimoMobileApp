@@ -12,17 +12,21 @@ import { Asset } from "expo-asset";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
+import { logoutUser } from "@/services/authService";
+
 const DashboardIcon = require("../../assets/images/landingDashIcon.png");
 const settingsIcon = require("../../assets/images/landingSettingIcon.png");
 const LogoutIcon = require("../../assets/images/SignOut.png");
 const handleLogout = async () => {
   try {
+    await logoutUser();
     await AsyncStorage.removeItem("authSession");
     await AsyncStorage.removeItem("authUser");
 
     router.replace(ROUTES.AUTH.LOGIN);
   } catch (error) {
     console.error("Logout failed:", error);
+    router.replace(ROUTES.AUTH.LOGIN);
   }
 };
 

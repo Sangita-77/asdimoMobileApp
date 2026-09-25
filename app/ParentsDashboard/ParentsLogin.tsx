@@ -410,18 +410,11 @@ export default function Index() {
   const GoogleIcon = require("../../assets/images/GoogleIcon.png");
   const FacebookIcon = require("../../assets/images/FacebookIcon.png");
 
-  const processGoogleAuth = async (
-    idToken: string,
-    action: "login" | "signup",
-  ) => {
+  const processGoogleAuth = async (idToken: string) => {
     try {
       setIsGoogleSubmitting(true);
       setSignInErrors((prev) => ({ ...prev, loginError: "" }));
-      if (action === "login") {
-        await googleLogin(idToken);
-      } else {
-        await googleSignup(idToken, { flag: 4 });
-      }
+      await googleLogin(idToken, { flag: 4 });
       router.replace(ROUTES.APP.HOME);
     } catch (error) {
       setSignInErrors((prev) => ({
@@ -429,7 +422,7 @@ export default function Index() {
         loginError:
           error instanceof Error
             ? error.message
-            : `${action === "login" ? "Google login" : "Google signup"} failed.`,
+            : "Google authentication failed.",
       }));
     } finally {
       setIsGoogleSubmitting(false);
@@ -473,9 +466,7 @@ export default function Index() {
         googleResponse.params?.id_token;
 
       if (idToken && pendingSocialAction?.startsWith("google")) {
-        const action =
-          pendingSocialAction === "google-signup" ? "signup" : "login";
-        void processGoogleAuth(idToken, action);
+        void processGoogleAuth(idToken);
       }
     } else if (googleResponse.type === "error") {
       setIsGoogleSubmitting(false);
@@ -582,7 +573,7 @@ export default function Index() {
         const idToken =
           result.authentication?.idToken || result.params?.id_token;
         if (idToken) {
-          await processGoogleAuth(idToken, "login");
+          await processGoogleAuth(idToken);
         }
       } else if (result.type === "cancel" || result.type === "dismiss") {
         setIsGoogleSubmitting(false);
@@ -613,7 +604,7 @@ export default function Index() {
         const idToken =
           result.authentication?.idToken || result.params?.id_token;
         if (idToken) {
-          await processGoogleAuth(idToken, "signup");
+          await processGoogleAuth(idToken);
         }
       } else if (result.type === "cancel" || result.type === "dismiss") {
         setIsGoogleSubmitting(false);
