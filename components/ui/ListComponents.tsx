@@ -55,6 +55,22 @@ function dateValue(date: string) {
   return new Date(year, month - 1, day).getTime();
 }
 
+function isFutureSlot(slot: AvailabilitySlot) {
+  if (!slot?.date) return false;
+
+  const [day, month, year] = slot.date.split("-").map(Number);
+
+  if (!day || !month || !year) return false;
+
+  const [hours = 0, minutes = 0] = (slot.time || "00:00")
+    .split(":")
+    .map(Number);
+
+  const slotDate = new Date(year, month - 1, day, hours, minutes, 0, 0);
+
+  return slotDate.getTime() > Date.now();
+}
+
 export default function DoctorListCard({
   image,
   name = "Doctor",
@@ -79,7 +95,10 @@ export default function DoctorListCard({
   noticeText,
 }: DoctorListCardProps) {
   const availableSlots = useMemo(
-    () => availability.filter((slot) => !slot.isBooked),
+    () =>
+      availability.filter(
+        (slot) => !slot.isBooked && isFutureSlot(slot)
+      ),
     [availability]
   );
 
