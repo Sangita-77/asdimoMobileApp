@@ -53,6 +53,28 @@ function isPastTime(slot: AvailabilitySlot) {
   return selectedDate <= now;
 }
 
+function normalizeMedium(medium?: string) {
+  const value = (medium || "online").toLowerCase().trim();
+  if (value === "clinic" || value === "centre" || value === "center") {
+    return "center";
+  }
+  if (value === "room") return "online";
+  return value || "online";
+}
+
+function formatMediumLabel(medium?: string) {
+  switch (normalizeMedium(medium)) {
+    case "home":
+      return "Home";
+    case "center":
+      return "Center";
+    case "online":
+      return "Online";
+    default:
+      return "Medium";
+  }
+}
+
 export default function BookDoctor() {
   const {
     therapistId: therapistIdParam,
@@ -131,6 +153,25 @@ export default function BookDoctor() {
   const slotsForSelectedDate = availability.filter(
     (slot) => slot.date === selectedDate && !slot.isBooked,
   );
+  const groupedSlotsByMedium = useMemo(() => {
+    const mediumOrder = ["home", "center", "online"] as const;
+    const grouped = new Map<string, AvailabilitySlot[]>();
+
+    slotsForSelectedDate.forEach((slot) => {
+      const medium = normalizeMedium(slot.medium);
+      const existingSlots = grouped.get(medium) || [];
+      grouped.set(medium, [...existingSlots, slot]);
+    });
+
+    return mediumOrder
+      .map((medium) => ({
+        medium,
+        slots: (grouped.get(medium) || []).sort(
+          (a, b) => a.time.localeCompare(b.time),
+        ),
+      }))
+      .filter((group) => group.slots.length > 0);
+  }, [slotsForSelectedDate]);
 
   const rawProfileImg =
     therapist?.profileImg ||
@@ -207,6 +248,7 @@ export default function BookDoctor() {
         teacherId: therapistId,
         date: selectedSlot.date,
         time: selectedSlot.time,
+        medium: selectedSlot.medium || "online",
         parentId,
       };
       const accessToken = await getAccessToken();
@@ -303,34 +345,43 @@ export default function BookDoctor() {
 
                   <View style={styles.selectTimeWrap}>
                     <Text style={styles.doctorName}>Select Time</Text>
-                    <View style={styles.timeContainer}>
-                      {slotsForSelectedDate.map((slot) => {
-                        const disabled = isPastTime(slot);
-                        const isSelected = selectedSlot?._id === slot._id;
-                        return (
-                          <Pressable
-                            key={slot._id}
-                            disabled={disabled}
-                            onPress={() => setSelectedSlot(slot)}
-                            style={[
-                              styles.timeButton,
-                              isSelected && styles.selectedTime,
-                              disabled && styles.disabledTime,
-                            ]}
-                          >
-                            <Text
-                              style={[
-                                styles.timeText,
-                                isSelected && styles.selectedTimeText,
-                                disabled && styles.disabledTimeText,
-                              ]}
-                            >
-                              {slot.time}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
+                    {groupedSlotsByMedium.length ? (
+                      groupedSlotsByMedium.map((group) => (
+                        <View key={group.medium} style={styles.mediumGroup}>
+                          <Text style={styles.mediumTitle}>
+                            {formatMediumLabel(group.medium)}
+                          </Text>
+                          <View style={styles.timeContainer}>
+                            {group.slots.map((slot) => {
+                              const disabled = isPastTime(slot);
+                              const isSelected = selectedSlot?._id === slot._id;
+                              return (
+                                <Pressable
+                                  key={slot._id}
+                                  disabled={disabled}
+                                  onPress={() => setSelectedSlot(slot)}
+                                  style={[
+                                    styles.timeButton,
+                                    isSelected && styles.selectedTime,
+                                    disabled && styles.disabledTime,
+                                  ]}
+                                >
+                                  <Text
+                                    style={[
+                                      styles.timeText,
+                                      isSelected && styles.selectedTimeText,
+                                      disabled && styles.disabledTimeText,
+                                    ]}
+                                  >
+                                    {slot.time}
+                                  </Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                        </View>
+                      ))
+                    ) : null}
                   </View>
                   {!slotsForSelectedDate.length ? (
                     <Text style={styles.noSlots}>
@@ -402,7 +453,20 @@ const styles = StyleSheet.create({
   },
   placeholderText: { color: "#FFF", fontSize: 34, fontWeight: "700" },
   doctorName: { color: "#000000", fontSize: 16, fontWeight: "600", marginTop: 10 },
-  timeContainer: { flexDirection: "row", flexWrap: "wrap", gap: 12, paddingTop: 15, },
+  mediumGroup: { marginTop: 12 },
+  mediumTitle: {
+    color: "#111827",
+    fontSize: 15,
+    fontWeight: "700",
+    marginBottom: 8,
+    textTransform: "capitalize",
+  },
+  timeContainer: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: 12,
+    paddingTop: 6,
+  },
   timeButton: {
     paddingVertical: 10,
     paddingHorizontal: 18,
