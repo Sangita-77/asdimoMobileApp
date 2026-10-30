@@ -28,6 +28,7 @@ const CloseButton = require("@/assets/images/CloseButton.png");
 
 const images = {
   bgImg: require("@/assets/images/background.png"),
+  Matching: require("@/assets/images/Matching.png"),
   PuzzleIcon: require("@/assets/images/PuzzleIcon.png"),
   ShapeMatchingIcon: require("@/assets/images/ShapeMatchingIcon.png"),
   // emotions: require("@/assets/images/EmotionsIcon.png"),
@@ -48,8 +49,8 @@ const categories = [
   // { id: 1, title: "Puzzle", icon: images.PuzzleIcon, route: ROUTES.PUZZLE.PUZZLE_1, },
   {
     id: 2,
-    title: "Shape Matching",
-    icon: images.ShapeMatchingIcon,
+    title: "Matching",
+    icon: images.Matching,
     route: ROUTES.SHAPESORTING.SHAPESORTING_1,
   },
   {

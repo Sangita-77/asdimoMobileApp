@@ -6,6 +6,7 @@ import Tab from "@/components/ui/Tab";
 import { ROUTES } from "@/constants/routes";
 import { facebookLogin, facebookSignup, googleLogin, googleSignup, loginUser, registerParent, validateSignupOtp, verifySignupEmail, } from "@/services/authService";
 import { Asset } from "expo-asset";
+import ChildForm from "@/app/ParentsDashboard/ParentsLogin";
 
 import * as Facebook from "expo-auth-session/providers/facebook";
 import * as Google from "expo-auth-session/providers/google";
@@ -314,7 +315,7 @@ function StepSix() {
     <View>
       <View style={globalStyle.Dblock}>
         <Input
-          placeholder="ORG. / Therapist Referral Code"
+          placeholder="ORG. Referral Code"
           variant="full"
           value={formData.referralCode}
           onChangeText={(text) =>

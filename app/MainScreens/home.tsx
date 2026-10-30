@@ -202,41 +202,13 @@ function LandingScreen() {
 
 const styles = StyleSheet.create({
   title: { fontSize: 27, lineHeight: 27, fontWeight: '700', marginBottom: 5, color: '#272727', textAlign: 'center', },
-
-  cardsScroll: {
-    width: '100%',
-    flexGrow: 0,
-  },
-
-  cardsContainer: {
-    flexDirection: 'row',
-    gap: 12,
-    paddingBottom: 13,
-    paddingLeft: 5,
-    paddingRight: 20,
-  },
-
-  Landcard: {
-    borderRadius: 16,
-    padding: 15,
-    shadowOpacity: 0.10,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-
+  cardsScroll: { width: '100%', flexGrow: 0, },
+  cardsContainer: { flexDirection: 'row', gap: 12, paddingBottom: 13, paddingLeft: 5, paddingRight: 20, }, 
+  Landcard: { borderRadius: 16, padding: 15, shadowOpacity: 0.10, shadowRadius: 12, elevation: 6, },
   cardTitle: { color: '#fff', marginBottom: 6, fontWeight: 700,}, 
   cardDescription: { color: '#fff', marginBottom: 10, },
   arrowButton: { borderRadius: 16, padding: 0, marginTop: 8, backgroundColor: "transparent",},
-
-  topButtons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    gap: 15,
-    marginBottom: -38,
-    marginTop: 17,
-  },
-
+  topButtons: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 15, marginBottom: -38, marginTop: 17, },
   logoutContainer: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginRight: 30, marginBottom: 20, },
 });
 
