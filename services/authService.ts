@@ -647,19 +647,109 @@ export function verifySignupEmail(email: string) {
   });
 }
 
-export function validateSignupOtp(email: string, otp: string) {
-  return postAuthEndpoint<{ message?: string; data?: { userId?: string } }>(
+export async function validateSignupOtp(email: string, otp: string) {
+  const data = await postAuthEndpoint<Record<string, any>>(
     AUTH_ENDPOINTS.validateOtp,
     { email, otp },
   );
+
+  const accessToken = extractValue(data, [
+    "accessToken",
+    "access_token",
+    "token",
+    "authToken",
+    "data.accessToken",
+    "data.access_token",
+    "data.token",
+    "result.accessToken",
+    "result.token",
+  ]);
+
+  const refreshToken = extractValue(data, [
+    "refreshToken",
+    "refresh_token",
+    "refreshTokenValue",
+    "data.refreshToken",
+    "data.refresh_token",
+    "result.refreshToken",
+  ]);
+
+  if (accessToken || refreshToken) {
+    await saveAuthTokens(accessToken || "", refreshToken || "");
+  }
+
+  const userId = [
+    data?.data?.userId,
+    data?.data?.user?.userId,
+    data?.data?.user?.id,
+    data?.userId,
+  ]
+    .map(toFiniteNumber)
+    .find((value): value is number => value !== null);
+
+  if (typeof userId === "number") {
+    await AsyncStorage.setItem(USER_ID_KEY, String(userId));
+  }
+
+  return data as { message?: string; data?: { userId?: string } };
 }
 
-export function registerParent(payload: ParentRegistrationPayload) {
-  return postAuthEndpoint<{ message?: string }>(
+export async function registerParent(payload: ParentRegistrationPayload) {
+  const data = await postAuthEndpoint<Record<string, any>>(
     AUTH_ENDPOINTS.register,
     payload,
     true,
   );
+
+  const accessToken = extractValue(data, [
+    "accessToken",
+    "access_token",
+    "token",
+    "authToken",
+    "data.accessToken",
+    "data.access_token",
+    "data.token",
+    "result.accessToken",
+    "result.token",
+  ]);
+
+  const refreshToken = extractValue(data, [
+    "refreshToken",
+    "refresh_token",
+    "refreshTokenValue",
+    "data.refreshToken",
+    "data.refresh_token",
+    "result.refreshToken",
+  ]);
+
+  await saveAuthTokens(accessToken || "", refreshToken || "");
+
+  const userFlag = extractUserFlag(data) ?? payload.flag;
+  if (typeof userFlag === "number") {
+    await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
+  }
+
+  const userId = [
+    data?.user?.userId,
+    data?.user?.id,
+    data?.user?._id,
+    data?.data?.user?.userId,
+    data?.data?.user?.id,
+    data?.data?.user?._id,
+    data?.data?.parent?.userId,
+    data?.data?.parentId,
+    data?.data?.userId,
+    data?.userId,
+    data?.result?.user?.userId,
+  ]
+    .map(toFiniteNumber)
+    .find((value): value is number => value !== null);
+
+  if (typeof userId === "number") {
+    await AsyncStorage.setItem(USER_ID_KEY, String(userId));
+  }
+
+  return data as { message?: string };
 }
 
 export async function getTherapists() {
@@ -688,12 +778,30 @@ export async function getTherapists() {
   }
 }
 
-export function addChildInformation(payload: ChildInformationPayload) {
-  return postAuthEndpoint<AddChildInformationResponse>(
-    AUTH_ENDPOINTS.addChildInformation,
-    payload,
-    true,
+export async function addChildInformation(
+  payload: ChildInformationPayload,
+  customAccessToken?: string | null,
+) {
+  const accessToken = customAccessToken || (await getAccessToken());
+
+  const response = await fetch(
+    `${API_BASE_URL}${AUTH_ENDPOINTS.addChildInformation}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      },
+      body: JSON.stringify(payload),
+    },
   );
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Request failed. Please try again.");
+  }
+
+  return data as AddChildInformationResponse;
 }
 
 export async function getLoggedInUserId() {

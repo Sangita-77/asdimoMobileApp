@@ -1,8 +1,10 @@
 import Button from "@/components/ButtonCompo/Button";
 import CompoLoginBack from "@/components/ui/CompoLoginBack";
 import Input from "@/components/ui/Input";
-import { addChildInformation, getLoggedInUserId } from "@/services/authService";
+import { ROUTES } from "@/constants/routes";
+import { addChildInformation, getAccessToken, getLoggedInUserId } from "@/services/authService";
 import { FontAwesome, MaterialCommunityIcons, MaterialIcons, SimpleLineIcons } from "@expo/vector-icons";
+import { router } from "expo-router";
 import { useState } from "react";
 import { StyleSheet, Text, View, useWindowDimensions } from "react-native";
 import Form from "../../components/ui/Form";
@@ -71,7 +73,10 @@ export default function Login() {
       (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
     if (!birthdayHasOccurred) age -= 1;
 
-    const parentId = await getLoggedInUserId();
+    const [parentId, accessToken] = await Promise.all([
+      getLoggedInUserId(),
+      getAccessToken(),
+    ]);
     if (!parentId) {
       setIsError(true);
       setMessage("Unable to identify your account. Please sign in again.");
@@ -81,19 +86,23 @@ export default function Login() {
     try {
       setIsSubmitting(true);
       setMessage("");
-      const response = await addChildInformation({
-        parentId,
-        childName: childName.trim(),
-        childAge: age,
-        dob,
-        childGender,
-        grade,
-        familyType,
-        language,
-      });
+      const response = await addChildInformation(
+        {
+          parentId,
+          childName: childName.trim(),
+          childAge: age,
+          dob,
+          childGender,
+          grade,
+          familyType,
+          language,
+        },
+        accessToken,
+      );
       setIsError(false);
       setMessage(response.message || "Child information added successfully.");
       clearForm();
+      router.replace(ROUTES.APP.HOME);
     } catch (submitError) {
       setIsError(true);
       setMessage(submitError instanceof Error ? submitError.message : "Unable to add child information. Please try again.");
@@ -194,7 +203,15 @@ export default function Login() {
               text={isSubmitting ? "Submitting..." : "Submit"}
               onPress={handleSubmit}
               disabled={isSubmitting}
-              width="full"
+              width="half"
+              textSize="lg"
+            />
+            <Button
+              text="Skip"
+              onPress={() => router.replace(ROUTES.APP.HOME)}
+              disabled={isSubmitting}
+              width="half"
+              variant="transparent"
               textSize="lg"
             />
             {/* <Button

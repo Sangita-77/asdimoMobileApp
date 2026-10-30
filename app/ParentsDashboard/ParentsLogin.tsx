@@ -297,7 +297,7 @@ function StepSix() {
       setRegistrationMessage(
         response.message || "Your account has been created.",
       );
-      router.replace(ROUTES.AUTH.LOGIN);
+      router.replace(ROUTES.AUTH.CHILDFORM);
     } catch (error) {
       setIsRegistrationSuccess(false);
       setRegistrationMessage(
