@@ -24,7 +24,7 @@ export const commonStyles = StyleSheet.create({
 
 export const getDynamicStyles = (width: number) =>
   StyleSheet.create({
-    FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
+    FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05,},
   });
 
 export const doctorStyles = StyleSheet.create({

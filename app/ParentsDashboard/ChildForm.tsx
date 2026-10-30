@@ -106,7 +106,9 @@ export default function Login() {
   return (
     <CompoLoginBack dinoImage={require("@/assets/images/Diano_Run.gif")}>
         <View style={dynamicStyles.FormWrap}>
-        <Text style={globalStyle.signinText}>
+        <Text style={[
+                    globalStyle.signinText,
+                    { fontSize: Math.max(15, Math.min(width * 0.035, 24)), }, ]} >
           Child Basic Information
         </Text>
         <Form type="normal">
