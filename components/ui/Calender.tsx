@@ -182,7 +182,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "transparent",
   },
-  selected: { backgroundColor: "#2563EB" },
+  selected: { backgroundColor: "#007CDD" },
   disabledDay: { opacity: 0.42 },
   dayText: { fontSize: 15, color: "#1F2937", fontWeight: "600" },
   selectedText: { color: "#FFF" },
