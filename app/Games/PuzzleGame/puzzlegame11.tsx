@@ -77,7 +77,8 @@ export default function PuzzleGame1() {
     ],
 
     fullpieces: [
-      { id: 1, width: 65, height: 109, x: 72, y: 3, image: BrinjalFull, },
+      // { id: 1, width: 65, height: 109, x: 72, y: 3, image: BrinjalFull, },
+      { id: 1, width: width * 0.07100, height: height * 0.24186, x: 72, y: 3, image: BrinjalFull, },
     ],
   };
 

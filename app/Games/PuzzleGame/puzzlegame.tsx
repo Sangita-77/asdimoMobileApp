@@ -348,7 +348,7 @@ export default function PuzzleGame({
               >
                 <Image
                   source={roundSlot}
-                  style={{ width: 150, height: 150, left: 30, top: -16 }}
+                  style={{ width: width * 0.16, height: height * 0.347, left: 30, top: -16 }}
                   resizeMode="contain"
                 />
                 {fullpieces.map((fullpiece) => {

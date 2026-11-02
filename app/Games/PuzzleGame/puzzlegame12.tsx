@@ -23,6 +23,9 @@ export default function PuzzleGame1() {
   const [showLevelOverlay, setShowLevelOverlay] = useState(true);
   const { width, height } = useWindowDimensions();
 
+  const vw = (value: number) => (width * value) / 100;
+  const vh = (value: number) => (height * value) / 100;
+
   // ANIMATION VALUES
   const scaleAnim = useRef(new Animated.Value(0.3)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
@@ -64,17 +67,22 @@ export default function PuzzleGame1() {
 
   const level2Data = {
     slots: [
-      { id: 1, width: 121, height: 180, x: 141, y: 67, image: RabbitSlotOne, },
-      { id: 2, width: 148, height: 143, x: 135, y: 171, image: RabbitSlotTwo, },
+      // { id: 1, width: 121, height: 180, x: 141, y: 67, image: RabbitSlotOne, },
+      // { id: 2, width: 148, height: 143, x: 135, y: 171, image: RabbitSlotTwo, },
+      { id: 1, width: vw(14.27), height: vw(19.64), x: vw(14.48), y: vw(6.87), image: RabbitSlotOne, },
+      { id: 2, width: vw(15.88), height: vw(15.34), x: vw(14.48), y: vw(18.35), image: RabbitSlotTwo, },
     ],
 
     pieces: [
-      { id: 1, width: 122, height: 181, startX: 68, startY: 150, image: RabbitOne, },
-      { id: 2, width: 150, height: 143, startX: -20.984, startY: 4.2, image: RabbitTwo, },
+      // { id: 1, width: 122, height: 181, startX: 68, startY: 150, image: RabbitOne, },
+      // { id: 2, width: 150, height: 143, startX: -20.984, startY: 4.2, image: RabbitTwo, },
+      { id: 1, width: vw(14.34), height: vw(19.72), startX: 68, startY: 130, image: RabbitOne, },
+      { id: 2, width: vw(15.88), height: vw(15.34), startX: -20.984, startY: 4.2, image: RabbitTwo, },
     ],
 
     fullpieces: [
-      { id: 1, width: 65, height: 102, x: 74, y: 4, image: RabbitFull, },
+      // { id: 1, width: 65, height: 102, x: 74, y: 4, image: RabbitFull, },
+      { id: 1, width: vw(6.97), height: vw(10.94), x: vw(7.94), y: vw(0.43), image: RabbitFull, },
     ],
   };
 

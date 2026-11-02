@@ -22,6 +22,9 @@ export default function PuzzleGame1() {
   const [showLevelOverlay, setShowLevelOverlay] = useState(true);
   const { width, height } = useWindowDimensions();
 
+  const vw = (value: number) => (width * value) / 100;
+  const vh = (value: number) => (height * value) / 100;
+
   // ANIMATION VALUES
   const scaleAnim = useRef(new Animated.Value(0.3)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
@@ -63,17 +66,22 @@ export default function PuzzleGame1() {
 
   const level3Data = {
     slots: [
-      { id: 1, width: 149, height: 106, x: 81, y: 185, image: BananaSlotOne, },
-      { id: 2, width: 111, height: 226, x: 209, y: 73.24, image: BananaSlotTwo, },
+      // { id: 1, width: 149, height: 106, x: 81, y: 185, image: BananaSlotOne, },
+      // { id: 2, width: 111, height: 226, x: 209, y: 73.24, image: BananaSlotTwo, },
+      { id: 1, width: vw(15.99), height: vw(11.37), x: vw(8.60), y: vw(19.85), image: BananaSlotOne, },
+      { id: 2, width: vw(11.91), height: vw(24.25), x: vw(22.42), y: vw(7.86), image: BananaSlotTwo, },
     ],
 
     pieces: [
-      { id: 1, width: 148, height: 108, startX: 42, startY: 194, image: BananaOne, },
-      { id: 2, width: 112, height: 225, startX: 2.016, startY: 0.2, image: BananaTwo, },
+      // { id: 1, width: 148, height: 108, startX: 42, startY: 194, image: BananaOne, },
+      // { id: 2, width: 112, height: 225, startX: 2.016, startY: 0.2, image: BananaTwo, },
+      { id: 1, width: vw(15.88), height: vw(11.59), startX: 42, startY: 194, image: BananaOne, },
+      { id: 2, width: vw(12.02), height: vw(24.14), startX: 2.016, startY: 0.2, image: BananaTwo, },
     ],
 
     fullpieces: [
-      { id: 1, width: 107, height: 87, x: 49, y: 13, image: BananaFull, },
+      // { id: 1, width: 107, height: 87, x: 49, y: 13, image: BananaFull, },
+      { id: 1, width: vw(11.48), height: vw(9.33), x: vw(5.26), y: vw(1.39), image: BananaFull, },
     ],
   };
 
