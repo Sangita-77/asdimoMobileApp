@@ -12,17 +12,21 @@ import { Asset } from "expo-asset";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 
+import { logoutUser } from "@/services/authService";
+
 const DashboardIcon = require("../../assets/images/landingDashIcon.png");
 const settingsIcon = require("../../assets/images/landingSettingIcon.png");
 const LogoutIcon = require("../../assets/images/SignOut.png");
 const handleLogout = async () => {
   try {
+    await logoutUser();
     await AsyncStorage.removeItem("authSession");
     await AsyncStorage.removeItem("authUser");
 
     router.replace(ROUTES.AUTH.LOGIN);
   } catch (error) {
     console.error("Logout failed:", error);
+    router.replace(ROUTES.AUTH.LOGIN);
   }
 };
 
@@ -41,7 +45,7 @@ const cards = [
     image: require('../../assets/images/appointment-img01.png'),
     cardbtn: require('../../assets/images/landingGreenArrow.webp'),
     colors: ['#9060ED', '#7344D7'] as const,
-    route: ROUTES.AUTH.DOCTORSLIST,
+    route: ROUTES.AUTH.NEWAPPOINTMENT,
   },
   {
     title: 'Games',
@@ -121,58 +125,58 @@ function LandingScreen() {
           What would you like to explore today?
         </Text>
 
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.cardsContainer}
-        >
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            style={styles.cardsScroll}
+            contentContainerStyle={styles.cardsContainer}
+            nestedScrollEnabled
+          >
           {cards.map((card, index) => (
             <LinearGradient
               key={index}
               colors={card.colors}
               style={[
-                styles.card, { width: width * 0.175, paddingLeft: width * 0.02, },
+                styles.Landcard, { width: width * 0.175, paddingLeft: width * 0.02, },
               ]}
             >
-              <Text style={[styles.cardTitle, { fontSize: width * 0.018, }, ]}>
+              <Text style={[styles.cardTitle, { fontSize: width * 0.02, }, ]}>
                 {card.title}
               </Text>
 
-              <Text style={[styles.cardDescription, { fontSize: width * 0.010, lineHeight: width * 0.015}, ]}>
+              <Text style={[styles.cardDescription, { fontSize: width * 0.012, lineHeight: width * 0.015}, ]}>
                 {card.description}
               </Text>
 
               <Image
                 source={card.image}
                 style={{
-                  width: width * 0.110,
+                  width: width * 0.120,
                   height: width * 0.110,
                 }}
                 resizeMode="contain"
               />
-              <View style={{ paddingLeft: width * 0.02, paddingBottom: width * 0.02 }}>
-            <Button
-              text=""
-              style={styles.arrowButton}
-              width="auto"
-              icon={
-                <Image
-                  source={card.cardbtn}
-                  style={{
-                    width: 30,
-                    height: 30,
-                  }}
-                  resizeMode="contain"
-                />
-              }
-              onPress={() => {
-                playClickSound();
-
-                transition.current?.cover(() => {
-                  router.push(card.route);
-                });
-              }}
-            />
+              <View style={{ width: width * 0.06,}}>
+              <Button
+                text=""
+                style={styles.arrowButton}
+                variant="Red"
+                icon={
+                  <Image
+                    source={card.cardbtn}
+                    style={{
+                      width: width * 0.06,
+                    }}
+                    resizeMode="contain"
+                  />
+                }
+                onPress={() => {
+                  playClickSound();
+                  transition.current?.cover(() => {
+                    router.push(card.route);
+                  });
+                }}
+              />
               </View>
             </LinearGradient>
           ))}
@@ -195,84 +199,17 @@ function LandingScreen() {
   );
 }
 
+
 const styles = StyleSheet.create({
   title: { fontSize: 27, lineHeight: 27, fontWeight: '700', marginBottom: 5, color: '#272727', textAlign: 'center', },
-
-  cardsContainer: {
-    gap: 12,
-    width: '100%',
-    paddingBottom: 13,
-    paddingLeft: 5,
-  },
-
-  card: {
-    borderRadius: 16,
-    padding: 15,
-    overflow: 'hidden',
-
-    shadowColor: '#707070',
-    shadowOffset: {
-      width: 0,
-      height: 6,
-    },
-    shadowOpacity: 0.10,
-    shadowRadius: 12,
-    elevation: 6,
-  },
-
-  cardTitle: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 6,
-  },
-
-  cardDescription: {
-    color: '#fff',
-    fontSize: 12,
-    lineHeight: 14,
-    marginBottom: 10,
-  },
-  arrowButton: {
-    left: -11,
-    bottom: 15,
-    width: 30,
-    height: 30,
-    padding: 0,
-    borderRadius: 16,
-    backgroundColor: 'transparent',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-
-  topButtons: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    gap: 15,
-    marginBottom: -38,
-    marginTop: 17,
-  },
-
-  iconCircle: {
-    width: 22,
-    height: 22,
-    marginRight: 3,
-  },
-
-  FormWrap: {
-    zIndex: 100,
-    justifyContent: 'center',
-    flex: 1,
-  },
-
-  logoutContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    alignItems: 'center',
-    marginRight: 30,
-    marginBottom: 20,
-  },
+  cardsScroll: { width: '100%', flexGrow: 0, },
+  cardsContainer: { flexDirection: 'row', gap: 12, paddingBottom: 13, paddingLeft: 5, paddingRight: 20, }, 
+  Landcard: { borderRadius: 16, padding: 15, shadowOpacity: 0.10, shadowRadius: 12, elevation: 6, },
+  cardTitle: { color: '#fff', marginBottom: 6, fontWeight: 700,}, 
+  cardDescription: { color: '#fff', marginBottom: 10, },
+  arrowButton: { borderRadius: 16, padding: 0, marginTop: 8, backgroundColor: "transparent",},
+  topButtons: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', gap: 15, marginBottom: -38, marginTop: 17, },
+  logoutContainer: { flexDirection: 'row', justifyContent: 'flex-end', alignItems: 'center', marginRight: 30, marginBottom: 20, },
 });
 
 export default LandingScreen;

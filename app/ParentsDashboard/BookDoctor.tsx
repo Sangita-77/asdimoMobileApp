@@ -4,17 +4,22 @@ import Footer from "@/components/ui/Footer";
 import Header from "@/components/ui/Header";
 import OrientationLock from "@/components/ui/ScreenOrientation";
 import { API_BASE_URL } from "@/constants/config";
-import { ROUTES } from "@/constants/routes";
+// import { ROUTES } from "@/constants/routes";
+import MyList, { ListItem } from "@/components/ui/IconTitleText";
+
 import {
   AvailabilitySlot,
   createAppointment,
   getAccessToken,
   getLoggedInUserId,
   getTherapistAvailability,
+  getUserById,
+  Therapist,
 } from "@/services/authService";
 import { processPayment } from "@/services/paymentService";
 import { router, useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { AntDesign } from "@expo/vector-icons";
 import {
   ActivityIndicator,
   Image,
@@ -48,17 +53,44 @@ function isPastTime(slot: AvailabilitySlot) {
   return selectedDate <= now;
 }
 
+function normalizeMedium(medium?: string) {
+  const value = (medium || "online").toLowerCase().trim();
+  if (value === "clinic" || value === "centre" || value === "center") {
+    return "center";
+  }
+  if (value === "room") return "online";
+  return value || "online";
+}
+
+function formatMediumLabel(medium?: string) {
+  switch (normalizeMedium(medium)) {
+    case "home":
+      return "Home";
+    case "center":
+      return "Center";
+    case "online":
+      return "Online";
+    default:
+      return "Medium";
+  }
+}
+
 export default function BookDoctor() {
   const {
     therapistId: therapistIdParam,
     therapistName,
     profileImg,
+    therapistCategory,
+    yearsOfExperience,
   } = useLocalSearchParams<{
     therapistId?: string;
     therapistName?: string;
     profileImg?: string;
+    therapistCategory?: string;
+    yearsOfExperience?: string;
   }>();
   const therapistId = Number(therapistIdParam);
+  const [therapist, setTherapist] = useState<Therapist | null>(null);
   const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(
@@ -70,7 +102,7 @@ export default function BookDoctor() {
   const [bookingMessage, setBookingMessage] = useState("");
   const [isBookingError, setIsBookingError] = useState(false);
 
-  const loadAvailability = useCallback(async () => {
+  const loadData = useCallback(async () => {
     if (!Number.isFinite(therapistId)) {
       setError("Therapist details are missing.");
       setIsLoading(false);
@@ -80,8 +112,18 @@ export default function BookDoctor() {
     try {
       setIsLoading(true);
       setError("");
-      const slots = await getTherapistAvailability(therapistId);
+      const [slots, therapistData] = await Promise.all([
+        getTherapistAvailability(therapistId).catch(() => []),
+        getUserById(therapistId).catch((err) => {
+          console.warn("Failed to fetch user by id:", err);
+          return null;
+        }),
+      ]);
+
       setAvailability(slots);
+      if (therapistData) {
+        setTherapist(therapistData);
+      }
       const firstAvailableDate = [...new Set(slots.map((slot) => slot.date))]
         .sort((a, b) => toDateValue(a).getTime() - toDateValue(b).getTime())
         .find((date) => !isPastDate(date));
@@ -90,7 +132,7 @@ export default function BookDoctor() {
       setError(
         loadError instanceof Error
           ? loadError.message
-          : "Unable to load availability.",
+          : "Unable to load details.",
       );
     } finally {
       setIsLoading(false);
@@ -98,8 +140,8 @@ export default function BookDoctor() {
   }, [therapistId]);
 
   useEffect(() => {
-    void loadAvailability();
-  }, [loadAvailability]);
+    void loadData();
+  }, [loadData]);
 
   const dates = useMemo(
     () =>
@@ -111,6 +153,77 @@ export default function BookDoctor() {
   const slotsForSelectedDate = availability.filter(
     (slot) => slot.date === selectedDate && !slot.isBooked,
   );
+  const groupedSlotsByMedium = useMemo(() => {
+    const mediumOrder = ["home", "center", "online"] as const;
+    const grouped = new Map<string, AvailabilitySlot[]>();
+
+    slotsForSelectedDate.forEach((slot) => {
+      const medium = normalizeMedium(slot.medium);
+      const existingSlots = grouped.get(medium) || [];
+      grouped.set(medium, [...existingSlots, slot]);
+    });
+
+    return mediumOrder
+      .map((medium) => ({
+        medium,
+        slots: (grouped.get(medium) || []).sort(
+          (a, b) => a.time.localeCompare(b.time),
+        ),
+      }))
+      .filter((group) => group.slots.length > 0);
+  }, [slotsForSelectedDate]);
+
+  const rawProfileImg =
+    therapist?.profileImg ||
+    therapist?.googleProfile?.picture ||
+    therapist?.facebookProfile?.picture ||
+    profileImg ||
+    "";
+  const imageUri = rawProfileImg
+    ? rawProfileImg.startsWith("http")
+      ? rawProfileImg
+      : `${API_BASE_URL.replace(/\/api$/, "")}${rawProfileImg}`
+    : "";
+
+  const name = therapist?.name || therapistName || "Therapist";
+  const category =
+    therapist?.roleData?.therapist_category ||
+    therapistCategory ||
+    "Therapist";
+
+  const expYears =
+    therapist?.roleData?.yearsOfExperience ??
+    (yearsOfExperience ? Number(yearsOfExperience) : null);
+
+  const languages = therapist?.roleData?.languages;
+  const languagesText =
+    Array.isArray(languages) && languages.length > 0
+      ? languages.join(", ")
+      : "English";
+
+  const clinicName = therapist?.roleData?.cliniqueName?.trim();
+
+  const specialities: ListItem[] = useMemo(() => {
+    const items: ListItem[] = [];
+
+    // Show Clinic only when cliniqueName exists
+    if (clinicName) {
+      items.push({
+        icon: "home-outline",
+        title: "Clinic",
+        text: clinicName,
+      });
+    }
+
+    // Languages always shown
+    items.push({
+      icon: "language",
+      title: "Languages",
+      text: languagesText,
+    });
+
+    return items;
+  }, [clinicName, languagesText]);
 
   const handleBookAppointment = async () => {
     if (!selectedSlot) {
@@ -135,6 +248,7 @@ export default function BookDoctor() {
         teacherId: therapistId,
         date: selectedSlot.date,
         time: selectedSlot.time,
+        medium: selectedSlot.medium || "online",
         parentId,
       };
       const accessToken = await getAccessToken();
@@ -180,31 +294,13 @@ export default function BookDoctor() {
     }
   };
 
-  const imageUri = profileImg
-    ? `${API_BASE_URL.replace(/\/api$/, "")}${profileImg}`
-    : "";
-  const name = therapistName || "Therapist";
-
   return (
     <>
       <OrientationLock variant="portrait" />
       <View style={globalStyle.container}>
         <Header title="Doctor Profile" showBack={true} />
         <ScrollView contentContainerStyle={styles.container}>
-          <View style={styles.profileContainer}>
-            {imageUri ? (
-              <Image source={{ uri: imageUri }} style={styles.avatar} />
-            ) : (
-              <View style={styles.placeholder}>
-                <Text style={styles.placeholderText}>
-                  {name.charAt(0).toUpperCase()}
-                </Text>
-              </View>
-            )}
-            <Text style={styles.doctorName}>{name}</Text>
-          </View>
-
-          {isLoading ? (
+         {isLoading ? (
             <View style={styles.statusContainer}>
               <ActivityIndicator size="large" color="#2563EB" />
             </View>
@@ -212,124 +308,165 @@ export default function BookDoctor() {
             <Text style={styles.errorText}>{error}</Text>
           ) : (
             <>
-              <View style={styles.selectDateWrap}>
-                <Text style={styles.heading}>Select Date</Text>
-                <Calender
-                  selectedDate={selectedDate}
-                  availableDates={dates}
-                  onDateChange={(date) => {
-                    setSelectedDate(date);
-                    setSelectedSlot(null);
-                  }}
-                />
-              </View>
-
-              <View style={styles.selectTimeWrap}>
-                <Text style={styles.heading}>Select Time</Text>
-                <View style={styles.timeContainer}>
-                  {slotsForSelectedDate.map((slot) => {
-                    const disabled = isPastTime(slot);
-                    const isSelected = selectedSlot?._id === slot._id;
-                    return (
-                      <Pressable
-                        key={slot._id}
-                        disabled={disabled}
-                        onPress={() => setSelectedSlot(slot)}
-                        style={[
-                          styles.timeButton,
-                          isSelected && styles.selectedTime,
-                          disabled && styles.disabledTime,
-                        ]}
-                      >
-                        <Text
-                          style={[
-                            styles.timeText,
-                            isSelected && styles.selectedTimeText,
-                            disabled && styles.disabledTimeText,
-                          ]}
-                        >
-                          {slot.time}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
+              <View style={styles.profileContainer}>
+                {imageUri ? (
+                  <Image source={{ uri: imageUri }} style={styles.avatar} />
+                ) : (
+                  <View style={styles.placeholder}>
+                    <Text style={styles.placeholderText}> {name.charAt(0).toUpperCase()} </Text>
+                  </View>
+                )}
+                <View style={styles.profileDetails}>
+                  <Text style={styles.doctorName}>{name}</Text>
+                  <Text style={globalStyle.smallText2}>{category}</Text>
+                  <View style={styles.specialitiesRow}>
+                    <MyList items={specialities} />
+                  </View>
                 </View>
               </View>
-              {!slotsForSelectedDate.length ? (
-                <Text style={styles.noSlots}>
-                  No available time slots for this date.
-                </Text>
-              ) : null}
+              <Text style={styles.doctorName}>About {name}</Text>
+               <Text style={globalStyle.smallText2}>
+                 {name} is a dedicated specialist in {category.toLowerCase()}
+                 {expYears !== null && expYears !== undefined && expYears > 0
+                   ? ` with over ${expYears} years of experience.`
+                   : " with extensive experience in therapy and child development."}
+               </Text>
+                  <Text style={styles.doctorName}>Select Date</Text>
+                  <View style={styles.selectDateWrap}>
+                    <Calender
+                      selectedDate={selectedDate}
+                      availableDates={dates}
+                      onDateChange={(date) => {
+                        setSelectedDate(date);
+                        setSelectedSlot(null);
+                      }}
+                    />
+                  </View>
 
-              {bookingMessage ? (
-                <Text
-                  style={[
-                    styles.bookingMessage,
-                    isBookingError
-                      ? styles.bookingError
-                      : styles.bookingSuccess,
-                  ]}
-                >
-                  {bookingMessage}
-                </Text>
-              ) : null}
-              <Button
-                text={isBooking ? "Booking..." : "Book Appointment"}
-                textSize="lg"
-                width="full"
-                disabled={!selectedSlot || isBooking}
-                onPress={handleBookAppointment}
-              />
-            </>
+                  <View style={styles.selectTimeWrap}>
+                    <Text style={styles.doctorName}>Select Time</Text>
+                    {groupedSlotsByMedium.length ? (
+                      groupedSlotsByMedium.map((group) => (
+                        <View key={group.medium} style={styles.mediumGroup}>
+                          <Text style={styles.mediumTitle}>
+                            {formatMediumLabel(group.medium)}
+                          </Text>
+                          <View style={styles.timeContainer}>
+                            {group.slots.map((slot) => {
+                              const disabled = isPastTime(slot);
+                              const isSelected = selectedSlot?._id === slot._id;
+                              return (
+                                <Pressable
+                                  key={slot._id}
+                                  disabled={disabled}
+                                  onPress={() => setSelectedSlot(slot)}
+                                  style={[
+                                    styles.timeButton,
+                                    isSelected && styles.selectedTime,
+                                    disabled && styles.disabledTime,
+                                  ]}
+                                >
+                                  <Text
+                                    style={[
+                                      styles.timeText,
+                                      isSelected && styles.selectedTimeText,
+                                      disabled && styles.disabledTimeText,
+                                    ]}
+                                  >
+                                    {slot.time}
+                                  </Text>
+                                </Pressable>
+                              );
+                            })}
+                          </View>
+                        </View>
+                      ))
+                    ) : null}
+                  </View>
+                  {!slotsForSelectedDate.length ? (
+                    <Text style={styles.noSlots}>
+                      No available time slots for this date.
+                    </Text>
+                  ) : null}
+
+                  {bookingMessage ? (
+                    <Text
+                      style={[
+                        styles.bookingMessage,
+                        isBookingError
+                          ? styles.bookingError
+                          : styles.bookingSuccess,
+                      ]}
+                    >
+                      {bookingMessage}
+                    </Text>
+                  ) : null}
+                  <Button
+                    text={isBooking ? "Booking..." : "Book Appointment"}
+                    textSize="lg"
+                    width="full"
+                    icon={
+                      <AntDesign
+                        name="calendar"
+                        size={24}
+                        color="white"
+                      />
+                    }
+                    variant="blue"
+                    disabled={!selectedSlot || isBooking}
+                    onPress={handleBookAppointment}
+                  />
+
+                {/* <Button
+                  style={styles.PastbookingBtn}
+                  text="Bookings"
+                  textSize="lg"
+                  width="full"
+                  onPress={() => {
+                    router.push(ROUTES.AUTH.BOOKINGS);
+                  }}
+                /> */}
+          </>
           )}
-          <Button
-            style={styles.PastbookingBtn}
-            text="Bookings"
-            textSize="lg"
-            width="full"
-            onPress={() => {
-              router.push(ROUTES.AUTH.BOOKINGS);
-            }}
-          />
         </ScrollView>
-
-        <Footer />
+  
       </View>
+      <Footer />
     </>
   );
 }
 
 const styles = StyleSheet.create({
   PastbookingBtn: { marginTop: 20 },
-  container: { padding: 20, flexGrow: 1, paddingBottom: 85, },
-  profileContainer: { alignItems: "center", marginBottom: 24 },
-  avatar: { width: 88, height: 88, borderRadius: 44 },
+  container: { padding: 20, flexGrow: 1, paddingBottom: 85 },
+  profileContainer: { alignItems: "center", flexDirection: "row", gap: 15 },
+  profileDetails: { flex: 1 },
+  specialitiesRow: { flexDirection: "row", gap: 15, alignItems: "center" },
+  avatar: { width: 125, height: 140, borderRadius: 20 },
   placeholder: {
-    width: 88,
-    height: 88,
+    width: 125,
+    height: 140,
     borderRadius: 44,
     backgroundColor: "#2563EB",
     justifyContent: "center",
     alignItems: "center",
   },
   placeholderText: { color: "#FFF", fontSize: 34, fontWeight: "700" },
-  doctorName: {
+  doctorName: { color: "#000000", fontSize: 16, fontWeight: "600", marginTop: 10 },
+  mediumGroup: { marginTop: 12 },
+  mediumTitle: {
     color: "#111827",
-    fontSize: 21,
+    fontSize: 15,
     fontWeight: "700",
-    marginTop: 10,
-  },
-  heading: {
-    color: "#000000",
-    fontSize: 13,
-    fontWeight: "600",
-    marginBottom: 13,
+    marginBottom: 8,
+    textTransform: "capitalize",
   },
   timeContainer: {
     flexDirection: "row",
     flexWrap: "wrap",
     gap: 12,
     paddingBottom: 10,
+    paddingTop: 6,
   },
   timeButton: {
     paddingVertical: 8,

@@ -9,7 +9,11 @@ export const ROUTES = {
     CHILDFORM: "/ParentsDashboard/ChildForm",
     DOCTORSLIST: "/ParentsDashboard/DoctorsList",
     BOOKDOCTOR: "/ParentsDashboard/BookDoctor",
-    BOOKINGS: "/ParentsDashboard/Bookings",
+    NEWAPPOINTMENT: "/ParentsDashboard/Appointment",
+    BOOKINGHISTORY: "/ParentsDashboard/BookingHistory",
+    BOOKINGDETAILS: "/ParentsDashboard/BookingDetails",
+    UPCOMINGBOOKING: "/ParentsDashboard/UpcomingBooking",
+    PASTBOOKING: "/ParentsDashboard/PastBooking",
   },
 
   APP: {

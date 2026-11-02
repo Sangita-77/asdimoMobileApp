@@ -11,11 +11,11 @@ export const globalStyle = StyleSheet.create({
   Dflex:{flexDirection: "row", justifyContent: "space-between", width: "auto",},
   Dblock:{flexDirection: "column", justifyContent: "space-between", width: "auto",},
   smallText:{textAlign: "center", paddingBottom: 10, fontWeight: 500, color: "#393B3E", fontSize: 15},
+  smallText2:{textAlign: "left", paddingBottom: 10, fontWeight: 500, color: "#999a9b", fontSize: 15},
   // Global Styles End
   safeArea: { flex: 1, },
   listContent:{ flexGrow: 1, padding: 16,},
   signinText: { color: "#000", textAlign: "center", fontWeight: "bold", marginBottom: 10, },
-  // FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
 });
 
 export const commonStyles = StyleSheet.create({
@@ -24,10 +24,11 @@ export const commonStyles = StyleSheet.create({
 
 export const getDynamicStyles = (width: number) =>
   StyleSheet.create({
-    FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05, },
+    FormWrap: { zIndex: 100, justifyContent: "center", flex: 1, marginLeft: width * 0.25, marginRight: width * 0.05,},
   });
 
 export const doctorStyles = StyleSheet.create({
   doctorWrap: {flex: 1, justifyContent: "flex-start", alignItems: "center", backgroundColor: "#ffffff", paddingBottom: 85,},
   cardCon: {width: "100%", maxWidth: 500, margin: 0, overflowY: "scroll",},
+  heading: { color: "#111827", fontSize: 18, fontWeight: "700",},
 });

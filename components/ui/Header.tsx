@@ -52,7 +52,6 @@ export default function Header({
               styles.HeaderText,
               {
                 width: showBack ? width : width,
-                paddingLeft: showBack ? 60 : 20,
               },
             ]}
           >
@@ -98,7 +97,7 @@ export default function Header({
 }
 
 const styles = StyleSheet.create({
-  HeaderContainer:{backgroundColor: "#00A0ED",},
+  HeaderContainer:{backgroundColor: "#ffffff",},
   HeaderContainerWrap: {
     backgroundColor: "#00A0ED",
     width: "100%",
@@ -109,14 +108,16 @@ const styles = StyleSheet.create({
   HeaderText: {
     color: "#fff",
     fontSize: 20,
-    paddingTop: 15 ,
+    paddingTop: 35,
+    paddingBottom: 10,
     fontWeight: "500",
+    textAlign: "center",
   },
 
   backButton: {
     position: "absolute",
-    left: 20,
-    top: 22,
+    left: 10,
+    top: 42,
     width: 35,
     height: 35,
     alignItems: "center",

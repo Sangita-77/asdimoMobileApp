@@ -8,18 +8,32 @@ import {
   TextStyle,
 } from "react-native";
 
+export type ButtonVariant =
+  | "transparent"
+  | "white"
+  | "solid"
+  | "border"
+  | "green"
+  | "blue"
+  | "Sky"
+  | "Red"
+  | "Neon";
+
+
 type ButtonProps = {
   text: string;
   onPress?: () => void;
-  textSize?: "sm" | "md" | "lg";
-  variant?: "transparent" | "white" | "solid" | "border";
+  textSize?: "xs" | "sm" | "md" | "lg";
+  variant?: "transparent" | "white" | "solid" | "border" | "blue"  | "green" | "Sky" | "Red" | "Neon";
+  // textSize?: "sm" | "md" | "lg";
+  // variant?: "transparent" | "white" | "solid" | "border" | "blue"  | "green";
   icon?: React.ReactNode;
   disabled?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
   iconPosition?: "left" | "right";
   width?: "full" | "half" | "auto";
-};
+}; 
 
 export default function Button({
   text,
@@ -44,6 +58,12 @@ export default function Button({
         variant === "white" && styles.whiteButton,
         variant === "transparent" && styles.transparentButton,
         variant === "border" && styles.transparentButton,
+        variant === "blue" && styles.blueButton,
+        variant === "green" && styles.greenButton,
+        variant === "Sky" && styles.SkyButton,
+        variant === "Red" && styles.RedButton,
+        variant === "Neon" && styles.NeonButton,
+
 
         width === "full" && styles.fullWidth,
         width === "half" && styles.halfWidth,
@@ -52,8 +72,8 @@ export default function Button({
         style,
       ]}
     >
-      <View style={styles.content}>
-        {icon && iconPosition === "left" && (
+      <View style={styles.content}> 
+        {Boolean(icon) && iconPosition === "left" && (
           <View style={styles.icon}>{icon}</View>
         )}
 
@@ -63,7 +83,15 @@ export default function Button({
             variant === "solid" && styles.solidText,
             variant === "white" && styles.whiteText,
             variant === "transparent" && styles.transparentText,
+            variant === "blue" && styles.solidText,
+            variant === "green" && styles.solidText,
+            variant === "Sky" && styles.BlueText,
+            variant === "Red" && styles.RedText,
+            variant === "Neon" && styles.NeonText,
 
+
+
+            textSize === "xs" && styles.xs,
             textSize === "sm" && styles.sm,
             textSize === "md" && styles.md,
             textSize === "lg" && styles.lg,
@@ -74,7 +102,7 @@ export default function Button({
           {text}
         </Text>
 
-        {icon && iconPosition === "right" && (
+        {Boolean(icon) && iconPosition === "right" && (
           <View style={styles.icon}>{icon}</View>
         )}
       </View>
@@ -83,17 +111,23 @@ export default function Button({
 }
 
 const styles = StyleSheet.create({
-  button: { height: 55, borderRadius: 50, justifyContent: "center", alignItems: "center", paddingHorizontal: 20, },
+  button: { borderRadius: 50, justifyContent: "center", alignItems: "center", paddingHorizontal: 18,  paddingVertical: 10,},
   solid: { backgroundColor: "#763DFF",  color: "#FFF",},
+  blueButton:{backgroundColor: "#007CDD",  color: "#FFF" },
+  SkyButton:{backgroundColor: "#DBEAFE",  color: "#FFF", paddingHorizontal: 10,  paddingVertical: 5,},
   white: { backgroundColor: "#fff", color: "#000", },
   transparent: { backgroundColor: "transparent", borderWidth: 0, borderColor: "#4F46E5", },
   solidButton: { backgroundColor: "#763DFF", },
+  greenButton: { backgroundColor: "#16A34A", },
+  NeonButton: { backgroundColor: "#DBF5DB", },
+  RedButton:  {backgroundColor: "#fdc5d8", paddingHorizontal: 10,  paddingVertical: 5,},
   whiteButton: { backgroundColor: "#FFF", },
   transparentButton: { backgroundColor: "transparent", borderWidth: 1, borderColor: "#763DFF", }, 
-solidText: {
-  color: "#FFF",
-},
-
+  solidText: { color: "#FFF", textTransform: "capitalize",},
+  BlackText: { color: "#000", textTransform: "capitalize",},
+  NeonText: {color: "#16A34A", textTransform: "capitalize",},
+  RedText: {color: "#a31635", textTransform: "capitalize",},
+  BlueText: {color: "#007CDD", textTransform: "capitalize",},
 whiteText: {
   color: "#111827",
 },
@@ -122,6 +156,10 @@ icon: {
 
 text: {
   fontWeight: "600",
+},
+
+xs: {
+  fontSize: 12,
 },
 
 sm: {

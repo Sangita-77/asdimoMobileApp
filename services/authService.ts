@@ -41,10 +41,17 @@ export type Therapist = {
   name: string;
   email?: string;
   flag: number;
+  status?: number;
   profileImg?: string | null;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  address?: string;
   phone?: string;
+  country?: string | null;
   roleData?: TherapistRoleData;
   relatedData?: Record<string, any>;
+  [key: string]: any;
 };
 
 export type AvailabilitySlot = {
@@ -53,7 +60,9 @@ export type AvailabilitySlot = {
   date: string;
   time: string;
   isBooked: boolean;
-  zoomLink?: string;
+  medium?: "home" | "center" | "online" | "room" | string;
+  zoomLink?: string | null;
+  zoomMeetingId?: string | null;
 };
 
 type GetUsersResponse = {
@@ -75,18 +84,87 @@ type CreateAppointmentResponse = {
   data?: { _id: string; status: string };
 };
 
+export type AppointmentTeacher = {
+  _id?: string;
+  teacherId?: number;
+  userId?: number;
+  user?: string;
+  organizationId?: number | null;
+  organizationAdminId?: number | null;
+  zonalAdminId?: number | null;
+  adminId?: number | null;
+  therapist_category?: string;
+  yearsOfExperience?: number;
+  languages?: string[];
+  [key: string]: any;
+};
+
+export type AppointmentTeacherUser = {
+  _id?: string;
+  name?: string;
+  email?: string;
+  flag?: number;
+  status?: number;
+  profileImg?: string | null;
+  city?: string;
+  state?: string;
+  pincode?: string;
+  address?: string;
+  phone?: string | null;
+  country?: string | null;
+  googleProfile?: {
+    name?: string;
+    picture?: string;
+    email?: string;
+  };
+  facebookProfile?: {
+    name?: string;
+    picture?: string;
+    email?: string;
+  };
+  [key: string]: any;
+};
+
+export type ChildDetail = {
+  _id?: string;
+  parentId?: number;
+  childName?: string;
+  childGender?: string;
+  childAge?: number;
+  grade?: string;
+  familyType?: string;
+  language?: string;
+  dob?: string;
+  childId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+};
+
 export type Appointment = {
   _id: string;
   parentId: number;
   teacherId: number;
+  availabilityId?: string;
   date: string;
   time: string;
   status: string;
-  zoomLink?: string;
-  teacherUser?: {
-    name?: string;
-    profileImg?: string | null;
-  };
+  reason?: string | null;
+  paymentId?: string | null;
+  zoomLink?: string | null;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
+  availability?: AvailabilitySlot | AvailabilitySlot[];
+  teacher?: AppointmentTeacher;
+  teacherUser?: AppointmentTeacherUser;
+  parent?: Record<string, any>;
+  parentUser?: Record<string, any>;
+  childDetails?: ChildDetail[];
+  organization?: Record<string, any>;
+  zonalAdmin?: Record<string, any>;
+  admin?: Record<string, any>;
+  [key: string]: any;
 };
 
 type GetAppointmentsResponse = {
@@ -308,23 +386,26 @@ export async function loginUser(email: string, password: string) {
  * Exchanges a Google-issued OpenID Connect ID token for an AsDimo session.
  * The API verifies the token and returns the same session fields as password login.
  */
-export async function googleLogin(idToken: string) {
+export async function googleLogin(
+  idToken: string,
+  userData?: Pick<ParentRegistrationPayload, "flag"> | { flag?: number },
+) {
   await clearAuthTokens();
-  const response = await fetch(`${API_BASE_URL}${AUTH_ENDPOINTS.googleLogin}`, {
+  const response = await fetch(`${API_BASE_URL}${AUTH_ENDPOINTS.googleLoginMain}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ idToken }),
+    body: JSON.stringify({ idToken, ...(userData || {}) }),
   });
 
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok) {
-    throw new Error(data?.message || "Google login failed");
+    throw new Error(data?.message || "Google authentication failed");
   }
 
-  const userFlag = extractUserFlag(data);
+  const userFlag = extractUserFlag(data) ?? userData?.flag;
 
   if (userFlag !== 2 && userFlag !== 4) {
     throw new Error("You are not register as Parent.");
@@ -342,7 +423,7 @@ export async function googleLogin(idToken: string) {
   ]);
 
   if (!accessToken) {
-    throw new Error("Google login did not return an access token");
+    throw new Error("Google authentication did not return an access token");
   }
 
   await saveAuthTokens(accessToken, refreshToken || "");
@@ -366,58 +447,12 @@ export async function googleLogin(idToken: string) {
 
 export async function googleSignup(
   idToken: string,
-  userData: Pick<ParentRegistrationPayload, "flag">,
+  userData?: Pick<ParentRegistrationPayload, "flag"> | { flag?: number },
 ) {
-  await clearAuthTokens();
-  const response = await fetch(
-    `${API_BASE_URL}${AUTH_ENDPOINTS.googleSignup}`,
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ idToken, ...userData }),
-    },
-  );
-
-  const data = await response.json().catch(() => ({}));
-
-  if (!response.ok) {
-    throw new Error(data?.message || "Google signup failed");
-  }
-
-  const accessToken = extractValue(data as Record<string, any>, [
-    "accessToken",
-    "token",
-    "data.accessToken",
-    "data.token",
-  ]);
-  const refreshToken = extractValue(data as Record<string, any>, [
-    "refreshToken",
-    "data.refreshToken",
-  ]);
-
-  if (!accessToken) {
-    throw new Error("Google signup did not return an access token");
-  }
-
-  await saveAuthTokens(accessToken, refreshToken || "");
-
-  const userFlag = extractUserFlag(data) ?? userData.flag;
-  if (userFlag !== null && typeof userFlag === "number") {
-    await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
-  }
-
-  const user = data?.data?.user ?? data?.user;
-  const userId = [user?.userId, user?.id, user?._id, data?.data?.userId, data?.userId]
-    .map(toFiniteNumber)
-    .find((value): value is number => value !== null);
-  if (userId !== undefined && userId !== null) {
-    await AsyncStorage.setItem(USER_ID_KEY, String(userId));
-  }
-
-  return data as LoginResponse;
+  return googleLogin(idToken, userData);
 }
+
+//////////////// google signup /////////////////////
 
 //////////////// google signup /////////////////////
 
@@ -562,25 +597,159 @@ async function postAuthEndpoint<T>(
   return data as T;
 }
 
+async function getAuthEndpoint<T>(
+  endpoint: string,
+  includeAccessToken = false,
+) {
+  const accessToken = includeAccessToken ? await getAccessToken() : null;
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Request failed. Please try again.");
+  }
+
+  return data as T;
+}
+
+async function patchAuthEndpoint<T>(
+  endpoint: string,
+  body: Record<string, unknown>,
+  includeAccessToken = false,
+) {
+  const accessToken = includeAccessToken ? await getAccessToken() : null;
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Request failed. Please try again.");
+  }
+
+  return data as T;
+}
+
 export function verifySignupEmail(email: string) {
   return postAuthEndpoint<{ message?: string }>(AUTH_ENDPOINTS.verifyEmail, {
     email,
   });
 }
 
-export function validateSignupOtp(email: string, otp: string) {
-  return postAuthEndpoint<{ message?: string; data?: { userId?: string } }>(
+export async function validateSignupOtp(email: string, otp: string) {
+  const data = await postAuthEndpoint<Record<string, any>>(
     AUTH_ENDPOINTS.validateOtp,
     { email, otp },
   );
+
+  const accessToken = extractValue(data, [
+    "accessToken",
+    "access_token",
+    "token",
+    "authToken",
+    "data.accessToken",
+    "data.access_token",
+    "data.token",
+    "result.accessToken",
+    "result.token",
+  ]);
+
+  const refreshToken = extractValue(data, [
+    "refreshToken",
+    "refresh_token",
+    "refreshTokenValue",
+    "data.refreshToken",
+    "data.refresh_token",
+    "result.refreshToken",
+  ]);
+
+  if (accessToken || refreshToken) {
+    await saveAuthTokens(accessToken || "", refreshToken || "");
+  }
+
+  const userId = [
+    data?.data?.userId,
+    data?.data?.user?.userId,
+    data?.data?.user?.id,
+    data?.userId,
+  ]
+    .map(toFiniteNumber)
+    .find((value): value is number => value !== null);
+
+  if (typeof userId === "number") {
+    await AsyncStorage.setItem(USER_ID_KEY, String(userId));
+  }
+
+  return data as { message?: string; data?: { userId?: string } };
 }
 
-export function registerParent(payload: ParentRegistrationPayload) {
-  return postAuthEndpoint<{ message?: string }>(
+export async function registerParent(payload: ParentRegistrationPayload) {
+  const data = await postAuthEndpoint<Record<string, any>>(
     AUTH_ENDPOINTS.register,
     payload,
     true,
   );
+
+  const accessToken = extractValue(data, [
+    "accessToken",
+    "access_token",
+    "token",
+    "authToken",
+    "data.accessToken",
+    "data.access_token",
+    "data.token",
+    "result.accessToken",
+    "result.token",
+  ]);
+
+  const refreshToken = extractValue(data, [
+    "refreshToken",
+    "refresh_token",
+    "refreshTokenValue",
+    "data.refreshToken",
+    "data.refresh_token",
+    "result.refreshToken",
+  ]);
+
+  await saveAuthTokens(accessToken || "", refreshToken || "");
+
+  const userFlag = extractUserFlag(data) ?? payload.flag;
+  if (typeof userFlag === "number") {
+    await AsyncStorage.setItem(USER_FLAG_KEY, String(userFlag));
+  }
+
+  const userId = [
+    data?.user?.userId,
+    data?.user?.id,
+    data?.user?._id,
+    data?.data?.user?.userId,
+    data?.data?.user?.id,
+    data?.data?.user?._id,
+    data?.data?.parent?.userId,
+    data?.data?.parentId,
+    data?.data?.userId,
+    data?.userId,
+    data?.result?.user?.userId,
+  ]
+    .map(toFiniteNumber)
+    .find((value): value is number => value !== null);
+
+  if (typeof userId === "number") {
+    await AsyncStorage.setItem(USER_ID_KEY, String(userId));
+  }
+
+  return data as { message?: string };
 }
 
 export async function getTherapists() {
@@ -609,12 +778,30 @@ export async function getTherapists() {
   }
 }
 
-export function addChildInformation(payload: ChildInformationPayload) {
-  return postAuthEndpoint<AddChildInformationResponse>(
-    AUTH_ENDPOINTS.addChildInformation,
-    payload,
-    true,
+export async function addChildInformation(
+  payload: ChildInformationPayload,
+  customAccessToken?: string | null,
+) {
+  const accessToken = customAccessToken || (await getAccessToken());
+
+  const response = await fetch(
+    `${API_BASE_URL}${AUTH_ENDPOINTS.addChildInformation}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+      },
+      body: JSON.stringify(payload),
+    },
   );
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Request failed. Please try again.");
+  }
+
+  return data as AddChildInformationResponse;
 }
 
 export async function getLoggedInUserId() {
@@ -628,6 +815,16 @@ export async function getLoggedInUserId() {
   }
 
   return tokenUserId;
+}
+
+export async function getUserById(userId: number) {
+  const response = await postAuthEndpoint<{
+    success: boolean;
+    data: Therapist;
+    message?: string;
+  }>(AUTH_ENDPOINTS.getAllUsersById, { userId }, true);
+
+  return response.data;
 }
 
 export async function getTherapistAvailability(therapistId: number) {
@@ -662,6 +859,67 @@ export async function getParentAppointments(parentId: number) {
   );
 
   return response.data || [];
+}
+
+export async function getAppointmentsForParent(parentId: number) {
+  const response = await postAuthEndpoint<GetAppointmentsResponse>(
+    AUTH_ENDPOINTS.getAppointmentsForParent,
+    { parentId },
+    true,
+  );
+
+  return response.data || [];
+}
+
+export async function getAppointmentById(appointmentId: string) {
+  const response = await getAuthEndpoint<{
+    success: boolean;
+    message?: string;
+    data: Appointment;
+  }>(`/appointments/${appointmentId}`, true);
+
+  return response.data;
+}
+
+export async function getTeacherAvailableSlots(teacherUserId: number | string) {
+  const response = await getAuthEndpoint<{
+    success: boolean;
+    data: AvailabilitySlot[];
+    message?: string;
+  }>(`/appointments/available-slots/${teacherUserId}`, true);
+
+  return response.data || [];
+}
+
+export async function cancelAppointment(appointmentId: string, reason: string) {
+  const response = await patchAuthEndpoint<{
+    success: boolean;
+    message?: string;
+    data?: any;
+  }>(`/appointments/cancel/${appointmentId}`, { reason: reason.trim() }, true);
+
+  return response;
+}
+
+export async function rescheduleAppointment(
+  appointmentId: string,
+  payload: { date: string; time: string; reason: string },
+) {
+  const response = await patchAuthEndpoint<{
+    success: boolean;
+    message?: string;
+    data?: any;
+  }>(
+    `/appointments/reschedule/${appointmentId}`,
+    {
+      date: payload.date,
+      time: payload.time,
+      reason: payload.reason.trim(),
+    },
+    true,
+  );
+
+  return response;
 }
 
 export async function refreshToken() {
@@ -715,3 +973,30 @@ export async function refreshToken() {
 
   return data as LoginResponse;
 }
+
+export async function logoutUser(customRefreshToken?: string) {
+  try {
+    const accessToken = await getAccessToken();
+    const refreshToken = customRefreshToken || (await getRefreshToken());
+
+    if (accessToken) {
+      await fetch(`${API_BASE_URL}${AUTH_ENDPOINTS.logout}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${accessToken}`,
+        },
+        body: JSON.stringify({
+          refreshToken: refreshToken || null,
+        }),
+      }).catch((error) => {
+        console.warn("Logout API call error:", error);
+      });
+    }
+  } catch (error) {
+    console.warn("Logout error:", error);
+  } finally {
+    await clearAuthTokens();
+  }
+}
+
