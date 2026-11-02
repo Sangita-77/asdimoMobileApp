@@ -63,8 +63,10 @@ export default function PuzzleGame1() {
 
   const level1Data = {
     slots: [
-      { id: 1, width: 102, height: 147, x: 130, y: 166, image: BrinjalSlotOne, },
-      { id: 2, width: 84, height: 194, x: 177, y: 55, image: BrinjalSlotTwo, },
+      // { id: 1, width: 102, height: 147, x: 130, y: 166, image: BrinjalSlotOne, },
+      // { id: 2, width: 84, height: 194, x: 177, y: 55, image: BrinjalSlotTwo, },
+      { id: 1, width: width * 0.10945, height: height * 0.34186, x: width * 0.15, y: height * 0.39, image: BrinjalSlotOne,},
+      { id: 2, width: width * 0.09013, height: height * 0.45117, x: width * 0.200, y: height * 0.13, image: BrinjalSlotTwo,},
     ],
 
     pieces: [
