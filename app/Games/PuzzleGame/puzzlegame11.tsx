@@ -70,8 +70,10 @@ export default function PuzzleGame1() {
     ],
 
     pieces: [
-      { id: 1, width: 105, height: 145, startX: 30, startY: 10, image: BrinjalOne, },
-      { id: 2, width: 87, height: 194, startX: 100, startY: 115, image: BrinjalTwo, },
+      // { id: 1, width: 105, height: 145, startX: 30, startY: 10, image: BrinjalOne, },
+      // { id: 2, width: 87, height: 194, startX: 100, startY: 115, image: BrinjalTwo, },
+      { id: 1, width:  width * 0.10945, height: height * 0.34186, startX: 30, startY: 10, image: BrinjalOne, },
+      { id: 2, width: width * 0.09013, height: height * 0.45117, startX: 100, startY: 115, image: BrinjalTwo, },
     ],
 
     fullpieces: [
