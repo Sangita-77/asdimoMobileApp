@@ -149,6 +149,8 @@ export type Appointment = {
   date: string;
   time: string;
   status: string;
+  amount?: number | string | null;
+  paymentStatus?: "pending" | "completed" | string | null;
   reason?: string | null;
   paymentId?: string | null;
   zoomLink?: string | null;
@@ -641,6 +643,29 @@ async function patchAuthEndpoint<T>(
   return data as T;
 }
 
+async function putAuthEndpoint<T>(
+  endpoint: string,
+  body: Record<string, unknown>,
+  includeAccessToken = false,
+) {
+  const accessToken = includeAccessToken ? await getAccessToken() : null;
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+    },
+    body: JSON.stringify(body),
+  });
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok) {
+    throw new Error(data?.message || "Request failed. Please try again.");
+  }
+
+  return data as T;
+}
+
 export function verifySignupEmail(email: string) {
   return postAuthEndpoint<{ message?: string }>(AUTH_ENDPOINTS.verifyEmail, {
     email,
@@ -915,6 +940,32 @@ export async function rescheduleAppointment(
       date: payload.date,
       time: payload.time,
       reason: payload.reason.trim(),
+    },
+    true,
+  );
+
+  return response;
+}
+
+export async function updateAppointmentPaymentStatus(
+  appointmentId: string,
+  payload: {
+    paymentStatus: string;
+    status?: string;
+    paymentId?: string;
+  },
+) {
+  const response = await putAuthEndpoint<{
+    success: boolean;
+    message?: string;
+    data?: Appointment;
+  }>(
+    `${AUTH_ENDPOINTS.updatePaymentStatus}/${appointmentId}`,
+    {
+      appointmentId,
+      paymentStatus: payload.paymentStatus,
+      ...(payload.status !== undefined ? { status: payload.status } : {}),
+      ...(payload.paymentId !== undefined ? { paymentId: payload.paymentId } : {}),
     },
     true,
   );

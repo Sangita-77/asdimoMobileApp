@@ -22,7 +22,13 @@ import {
 import Button from "@/components/ButtonCompo/Button";
 import MyList, { ListItem } from "@/components/ui/IconTitleText";
 import { FontAwesome5, Ionicons } from "@expo/vector-icons";
-import { Appointment, getAppointmentById } from "@/services/authService";
+import {
+  Appointment,
+  getAppointmentById,
+  getLoggedInUserId,
+  updateAppointmentPaymentStatus,
+} from "@/services/authService";
+import { processPayment } from "@/services/paymentService";
 
 function formatDate(dateStr?: string) {
   if (!dateStr) return "";
@@ -90,6 +96,7 @@ export default function BookingDetails() {
   const [actionModal, setActionModal] = useState<"reschedule" | "cancel" | null>(null);
   const [appointment, setAppointment] = useState<Appointment | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isPaying, setIsPaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<{
     type: "success" | "error";
@@ -196,6 +203,77 @@ export default function BookingDetails() {
     });
   };
 
+  const handlePayNow = async () => {
+    const targetAppointmentId = appointment?._id || appointmentId;
+    if (!targetAppointmentId || isPaying) return;
+
+    try {
+      setIsPaying(true);
+      setStatusMessage(null);
+
+      const loggedInParentId = await getLoggedInUserId();
+      const parentId = appointment?.parentId || loggedInParentId;
+      const parsedAmount = Number(appointment?.amount);
+      const payableAmount =
+        Number.isFinite(parsedAmount) && parsedAmount > 0 ? parsedAmount : 499;
+
+      const paymentResult = await processPayment({
+        amount: payableAmount,
+        description: `Consultation with ${therapistName}`,
+        user: {
+          parentId: parentId || undefined,
+          name: parentUser?.name,
+          email: parentUser?.email,
+          phone: parentUser?.phone,
+        },
+        metadata: {
+          source: "mobile-booking-details",
+          appointmentId: targetAppointmentId,
+        },
+      });
+
+      if (!paymentResult.success || !paymentResult.paymentId) {
+        throw new Error("Payment could not be confirmed.");
+      }
+
+      const updateResponse = await updateAppointmentPaymentStatus(
+        targetAppointmentId,
+        {
+          paymentStatus: "completed",
+          status: "approved",
+          paymentId: paymentResult.paymentId,
+        }
+      );
+
+      setAppointment((curr) =>
+        curr
+          ? {
+              ...curr,
+              ...(updateResponse.data || {}),
+              paymentStatus: updateResponse.data?.paymentStatus || "completed",
+              status: updateResponse.data?.status || "approved",
+              paymentId: paymentResult.paymentId,
+            }
+          : curr
+      );
+
+      setStatusMessage({
+        type: "success",
+        text: updateResponse.message || "Payment completed successfully.",
+      });
+    } catch (payError) {
+      setStatusMessage({
+        type: "error",
+        text:
+          payError instanceof Error
+            ? payError.message
+            : "Unable to complete payment. Please try again.",
+      });
+    } finally {
+      setIsPaying(false);
+    }
+  };
+
   const appointmentItems: ListItem[] = [];
 
   if (appointmentDate) {
@@ -282,6 +360,10 @@ export default function BookingDetails() {
   // }
 
   const statusNormalized = (appointmentStatus || "").toLowerCase().trim();
+  const paymentStatusNormalized = (appointment?.paymentStatus || "")
+    .toLowerCase()
+    .trim();
+  const isPaymentPending = paymentStatusNormalized === "pending";
   const isPast =
     isPastAppointment(appointmentDate, appointmentTime) ||
     isFromPastBooking ||
@@ -397,7 +479,11 @@ export default function BookingDetails() {
                 </View>
               )}
 
-              {(medium === "online" || Boolean(zoomLink)) && !isWaitingApproval && !isRejected && !isPast ? (
+              {(medium === "online" || Boolean(zoomLink)) &&
+              !isPaymentPending &&
+              !isWaitingApproval &&
+              !isRejected &&
+              !isPast ? (
                 <View style={styles.zoomContainer}>
                   <Button
                     text="Join Video"
@@ -437,7 +523,19 @@ export default function BookingDetails() {
                 </Text>
               </View>
 
-              {isPast ? (
+              {isPaymentPending && !isPast && !isWaitingApproval && !isRejected ? (
+                <View style={styles.profileContainer}>
+                  <Button
+                    text={isPaying ? "Processing..." : "Pay Now"}
+                    variant="blue"
+                    style={styles.AppointStatus}
+                    width="full"
+                    textSize="md"
+                    disabled={isPaying}
+                    onPress={() => void handlePayNow()}
+                  />
+                </View>
+              ) : isPast ? (
                 <View style={styles.profileContainer}>
                   <Button
                     text="Book Again"
@@ -675,4 +773,3 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 });
-
