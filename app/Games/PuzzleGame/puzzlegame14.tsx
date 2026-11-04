@@ -86,21 +86,21 @@ export default function PuzzleGame1() {
       // { id: 1, width: vw(19.64), height: vw(13.41), x: vw(12.55), y: vw(18.67), image: AppleSlotOne, },
       // { id: 2, width: vw(20.71), height: vw(18.24), x: vw(11.48), y: vw(6.33), image: AppleSlotTwo, },
 
-      { id: 1, width: s(183), height: s(125), x: s(97), y: s(164), image: AppleSlotOne, },
-      { id: 2, width: s(193), height: s(170), x: s(87), y: s(49), image: AppleSlotTwo, },
+      { id: 1, width: s(183), height: s(125), x: s(97), y: s(159), image: AppleSlotOne, },
+      { id: 2, width: s(193), height: s(170), x: s(87), y: s(44), image: AppleSlotTwo, },
     ],
 
     pieces: [
       // { id: 1, width: vw(19.64), height: vw(13.41), startX: 2.98, startY: 0, image: AppleOne, },
       // { id: 2, width: vw(20.71), height: vw(18.24), startX: 23, startY: 129, image: AppleTwo, },
-      { id: 1, width: s(183), height: s(125), startX: s(2.98), startY: s(0), image: AppleOne, },
-      { id: 2, width: s(193), height: s(170), startX: s(11), startY: s(129), image: AppleTwo, },
+      { id: 1, width: s(183), height: s(125), startX: s(2.98), startY: s(-15), image: AppleOne, },
+      { id: 2, width: s(193), height: s(170), startX: s(11), startY: s(119), image: AppleTwo, },
     ],
 
     fullpieces: [
       // { id: 1, width: 97, height: 108, x: 58, y: 3, image: AppleFull, },
       // { id: 1, width: vw(10.41), height: vw(11.59), x: vw(6.22), y: vw(0.32), image: AppleFull, },
-      { id: 1, width: s(97), height: s(99), x: s(50), y: s(0), image: AppleFull, },
+      { id: 1, width: s(97), height: s(99), x: s(37), y: s(-3), image: AppleFull, },
     ],
   };
 
