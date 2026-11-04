@@ -87,8 +87,8 @@ export default function PuzzleGame1() {
       // { id: 1, width: vw(5.9), height: vw(20.92), x: 165, y: 116, image: CarrotSlotOne, },
       // { id: 2, width: vw(6.97), height: vw(19.74), x: 180, y: 56, image: CarrotSlotTwo, },
 
-      { id: 1, width: s(55), height: s(195), x: s(147), y: s(108), image: CarrotSlotOne, },
-      { id: 2, width: s(65), height: s(184), x: s(162), y: s(48), image: CarrotSlotTwo, },
+      { id: 1, width: s(55), height: s(195), x: s(147), y: s(100), image: CarrotSlotOne, },
+      { id: 2, width: s(65), height: s(184), x: s(162), y: s(40), image: CarrotSlotTwo, },
     ],
     
     pieces: [
@@ -97,14 +97,14 @@ export default function PuzzleGame1() {
       // { id: 1, width: vw(6.44), height: vw(21.03), startX: 105.98, startY: 0, image: CarrotOne, },
       // { id: 2, width: vw(7.3), height: vw(19.85), startX: 45, startY: 112, image: CarrotTwo, },
 
-      { id: 1, width: s(60), height: s(196), startX: s(105.98), startY: s(0), image: CarrotOne, },
-      { id: 2, width: s(68), height: s(185), startX: s(45), startY: s(112), image: CarrotTwo, },
+      { id: 1, width: s(55), height: s(195), startX: s(105.98), startY: s(0), image: CarrotOne, },
+      { id: 2, width: s(65), height: s(184), startX: s(45), startY: s(99), image: CarrotTwo, },
     ],
 
     fullpieces: [
       // { id: 1, width: 97, height: 108, x: 58, y: 3, image: CarrotFull, },
       // { id: 1, width: vw(10.41), height: vw(11.59), x: vw(6.22), y: vw(0.32), image: CarrotFull, },
-      { id: 1, width: s(97), height: s(104), x: s(50), y: s(0), image: CarrotFull, },
+      { id: 1, width: s(97), height: s(104), x: s(38), y: s(-4), image: CarrotFull, },
     ],
   };
 
