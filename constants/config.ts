@@ -23,6 +23,7 @@ export const AUTH_ENDPOINTS = {
   appointments: "/appointments",
   getAppointmentsById: "/appointments/getAppointmentsById",
   getAppointmentsForParent: "/appointments/getAppointmentsForParent",
+  updatePaymentStatus: "/appointments/updatePaymentStatus",
   paymentKey: "/payments/key",
   createOrder: "/payments/create-order",
   verifyPayment: "/payments/verify-payment",

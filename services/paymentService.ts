@@ -2,7 +2,7 @@ import { API_BASE_URL, AUTH_ENDPOINTS } from "@/constants/config";
 import { getAccessToken } from "@/services/authService";
 import * as Linking from "expo-linking";
 import * as WebBrowser from "expo-web-browser";
-import { Platform } from "react-native";
+import { NativeModules, Platform } from "react-native";
 
 export interface PaymentOrder {
   orderId: string;
@@ -42,6 +42,39 @@ try {
   NativeRazorpayCheckout = null;
 }
 
+function loadWebRazorpayScript(): Promise<void> {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return Promise.reject(new Error("Web environment is not available."));
+  }
+  if ((window as any).Razorpay) {
+    return Promise.resolve();
+  }
+
+  return new Promise((resolve, reject) => {
+    const existingScript = document.querySelector(
+      'script[src="https://checkout.razorpay.com/v1/checkout.js"]',
+    ) as HTMLScriptElement | null;
+
+    if (existingScript) {
+      existingScript.addEventListener("load", () => resolve(), { once: true });
+      existingScript.addEventListener(
+        "error",
+        () => reject(new Error("Unable to load Razorpay Checkout.")),
+        { once: true },
+      );
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = "https://checkout.razorpay.com/v1/checkout.js";
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () =>
+      reject(new Error("Unable to load Razorpay Checkout."));
+    document.body.appendChild(script);
+  });
+}
+
 /**
  * Fetch active Razorpay Key ID from backend
  */
@@ -50,7 +83,9 @@ export async function getRazorpayKey(): Promise<string> {
   const data = await response.json().catch(() => null);
 
   if (!response.ok || !data?.success) {
-    throw new Error(data?.message || "Failed to retrieve payment configuration.");
+    throw new Error(
+      data?.message || "Failed to retrieve payment configuration.",
+    );
   }
 
   const key = data.data?.key || data.key;
@@ -135,10 +170,54 @@ export async function verifyPayment(payload: {
 }
 
 /**
+ * Verify that the completed payment amount on the server matches the expected database amount
+ */
+async function verifyPaidAmountMatches(
+  paymentId: string,
+  expectedAmountInRupees: number,
+  accessToken: string,
+): Promise<void> {
+  const response = await fetch(
+    `${API_BASE_URL}/payments/${encodeURIComponent(paymentId)}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${accessToken}`,
+      },
+    },
+  );
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok || !data?.success || !data?.data) {
+    return;
+  }
+
+  const paymentRecord = data.data;
+  const rawPaidAmount = Number(paymentRecord.amount);
+  if (!Number.isFinite(rawPaidAmount) || rawPaidAmount <= 0) {
+    return;
+  }
+
+  // Razorpay stores amount in paise (e.g. 49900) or backend may normalize to rupees (499)
+  const expectedPaise = Math.round(expectedAmountInRupees * 100);
+  const expectedRupees = Math.round(expectedAmountInRupees);
+
+  const matchesRupees = Math.round(rawPaidAmount) === expectedRupees;
+  const matchesPaise = Math.round(rawPaidAmount) === expectedPaise;
+
+  if (!matchesRupees && !matchesPaise) {
+    throw new Error(
+      `Paid amount does not match the required fee of ₹${expectedAmountInRupees}.`,
+    );
+  }
+}
+
+/**
  * Unified Payment Processor for Android, iOS, and Web.
- * 1. Checks if native react-native-razorpay SDK is available.
- * 2. If available, opens native Razorpay checkout and verifies signature on backend.
- * 3. If running on Web or in Expo Go (without native binary), falls back to secure Web checkout.
+ * 1. On Web, opens official Razorpay Checkout modal directly with a server-locked order amount.
+ * 2. On Native with react-native-razorpay linked, opens native Razorpay checkout with locked order amount.
+ * 3. In Expo Go (without native binary), opens Web checkout with locked order & verifies paid amount.
  */
 export async function processPayment(
   options: ProcessPaymentOptions,
@@ -148,17 +227,96 @@ export async function processPayment(
     throw new Error("Your session has expired. Please sign in again.");
   }
 
+  const lockedAmount = Number(options.amount);
+  if (!Number.isFinite(lockedAmount) || lockedAmount <= 0) {
+    throw new Error("Invalid payable amount.");
+  }
+
   const razorpayKey = await getRazorpayKey();
 
+  // 1. Web platform: open official Razorpay checkout modal directly (amount is locked to orderId)
+  if (Platform.OS === "web") {
+    const order = await createPaymentOrder({
+      amount: lockedAmount,
+      currency: "INR",
+      receipt: options.receipt,
+      metadata: options.metadata,
+      notes: {
+        source: "mobile-web",
+        parentId: String(options.user?.parentId || ""),
+      },
+    });
+
+    await loadWebRazorpayScript();
+    const RazorpayConstructor = (window as any).Razorpay;
+    if (!RazorpayConstructor) {
+      throw new Error("Razorpay Checkout is unavailable.");
+    }
+
+    return new Promise<{ success: boolean; paymentId: string }>(
+      (resolve, reject) => {
+        const rzp = new RazorpayConstructor({
+          key: razorpayKey,
+          amount: order.amount,
+          currency: order.currency || "INR",
+          name: "ASdimo",
+          description: options.description || "ASdimo Appointment Booking",
+          image: "https://dreamgroupsindia.com/dev/asDimoWebApp/favicon.svg",
+          order_id: order.orderId,
+          prefill: {
+            email: options.user?.email || "",
+            contact: options.user?.phone || options.user?.contact || "",
+            name: options.user?.name || "ASdimo Customer",
+          },
+          theme: { color: "#2563EB" },
+          modal: {
+            ondismiss: () => {
+              reject(new Error("Payment was cancelled."));
+            },
+          },
+          handler: async (response: RazorpaySuccessResponse) => {
+            try {
+              if (!response.razorpay_payment_id) {
+                throw new Error(
+                  "Payment was completed but payment ID is missing.",
+                );
+              }
+              await verifyPayment({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id || order.orderId,
+                razorpay_signature: response.razorpay_signature || "",
+              });
+              resolve({
+                success: true,
+                paymentId: response.razorpay_payment_id,
+              });
+            } catch (err) {
+              reject(
+                err instanceof Error
+                  ? err
+                  : new Error("Payment verification failed."),
+              );
+            }
+          },
+        });
+
+        rzp.open();
+      },
+    );
+  }
+
+  // 2. Native Android/iOS with react-native-razorpay native module linked
+  const hasNativeBridge = Boolean(
+    NativeModules?.RNRazorpayCheckout || NativeModules?.RazorpayCheckout,
+  );
   const isNativeSupported =
-    Platform.OS !== "web" &&
+    hasNativeBridge &&
     NativeRazorpayCheckout &&
     typeof NativeRazorpayCheckout.open === "function";
 
   if (isNativeSupported) {
-    // 1. Create order on backend
     const order = await createPaymentOrder({
-      amount: options.amount,
+      amount: lockedAmount,
       currency: "INR",
       receipt: options.receipt,
       metadata: options.metadata,
@@ -192,7 +350,6 @@ export async function processPayment(
         throw new Error("Payment was completed but payment ID is missing.");
       }
 
-      // Verify payment on backend
       await verifyPayment({
         razorpay_payment_id: response.razorpay_payment_id,
         razorpay_order_id: response.razorpay_order_id || order.orderId,
@@ -215,21 +372,45 @@ export async function processPayment(
     }
   }
 
-  // Fallback: Web / In-App browser session
+  // 3. Fallback: In-App browser session (Expo Go)
+  const order = await createPaymentOrder({
+    amount: lockedAmount,
+    currency: "INR",
+    receipt: options.receipt,
+    metadata: options.metadata,
+    notes: {
+      source: `mobile-browser-${Platform.OS}`,
+      parentId: String(options.user?.parentId || ""),
+    },
+  });
+
   const returnUrl = Linking.createURL("payment-complete");
   const paymentUrl = new URL(
     "https://dreamgroupsindia.com/dev/asDimoWebApp/payment",
   );
   paymentUrl.searchParams.set("accessToken", accessToken);
-  paymentUrl.searchParams.set("amount", String(options.amount));
+  paymentUrl.searchParams.set("amount", String(lockedAmount));
+  paymentUrl.searchParams.set("orderId", order.orderId);
+  paymentUrl.searchParams.set("readOnly", "true");
+  paymentUrl.searchParams.set("lockAmount", "true");
   if (options.user) {
     paymentUrl.searchParams.set("user", JSON.stringify(options.user));
   }
   if (options.metadata) {
-    paymentUrl.searchParams.set("metadata", JSON.stringify(options.metadata));
+    paymentUrl.searchParams.set(
+      "metadata",
+      JSON.stringify({
+        ...options.metadata,
+        fixedAmount: lockedAmount,
+        orderId: order.orderId,
+      }),
+    );
   }
-  if (options.receipt) {
-    paymentUrl.searchParams.set("receipt", options.receipt);
+  if (options.receipt || order.receipt) {
+    paymentUrl.searchParams.set(
+      "receipt",
+      String(options.receipt || order.receipt),
+    );
   }
   paymentUrl.searchParams.set("returnUrl", returnUrl);
 
@@ -255,6 +436,8 @@ export async function processPayment(
   if (typeof paymentId !== "string" || !paymentId.trim()) {
     throw new Error("Payment reference is missing.");
   }
+
+  await verifyPaidAmountMatches(paymentId, lockedAmount, accessToken);
 
   return {
     success: true,
