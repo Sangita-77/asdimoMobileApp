@@ -22,6 +22,25 @@ export default function PuzzleGame1() {
   const [showLevelOverlay, setShowLevelOverlay] = useState(true);
   const { width, height } = useWindowDimensions();
 
+  // const vw = (value: number) => (width * value) / 100;
+  // const vh = (value: number) => (height * value) / 100;
+
+  // Reference design size
+  const BASE_WIDTH = 844;
+  const BASE_HEIGHT = 390;
+
+  // Uniform scaling for the puzzle layout
+  const scale = Math.min(
+  width / BASE_WIDTH,
+  height / BASE_HEIGHT
+);
+
+  const s = (value: number) => value * scale;
+
+  const overlaySize = Math.min(s(220), width * 0.65);
+  const overlayFontSize = Math.min(s(42), overlaySize * 0.19);
+
+
   // ANIMATION VALUES
   const scaleAnim = useRef(new Animated.Value(0.3)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
@@ -63,17 +82,29 @@ export default function PuzzleGame1() {
 
   const level5Data = {
     slots: [
-      { id: 1, width: 55, height: 195, x: 165, y: 116, image: CarrotSlotOne, },
-      { id: 2, width: 65, height: 184, x: 180, y: 56, image: CarrotSlotTwo, },
+      // { id: 1, width: 55, height: 195, x: 165, y: 116, image: CarrotSlotOne, },
+      // { id: 2, width: 65, height: 184, x: 180, y: 56, image: CarrotSlotTwo, },
+      // { id: 1, width: vw(5.9), height: vw(20.92), x: 165, y: 116, image: CarrotSlotOne, },
+      // { id: 2, width: vw(6.97), height: vw(19.74), x: 180, y: 56, image: CarrotSlotTwo, },
+
+      { id: 1, width: s(55), height: s(195), x: s(147), y: s(100), image: CarrotSlotOne, },
+      { id: 2, width: s(65), height: s(184), x: s(162), y: s(40), image: CarrotSlotTwo, },
     ],
     
     pieces: [
-      { id: 1, width: 60, height: 196, startX: 105.98, startY: 0, image: CarrotOne, },
-      { id: 2, width: 68, height: 185, startX: 45, startY: 112, image: CarrotTwo, },
+      // { id: 1, width: 60, height: 196, startX: 105.98, startY: 0, image: CarrotOne, },
+      // { id: 2, width: 68, height: 185, startX: 45, startY: 112, image: CarrotTwo, },
+      // { id: 1, width: vw(6.44), height: vw(21.03), startX: 105.98, startY: 0, image: CarrotOne, },
+      // { id: 2, width: vw(7.3), height: vw(19.85), startX: 45, startY: 112, image: CarrotTwo, },
+
+      { id: 1, width: s(55), height: s(195), startX: s(105.98), startY: s(0), image: CarrotOne, },
+      { id: 2, width: s(65), height: s(184), startX: s(45), startY: s(99), image: CarrotTwo, },
     ],
 
     fullpieces: [
-      { id: 1, width: 97, height: 108, x: 58, y: 3, image: CarrotFull, },
+      // { id: 1, width: 97, height: 108, x: 58, y: 3, image: CarrotFull, },
+      // { id: 1, width: vw(10.41), height: vw(11.59), x: vw(6.22), y: vw(0.32), image: CarrotFull, },
+      { id: 1, width: s(97), height: s(104), x: s(38), y: s(-4), image: CarrotFull, },
     ],
   };
 

@@ -22,6 +22,21 @@ export default function PuzzleGame1() {
   const [showLevelOverlay, setShowLevelOverlay] = useState(true);
   const { width, height } = useWindowDimensions();
 
+  // Reference design size
+  const BASE_WIDTH = 844;
+  const BASE_HEIGHT = 390;
+
+  // Uniform scaling for the puzzle layout
+  const scale = Math.min(
+  width / BASE_WIDTH,
+  height / BASE_HEIGHT
+);
+
+  const s = (value: number) => value * scale;
+
+  const overlaySize = Math.min(s(220), width * 0.65);
+  const overlayFontSize = Math.min(s(42), overlaySize * 0.19);
+
   // ANIMATION VALUES
   const scaleAnim = useRef(new Animated.Value(0.3)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
@@ -65,20 +80,20 @@ export default function PuzzleGame1() {
     slots: [
       // { id: 1, width: 102, height: 147, x: 130, y: 166, image: BrinjalSlotOne, },
       // { id: 2, width: 84, height: 194, x: 177, y: 55, image: BrinjalSlotTwo, },
-      { id: 1, width: width * 0.10945, height: height * 0.34186, x: width * 0.15, y: height * 0.39, image: BrinjalSlotOne,},
-      { id: 2, width: width * 0.09013, height: height * 0.45117, x: width * 0.201, y: height * 0.13, image: BrinjalSlotTwo,},
+      { id: 1, width: s(102), height: s(142), x: s(129), y: s(148), image: BrinjalSlotOne,},
+      { id: 2, width: s(84), height: s(189), x: s(176), y: s(39), image: BrinjalSlotTwo,},
     ],
 
     pieces: [
       // { id: 1, width: 105, height: 145, startX: 30, startY: 10, image: BrinjalOne, },
       // { id: 2, width: 87, height: 194, startX: 100, startY: 115, image: BrinjalTwo, },
-      { id: 1, width:  width * 0.10945, height: height * 0.34186, startX: 30, startY: 10, image: BrinjalOne, },
-      { id: 2, width: width * 0.09013, height: height * 0.45117, startX: 100, startY: 115, image: BrinjalTwo, },
+      { id: 1, width: s(102), height: s(142), startX: s(21), startY: s(4), image: BrinjalOne, },
+      { id: 2, width: s(84), height: s(189), startX: s(100), startY: s(102), image: BrinjalTwo, },
     ],
 
     fullpieces: [
       // { id: 1, width: 65, height: 109, x: 72, y: 3, image: BrinjalFull, },
-      { id: 1, width: width * 0.07100, height: height * 0.24186, x: 72, y: 3, image: BrinjalFull, },
+      { id: 1, width: s(65), height: s(102), x: s(56), y: s(-7), image: BrinjalFull, },
     ],
   };
 
