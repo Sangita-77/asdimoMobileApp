@@ -80,6 +80,17 @@ export default function PuzzleGame({
   currentLevel: number;
 }) {
   const { width, height } = useWindowDimensions();
+
+  const BASE_WIDTH = 844;
+  const BASE_HEIGHT = 390;
+
+  const scale = Math.min(
+    width / BASE_WIDTH,
+    height / BASE_HEIGHT
+  );
+
+  const s = (value: number) => value * scale;
+
   const router = useRouter();
   const { slots, fullpieces, pieces: piecesData } = game;
   const [hintPath, setHintPath] = useState<{
@@ -207,7 +218,20 @@ export default function PuzzleGame({
           resizeMode="cover"
         >
           <GestureHandlerRootView style={{ flex: 1 }}>
-            <View style={styles.container}>
+            {/* <View style={styles.container}> */}
+            <View
+              style={[
+                styles.container,
+                {
+                  width: BASE_WIDTH * scale,
+                  // height: BASE_HEIGHT * scale,
+                  height: "100%",
+                  left: (width - BASE_WIDTH * scale) / 2,
+                  // top: (height - BASE_HEIGHT * scale) / 2,
+                  top: 21,
+                },
+              ]}
+            >
               <Pressable
                 style={styles.hintButton}
                 onPress={() => {
@@ -247,7 +271,8 @@ export default function PuzzleGame({
               <View
                 style={[
                   styles.pieceBox,
-                  { width: width * 0.2, height: height * 0.64 },
+                  // { width: width * 0.2, height: height * 0.64 },
+                  { width: s(170), height: s(250), },
                 ]}
                 onLayout={(e) => {
                   setPieceBoxLayout(e.nativeEvent.layout);
@@ -299,7 +324,8 @@ export default function PuzzleGame({
                 <ImageBackground
                   style={[
                     styles.SlotBG,
-                    { width: width * 0.43, height: height * 0.88 },
+                    // { width: width * 0.43, height: height * 0.88 },
+                    { width: s(360), height: s(330), },
                   ]}
                   source={SlotBG}
                   resizeMode="contain"
@@ -343,12 +369,18 @@ export default function PuzzleGame({
               <View
                 style={[
                   styles.pieceBox,
-                  { width: width * 0.2, height: height * 0.64 },
+                  // { width: width * 0.2, height: height * 0.64 },
+                  { width: s(170), height: s(250), },
                 ]}
               >
-                <Image
+                {/* <Image
                   source={roundSlot}
                   style={{ width: width * 0.16, height: height * 0.347, left: 30, top: -16 }}
+                  resizeMode="contain"
+                /> */}
+                <Image
+                  source={roundSlot}
+                  style={{ width: s(140), height: s(140), top: s(-25), alignSelf: "center", }}
                   resizeMode="contain"
                 />
                 {fullpieces.map((fullpiece) => {
@@ -373,9 +405,14 @@ export default function PuzzleGame({
                     </View>
                   );
                 })}
-                <Image
+                {/* <Image
                   source={dinoimg}
                   style={{ width: 166, height: 209, left: -46, bottom: 40 }}
+                  resizeMode="contain"
+                /> */}
+                <Image
+                  source={dinoimg}
+                  style={{ width: s(153), height: s(190), position: "absolute", left: s(-46), bottom: s(-45), }}
                   resizeMode="contain"
                 />
               </View>
@@ -475,75 +512,24 @@ function HintHand({
 const styles = StyleSheet.create({
   safeArea: { flex: 1 },
   slotText: { color: "white", fontSize: 12, textAlign: "center" },
+  // container: { position: "relative", flex: 1, flexDirection: "row", justifyContent: "space-evenly", alignItems: "center", marginTop: 20, marginRight: 10, marginLeft: 10, },
   container: {
-    position: "relative",
-    flex: 1,
-    flexDirection: "row",
-    justifyContent: "space-evenly",
-    alignItems: "center",
-    marginTop: 20,
-    marginRight: 10,
-    marginLeft: 10,
-  },
-  slotBox: {
-    borderWidth: 2,
-    borderColor: "#00000000",
-    position: "relative",
-    zIndex: 0,
-  },
+  position: "absolute",
+  flexDirection: "row",
+  justifyContent: "space-evenly",
+  alignItems: "center",
+},
+  slotBox: { borderWidth: 2, borderColor: "#00000000", position: "relative", zIndex: 0, },
   SlotBG: { width: "100%", height: "100%" },
-  GameText: {
-    position: "absolute",
-    width: "auto",
-    height: 45,
-    left: 0,
-    right: 0,
-    margin: "auto",
-    top: 8,
-    textAlign: "center",
-    fontSize: 20,
-  },
-  TextBoard: {
-    position: "absolute",
-    width: "auto",
-    height: 45,
-    left: 0,
-    right: 0,
-    margin: "auto",
-    zIndex: 99999,
-    top: -20,
-    textAlign: "center",
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-  },
+  GameText: { position: "absolute", width: "auto", height: 45, left: 0, right: 0, margin: "auto", top: 8, textAlign: "center", fontSize: 20, },
+  TextBoard: { position: "absolute", width: "auto", height: 45, left: 0, right: 0, margin: "auto", zIndex: 99999, top: -20, textAlign: "center", flex: 1, alignItems: "center", justifyContent: "center", },
   pieceBox: { position: "relative", zIndex: 9 },
   slot: { position: "absolute", width: SIZE, height: SIZE },
   piece: { position: "absolute", width: SIZE, height: SIZE, borderRadius: 10 },
-  winText: {
-    position: "absolute",
-    bottom: 50,
-    alignSelf: "center",
-    color: "white",
-    fontSize: 24,
-  },
+  winText: { position: "absolute", bottom: 50, alignSelf: "center", color: "white", fontSize: 24, },
   hintButton: { position: "absolute", top: 5, left: 100, zIndex: 99 },
-  hintSlot: {
-    borderWidth: 0,
-    borderColor: "gold",
-    boxShadow: "0px 0px 100px yellow",
-    elevation: 10,
-    borderRadius: 100,
-    backgroundColor: "#ffd9001f",
-  },
-  hintPiece: {
-    borderWidth: 0,
-    borderColor: "gold",
-    boxShadow: "0px 0px 100px gold",
-    elevation: 100,
-    backgroundColor: "#ffd9001f",
-    borderRadius: 100,
-  },
+  hintSlot: { borderWidth: 0, borderColor: "gold", boxShadow: "0px 0px 100px yellow", elevation: 10, borderRadius: 100, backgroundColor: "#ffd9001f", },
+  hintPiece: { borderWidth: 0, borderColor: "gold", boxShadow: "0px 0px 100px gold", elevation: 100, backgroundColor: "#ffd9001f", borderRadius: 100, },
   // Overlayer:{position: "absolute", right: 0, bottom: 0,},
   ChalkRound: {},
 });
