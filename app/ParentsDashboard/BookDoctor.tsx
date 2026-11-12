@@ -17,9 +17,14 @@ import {
   Therapist,
 } from "@/services/authService";
 import { processPayment } from "@/services/paymentService";
-import { router, useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { AntDesign } from "@expo/vector-icons";
+import {
+  AntDesign,
+  Feather,
+  Ionicons,
+  MaterialCommunityIcons,
+} from "@expo/vector-icons";
 import {
   ActivityIndicator,
   Image,
@@ -75,6 +80,28 @@ function formatMediumLabel(medium?: string) {
   }
 }
 
+function formatPreviewDate(date: string) {
+  if (!date) return "";
+  return date.trim().replace(/-/g, ".");
+}
+
+function formatPreviewTime(time: string) {
+  if (!time) return "";
+  const trimmed = time.trim();
+  if (/[ap]m$/i.test(trimmed)) {
+    return trimmed.toLowerCase().replace(/\s+/g, "");
+  }
+  const parts = trimmed.split(":").map(Number);
+  if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+    const hours24 = parts[0];
+    const minutes = String(parts[1]).padStart(2, "0");
+    const period = hours24 >= 12 ? "pm" : "am";
+    const hours12 = hours24 % 12 || 12;
+    return `${hours12}:${minutes}${period}`;
+  }
+  return trimmed;
+}
+
 export default function BookDoctor() {
   const {
     therapistId: therapistIdParam,
@@ -93,9 +120,7 @@ export default function BookDoctor() {
   const [therapist, setTherapist] = useState<Therapist | null>(null);
   const [availability, setAvailability] = useState<AvailabilitySlot[]>([]);
   const [selectedDate, setSelectedDate] = useState("");
-  const [selectedSlot, setSelectedSlot] = useState<AvailabilitySlot | null>(
-    null,
-  );
+  const [selectedSlots, setSelectedSlots] = useState<AvailabilitySlot[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isBooking, setIsBooking] = useState(false);
   const [error, setError] = useState("");
@@ -173,6 +198,26 @@ export default function BookDoctor() {
       .filter((group) => group.slots.length > 0);
   }, [slotsForSelectedDate]);
 
+  const toggleSlotSelection = (slot: AvailabilitySlot) => {
+    if (bookingMessage) {
+      setBookingMessage("");
+      setIsBookingError(false);
+    }
+    setSelectedSlots((current) => {
+      const exists = current.some((item) => item._id === slot._id);
+      if (exists) {
+        return current.filter((item) => item._id !== slot._id);
+      }
+      return [...current, slot];
+    });
+  };
+
+  const removeSelectedSlot = (slotId: string) => {
+    setSelectedSlots((current) =>
+      current.filter((item) => item._id !== slotId),
+    );
+  };
+
   const rawProfileImg =
     therapist?.profileImg ||
     therapist?.googleProfile?.picture ||
@@ -226,9 +271,9 @@ export default function BookDoctor() {
   }, [clinicName, languagesText]);
 
   const handleBookAppointment = async () => {
-    if (!selectedSlot) {
+    if (selectedSlots.length === 0) {
       setIsBookingError(true);
-      setBookingMessage("Please choose an available time slot.");
+      setBookingMessage("Please choose at least one available time slot.");
       return;
     }
 
@@ -244,25 +289,40 @@ export default function BookDoctor() {
     try {
       setIsBooking(true);
       setBookingMessage("");
-      const appointmentPayload = {
-        teacherId: therapistId,
-        date: selectedSlot.date,
-        time: selectedSlot.time,
-        medium: selectedSlot.medium || "online",
-        parentId,
-      };
+
       const accessToken = await getAccessToken();
       if (!accessToken) {
         throw new Error("Your session has expired. Please sign in again.");
       }
 
+      const appointmentPayloads = selectedSlots.map((slot) => ({
+        teacherId: therapistId,
+        date: slot.date,
+        time: slot.time,
+        medium: slot.medium || "online",
+        parentId,
+      }));
+
+      const totalAmount = selectedSlots.reduce((sum, slot) => {
+        const slotAmount = Number(
+          (slot as any)?.amount ??
+            therapist?.roleData?.amount ??
+            therapist?.roleData?.fees ??
+            therapist?.amount ??
+            499,
+        );
+        return (
+          sum + (Number.isFinite(slotAmount) && slotAmount > 0 ? slotAmount : 499)
+        );
+      }, 0);
+
       const paymentResult = await processPayment({
-        amount: 499,
-        description: `Consultation with ${name}`,
+        amount: totalAmount,
+        description: `Consultation with ${name} (${selectedSlots.length} slot${selectedSlots.length > 1 ? "s" : ""})`,
         user: { parentId },
         metadata: {
           source: "mobile-book-appointment",
-          appointment: appointmentPayload,
+          appointments: appointmentPayloads,
         },
       });
 
@@ -270,18 +330,31 @@ export default function BookDoctor() {
         throw new Error("Payment could not be confirmed.");
       }
 
-      const response = await createAppointment({
-        ...appointmentPayload,
-        paymentId: paymentResult.paymentId,
-      });
+      let lastMessage = "";
+      for (const payload of appointmentPayloads) {
+        const response = await createAppointment({
+          ...payload,
+          paymentId: paymentResult.paymentId,
+        });
+        if (response.message) {
+          lastMessage = response.message;
+        }
+      }
+
+      const bookedIds = new Set(selectedSlots.map((s) => s._id));
       setAvailability((current) =>
         current.map((slot) =>
-          slot._id === selectedSlot._id ? { ...slot, isBooked: true } : slot,
+          bookedIds.has(slot._id) ? { ...slot, isBooked: true } : slot,
         ),
       );
-      setSelectedSlot(null);
+      setSelectedSlots([]);
       setIsBookingError(false);
-      setBookingMessage(response.message || "Appointment booked successfully.");
+      setBookingMessage(
+        lastMessage ||
+          (selectedSlots.length > 1
+            ? "Appointments booked successfully."
+            : "Appointment booked successfully."),
+      );
     } catch (bookingError) {
       setIsBookingError(true);
       setBookingMessage(
@@ -300,7 +373,7 @@ export default function BookDoctor() {
       <View style={globalStyle.container}>
         <Header title="Doctor Profile" showBack={true} />
         <ScrollView contentContainerStyle={styles.container}>
-         {isLoading ? (
+          {isLoading ? (
             <View style={styles.statusContainer}>
               <ActivityIndicator size="large" color="#2563EB" />
             </View>
@@ -313,7 +386,10 @@ export default function BookDoctor() {
                   <Image source={{ uri: imageUri }} style={styles.avatar} />
                 ) : (
                   <View style={styles.placeholder}>
-                    <Text style={styles.placeholderText}> {name.charAt(0).toUpperCase()} </Text>
+                    <Text style={styles.placeholderText}>
+                      {" "}
+                      {name.charAt(0).toUpperCase()}{" "}
+                    </Text>
                   </View>
                 )}
                 <View style={styles.profileDetails}>
@@ -325,99 +401,150 @@ export default function BookDoctor() {
                 </View>
               </View>
               <Text style={styles.doctorName}>About {name}</Text>
-               <Text style={globalStyle.smallText2}>
-                 {name} is a dedicated specialist in {category.toLowerCase()}
-                 {expYears !== null && expYears !== undefined && expYears > 0
-                   ? ` with over ${expYears} years of experience.`
-                   : " with extensive experience in therapy and child development."}
-               </Text>
-                  <Text style={styles.doctorName}>Select Date</Text>
-                  <View style={styles.selectDateWrap}>
-                    <Calender
-                      selectedDate={selectedDate}
-                      availableDates={dates}
-                      onDateChange={(date) => {
-                        setSelectedDate(date);
-                        setSelectedSlot(null);
-                      }}
-                    />
-                  </View>
+              <Text style={globalStyle.smallText2}>
+                {name} is a dedicated specialist in {category.toLowerCase()}
+                {expYears !== null && expYears !== undefined && expYears > 0
+                  ? ` with over ${expYears} years of experience.`
+                  : " with extensive experience in therapy and child development."}
+              </Text>
+              <Text style={styles.doctorName}>Select Date</Text>
+              <View style={styles.selectDateWrap}>
+                <Calender
+                  selectedDate={selectedDate}
+                  availableDates={dates}
+                  onDateChange={(date) => {
+                    setSelectedDate(date);
+                  }}
+                />
+              </View>
 
-                  <View style={styles.selectTimeWrap}>
-                    <Text style={styles.doctorName}>Select Time</Text>
-                    {groupedSlotsByMedium.length ? (
-                      groupedSlotsByMedium.map((group) => (
-                        <View key={group.medium} style={styles.mediumGroup}>
-                          <Text style={styles.mediumTitle}>
-                            {formatMediumLabel(group.medium)}
+              <View style={styles.selectTimeWrap}>
+                <Text style={styles.doctorName}>Select Time</Text>
+                {groupedSlotsByMedium.length ? (
+                  groupedSlotsByMedium.map((group) => (
+                    <View key={group.medium} style={styles.mediumGroup}>
+                      <Text style={styles.mediumTitle}>
+                        {formatMediumLabel(group.medium)}
+                      </Text>
+                      <View style={styles.timeContainer}>
+                        {group.slots.map((slot) => {
+                          const disabled = isPastTime(slot);
+                          const isSelected = selectedSlots.some(
+                            (item) => item._id === slot._id,
+                          );
+                          return (
+                            <Pressable
+                              key={slot._id}
+                              disabled={disabled}
+                              onPress={() => toggleSlotSelection(slot)}
+                              style={[
+                                styles.timeButton,
+                                isSelected && styles.selectedTime,
+                                disabled && styles.disabledTime,
+                              ]}
+                            >
+                              <Text
+                                style={[
+                                  styles.timeText,
+                                  isSelected && styles.selectedTimeText,
+                                  disabled && styles.disabledTimeText,
+                                ]}
+                              >
+                                {slot.time}
+                              </Text>
+                            </Pressable>
+                          );
+                        })}
+                      </View>
+                    </View>
+                  ))
+                ) : null}
+              </View>
+              {!slotsForSelectedDate.length ? (
+                <Text style={styles.noSlots}>
+                  No available time slots for this date.
+                </Text>
+              ) : null}
+
+              {selectedSlots.length > 0 ? (
+                <View style={styles.previewCard}>
+                  <Text style={styles.previewTitle}>Booking preview</Text>
+                  <View style={styles.previewList}>
+                    {selectedSlots.map((slot) => {
+                      const normalizedMedium = normalizeMedium(slot.medium);
+                      const isOnline = normalizedMedium === "online";
+
+                      return (
+                        <View key={slot._id} style={styles.previewRow}>
+                          <Ionicons
+                            name="checkmark-circle-outline"
+                            size={22}
+                            color="#007CDD"
+                          />
+                          <Text style={styles.previewDateText}>
+                            {formatPreviewDate(slot.date)}
                           </Text>
-                          <View style={styles.timeContainer}>
-                            {group.slots.map((slot) => {
-                              const disabled = isPastTime(slot);
-                              const isSelected = selectedSlot?._id === slot._id;
-                              return (
-                                <Pressable
-                                  key={slot._id}
-                                  disabled={disabled}
-                                  onPress={() => setSelectedSlot(slot)}
-                                  style={[
-                                    styles.timeButton,
-                                    isSelected && styles.selectedTime,
-                                    disabled && styles.disabledTime,
-                                  ]}
-                                >
-                                  <Text
-                                    style={[
-                                      styles.timeText,
-                                      isSelected && styles.selectedTimeText,
-                                      disabled && styles.disabledTimeText,
-                                    ]}
-                                  >
-                                    {slot.time}
-                                  </Text>
-                                </Pressable>
-                              );
-                            })}
+                          <View style={styles.previewMediumBadge}>
+                            {isOnline ? (
+                              <Ionicons
+                                name="videocam"
+                                size={15}
+                                color="#007CDD"
+                              />
+                            ) : (
+                              <MaterialCommunityIcons
+                                name="home-plus"
+                                size={16}
+                                color="#007CDD"
+                              />
+                            )}
                           </View>
+                          <Text style={styles.previewTimeText}>
+                            {formatPreviewTime(slot.time)}
+                          </Text>
+                          <Text
+                            style={styles.previewStatusText}
+                            numberOfLines={1}
+                          >
+                            Appointment Booked
+                          </Text>
+                          <Pressable
+                            onPress={() => removeSelectedSlot(slot._id)}
+                            hitSlop={8}
+                            style={styles.previewRemoveBtn}
+                          >
+                            <Feather name="x" size={18} color="#4B5563" />
+                          </Pressable>
                         </View>
-                      ))
-                    ) : null}
+                      );
+                    })}
                   </View>
-                  {!slotsForSelectedDate.length ? (
-                    <Text style={styles.noSlots}>
-                      No available time slots for this date.
-                    </Text>
-                  ) : null}
+                </View>
+              ) : null}
 
-                  {bookingMessage ? (
-                    <Text
-                      style={[
-                        styles.bookingMessage,
-                        isBookingError
-                          ? styles.bookingError
-                          : styles.bookingSuccess,
-                      ]}
-                    >
-                      {bookingMessage}
-                    </Text>
-                  ) : null}
-                  <Button
-                    text={isBooking ? "Booking..." : "Book Appointment"}
-                    textSize="lg"
-                    width="full"
-                    icon={
-                      <AntDesign
-                        name="calendar"
-                        size={24}
-                        color="white"
-                      />
-                    }
-                    variant="blue"
-                    disabled={!selectedSlot || isBooking}
-                    onPress={handleBookAppointment}
-                  />
+              {bookingMessage ? (
+                <Text
+                  style={[
+                    styles.bookingMessage,
+                    isBookingError
+                      ? styles.bookingError
+                      : styles.bookingSuccess,
+                  ]}
+                >
+                  {bookingMessage}
+                </Text>
+              ) : null}
+              <Button
+                text={isBooking ? "Booking..." : "Book Appointment"}
+                textSize="lg"
+                width="full"
+                icon={<AntDesign name="calendar" size={24} color="white" />}
+                variant="blue"
+                disabled={selectedSlots.length === 0 || isBooking}
+                onPress={handleBookAppointment}
+              />
 
-                {/* <Button
+              {/* <Button
                   style={styles.PastbookingBtn}
                   text="Bookings"
                   textSize="lg"
@@ -426,10 +553,9 @@ export default function BookDoctor() {
                     router.push(ROUTES.AUTH.BOOKINGS);
                   }}
                 /> */}
-          </>
+            </>
           )}
         </ScrollView>
-  
       </View>
       <Footer />
     </>
@@ -452,7 +578,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   placeholderText: { color: "#FFF", fontSize: 34, fontWeight: "700" },
-  doctorName: { color: "#000000", fontSize: 16, fontWeight: "600", marginTop: 10 },
+  doctorName: {
+    color: "#000000",
+    fontSize: 16,
+    fontWeight: "600",
+    marginTop: 10,
+  },
   mediumGroup: { marginTop: 12 },
   mediumTitle: {
     color: "#111827",
@@ -493,6 +624,74 @@ const styles = StyleSheet.create({
   bookingError: { color: "#DC2626" },
   bookingSuccess: { color: "#16A34A" },
 
-  selectDateWrap: { backgroundColor: "#fff", padding: 17, borderRadius: 10, boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)", },
-  selectTimeWrap: {marginTop: 27, marginBottom: 27, backgroundColor: "#fff", padding: 17, borderRadius: 10, boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)",},
+  selectDateWrap: {
+    backgroundColor: "#fff",
+    padding: 17,
+    borderRadius: 10,
+    boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)",
+  },
+  selectTimeWrap: {
+    marginTop: 27,
+    marginBottom: 20,
+    backgroundColor: "#fff",
+    padding: 17,
+    borderRadius: 10,
+    boxShadow: "0px 4px 4px rgba(0, 0, 0, 0.1)",
+  },
+  previewCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: "#E5E7EB",
+    paddingVertical: 14,
+    paddingHorizontal: 14,
+    marginBottom: 24,
+    boxShadow: "0px 4px 10px rgba(0, 0, 0, 0.06)",
+    elevation: 2,
+  },
+  previewTitle: {
+    color: "#000000",
+    fontSize: 15,
+    fontWeight: "700",
+    marginBottom: 10,
+  },
+  previewList: {
+    gap: 10,
+  },
+  previewRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  previewDateText: {
+    color: "#3F3F46",
+    fontSize: 14,
+    fontWeight: "700",
+  },
+  previewMediumBadge: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: "#DCEEFF",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  previewTimeText: {
+    color: "#4B5563",
+    fontSize: 13,
+    fontWeight: "500",
+  },
+  previewStatusText: {
+    flex: 1,
+    color: "#4B5563",
+    fontSize: 13,
+    fontWeight: "400",
+    textAlign: "center",
+  },
+  previewRemoveBtn: {
+    padding: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

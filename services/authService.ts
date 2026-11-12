@@ -866,6 +866,7 @@ export function createAppointment(payload: {
   teacherId: number;
   date: string;
   time: string;
+  medium?: string;
   parentId: number;
   paymentId: string;
 }) {
