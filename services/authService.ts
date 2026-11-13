@@ -869,6 +869,8 @@ export function createAppointment(payload: {
   medium?: string;
   parentId: number;
   paymentId: string;
+  paymentStatus?: "completed" | "pending" | string;
+  amount?: number;
 }) {
   return postAuthEndpoint<CreateAppointmentResponse>(
     AUTH_ENDPOINTS.appointments,
