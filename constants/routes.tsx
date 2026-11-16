@@ -14,6 +14,7 @@ export const ROUTES = {
     BOOKINGDETAILS: "/ParentsDashboard/BookingDetails",
     UPCOMINGBOOKING: "/ParentsDashboard/UpcomingBooking",
     PASTBOOKING: "/ParentsDashboard/PastBooking",
+    REVIEWAPPOINTMENTS: "/ParentsDashboard/ReviewAppointments",
   },
 
   APP: {
@@ -30,6 +31,7 @@ export const ROUTES = {
     PUZZLE_4: "/Games/PuzzleGame/puzzlegame14",
     PUZZLE_5: "/Games/PuzzleGame/puzzlegame15",
     PUZZLE_6: "/Games/PuzzleGame/puzzlegame16",
+    PUZZLE_7: "/Games/PuzzleGame/puzzlegame17",
   },
 
   SHAPESORTING: {
