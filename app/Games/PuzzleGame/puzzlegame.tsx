@@ -186,6 +186,7 @@ export default function PuzzleGame({
     ROUTES.PUZZLE.PUZZLE_4,
     ROUTES.PUZZLE.PUZZLE_5,
     ROUTES.PUZZLE.PUZZLE_6,
+    ROUTES.PUZZLE.PUZZLE_7,
   ] as const;
 
   useEffect(() => {
