@@ -108,6 +108,8 @@ function checkTherapistAvailability(
   return futureSlots.some((slot) => slot.isBooked === false);
 }
 
+type IconName = React.ComponentProps<typeof Ionicons>["name"];
+
 export default function UpcomingBooking() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -241,9 +243,9 @@ export default function UpcomingBooking() {
         contentContainerStyle={styles.listContent}
         ListHeaderComponent={
           <>
-            <Text style={doctorStyles.heading}>Upcoming Bookings</Text>
+            <Text style={doctorStyles.heading}>Your Upcoming Appointment</Text>
             <Text style={globalStyle.smallText2}>
-              Here are your scheduled upcoming appointments.
+              Here are the details of your upcoming appointment.
             </Text>
             {paymentBanner ? (
               <View
@@ -353,6 +355,16 @@ export default function UpcomingBooking() {
             onActionButtonPress = () => handleViewDetails(item);
           }
 
+          const Iconmedium: IconName | undefined =
+              medium === "center"
+            ? "storefront-outline"
+            : medium === "home"
+            ? "home-outline"
+            : medium === "online"
+            ? "videocam-outline"
+            : undefined;
+        
+
           return (
             <DoctorListCard
               slotVariant="compact"
@@ -360,6 +372,7 @@ export default function UpcomingBooking() {
               name={item.teacherUser?.name || "Therapist"}
               category={item.teacher?.therapist_category || "Therapist"}
               experience={item.teacher?.yearsOfExperience ?? 0}
+              Status={true}
               isAvailable={isAvailable}
               AppointDate={`${formatDate(item.date)} · ${item.time}`}
               AppointStatus={item.status}
@@ -370,6 +383,7 @@ export default function UpcomingBooking() {
               onActionButtonPress={onActionButtonPress}
               showViewDetails={true}
               onViewDetails={() => handleViewDetails(item)}
+              Iconmedium={Iconmedium}
             />
           );
         }}

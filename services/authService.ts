@@ -32,6 +32,7 @@ export type TherapistRoleData = {
   licenseNumber?: string | null;
   languages?: string[];
   cliniqueName?: string | null;
+  globalStatus?: boolean;
   [key: string]: any;
 };
 
@@ -42,6 +43,7 @@ export type Therapist = {
   email?: string;
   flag: number;
   status?: number;
+  globalStatus?: boolean;
   profileImg?: string | null;
   city?: string;
   state?: string;
@@ -793,13 +795,42 @@ export async function getTherapists() {
 
     return response.data || [];
   } else {
-    const response = await postAuthEndpoint<GetUsersResponse>(
-      AUTH_ENDPOINTS.getAllUsers,
-      { flag: 5 },
-      true,
+    const [flag5Response, flag3Response] = await Promise.all([
+      postAuthEndpoint<GetUsersResponse>(
+        AUTH_ENDPOINTS.getAllUsers,
+        { flag: 5 },
+        true,
+      ),
+      postAuthEndpoint<GetUsersResponse>(
+        AUTH_ENDPOINTS.getAllUsers,
+        { flag: 3 },
+        true,
+      ).catch(() => ({ success: false, count: 0, data: [] as Therapist[] })),
+    ]);
+
+    const flag5Users = flag5Response.data || [];
+    const flag3GlobalUsers = (flag3Response.data || []).filter(
+      (user) =>
+        user?.globalStatus === true ||
+        user?.roleData?.globalStatus === true ||
+        (user as any)?.teacherData?.globalStatus === true ||
+        user?.relatedData?.teacher?.globalStatus === true,
     );
 
-    return response.data || [];
+    const seenKeys = new Set(
+      flag5Users.map((user) => user._id || String(user.userId)),
+    );
+    const combinedUsers = [...flag5Users];
+
+    for (const user of flag3GlobalUsers) {
+      const key = user._id || String(user.userId);
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        combinedUsers.push(user);
+      }
+    }
+
+    return combinedUsers;
   }
 }
 

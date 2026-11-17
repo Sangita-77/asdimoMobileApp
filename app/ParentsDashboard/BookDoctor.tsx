@@ -683,7 +683,7 @@ const styles = StyleSheet.create({
   },
   specialityItem: {
     flex: 1,
-    alignItems: "flex-start",
+    alignItems: "center",
   },
   specialityTitle: {
     color: "#000000",
