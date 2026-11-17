@@ -5,7 +5,6 @@ import Header from "@/components/ui/Header";
 import OrientationLock from "@/components/ui/ScreenOrientation";
 import { API_BASE_URL } from "@/constants/config";
 import { ROUTES } from "@/constants/routes";
-
 import {
   AvailabilitySlot,
   getTherapistAvailability,

@@ -90,17 +90,26 @@ export default function DoctorListCard({
     [availability]
   );
 
-  const dates = useMemo(
-    () =>
-      [...new Set(availableSlots.map((slot) => slot.date))].sort(
-        (a, b) => parseDate(a)!.getTime() - parseDate(b)!.getTime()
-      ),
-    [availableSlots]
-  );
+  // const dates = useMemo(
+  //   () =>
+  //     [...new Set(availableSlots.map((slot) => slot.date))].sort(
+  //       (a, b) => parseDate(a)!.getTime() - parseDate(b)!.getTime()
+  //     ),
+  //   [availableSlots]
+  // );
   
-const medium = availability.find(
-  (slot) => !slot.isBooked && isFutureSlot(slot)
-)?.medium;
+const availableMedia = useMemo(
+  () =>
+    [...new Set(
+      availableSlots
+        .map((slot) => slot.medium?.toLowerCase().trim())
+        .filter((medium): medium is string => !!medium)
+    )],
+  [availableSlots]
+);
+
+console.log("Doctor:", name);
+console.log("All Available Media:", availableMedia);
 
   const isAvailable = propIsAvailable ?? availableSlots.length > 0;
   const clinicName = ClinicName || therapist?.cliniqueName;
@@ -169,14 +178,29 @@ const medium = availability.find(
             )}
           {slotVariant === "default" ? (
             <>
-              {!!languages.length && (
+
                 <Text style={styles.specialty} numberOfLines={1}>
-                  <Ionicons name="location-outline" color="#74798B" /> Locality (8km)
+                  <Ionicons name="location-outline" color="#74798B" /> Locality (8km) 
                 </Text>
-              )}
+
+                <Text style={styles.specialty} numberOfLines={1}>
+                  <Ionicons name="wallet" color="#74798B" /> Fees -  
+                </Text>
              
                 <Text style={styles.specialty} numberOfLines={1}>
-                <Ionicons name="calendar-outline" color="#74798B" /> Available for - { medium || "Not specified"}
+                <Ionicons name="calendar-outline" color="#74798B" /> Available for - {availableMedia.length
+                ? availableMedia
+                    .map((medium) => {
+                      const labels: Record<string, string> = {
+                        home: "At Home",
+                        center: "At Clinic",
+                        online: "Video Call",
+                      };
+
+                      return labels[medium] || medium;
+                    })
+                    .join(", ")
+                : "Not specified"}
                 </Text>
               
               <View style={globalStyle.Dflex}>
