@@ -1,5 +1,5 @@
 
-import { AvailabilitySlot, TherapistRoleData } from "@/services/authService";
+import { AvailabilitySlot, Therapist } from "@/services/authService";
 import { Ionicons, Fontisto, SimpleLineIcons, MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -18,7 +18,7 @@ type IconName = React.ComponentProps<typeof Ionicons>["name"];
 
 interface DoctorListCardProps {
   image?: ImageSourcePropType;
-  therapist?: TherapistRoleData;
+  therapist?: Therapist;
   name?: string;
   ClinicName?: string;
   category?: string;
@@ -97,6 +97,17 @@ export default function DoctorListCard({
   //     ),
   //   [availableSlots]
   // );
+
+const rawFee =
+  therapist?.roleData?.fees ??
+  therapist?.roleData?.amount ??
+  therapist?.relatedData?.teacher?.fees ??
+  therapist?.teacherData?.fees ??
+  therapist?.fees ??
+  therapist?.amount;
+
+const displayFee = Number(rawFee) > 0 ? Number(rawFee) : null;
+
   
 const availableMedia = useMemo(
   () =>
@@ -108,12 +119,9 @@ const availableMedia = useMemo(
   [availableSlots]
 );
 
-console.log("Doctor:", name);
-console.log("All Available Media:", availableMedia);
 
   const isAvailable = propIsAvailable ?? availableSlots.length > 0;
   const clinicName = ClinicName || therapist?.cliniqueName;
-
 
   return (
     <View style={styles.card}>
@@ -171,6 +179,11 @@ console.log("All Available Media:", availableMedia);
           <Text style={styles.specialty}>
             <Fontisto name="stethoscope" color="#74798B" /> {category}
           </Text>
+          {!!languages.length && (
+          <Text style={styles.specialty} numberOfLines={1}>
+                  <Ionicons name="language" color="#74798B" /> Languages - {languages.join(", ")}
+          </Text>
+          )}
            {clinicName && (
             <Text style={styles.specialty}> 
               <SimpleLineIcons name="organization" color="#74798B" /> Attached with - {clinicName} 
@@ -184,23 +197,24 @@ console.log("All Available Media:", availableMedia);
                 </Text>
 
                 <Text style={styles.specialty} numberOfLines={1}>
-                  <Ionicons name="wallet" color="#74798B" /> Fees -  
+                  <Ionicons name="wallet" color="#74798B" /> Fees - ₹{displayFee}/sessions
                 </Text>
              
-                <Text style={styles.specialty} numberOfLines={1}>
-                <Ionicons name="calendar-outline" color="#74798B" /> Available for - {availableMedia.length
-                ? availableMedia
-                    .map((medium) => {
-                      const labels: Record<string, string> = {
-                        home: "At Home",
-                        center: "At Clinic",
-                        online: "Video Call",
-                      };
+                <Text style={styles.specialty} numberOfLines={2}>
+                  <Ionicons name="calendar-outline" color="#74798B" />{" "}
+                  {availableMedia.length > 0
+                    ? `Available for - ${availableMedia
+                        .map((medium) => {
+                          const labels: Record<string, string> = {
+                            home: "At Home",
+                            center: "At Clinic",
+                            online: "Video Call",
+                          };
 
-                      return labels[medium] || medium;
-                    })
-                    .join(", ")
-                : "Not specified"}
+                          return labels[medium] || medium;
+                        })
+                        .join(", ")}`
+                    : "No available medium"}
                 </Text>
               
               <View style={globalStyle.Dflex}>
