@@ -297,6 +297,7 @@ const handleViewDetails = (item: Therapist) => {
           keyExtractor={(item) => item._id}
           renderItem={({ item }) => (
           <DoctorListCard
+           therapist={item} 
             image={
               item.profileImg
                 ? {
