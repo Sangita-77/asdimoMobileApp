@@ -252,6 +252,25 @@ export default function Bookings() {
       });
   }, [therapists, activeTab, selectedCategory, selectedDate, selectedLanguage]);
 
+const handleViewDetails = (item: Therapist) => {
+  router.push({
+    pathname: ROUTES.AUTH.BOOKDOCTOR,
+    params: {
+      therapistId: String(item.userId),
+      therapistName: item.name,
+      profileImg: item.profileImg || "",
+      therapistCategory: item.roleData?.therapist_category || "Therapist",
+      yearsOfExperience: String(item.roleData?.yearsOfExperience ?? 0),
+      medium:
+        activeTab === "At Home"
+          ? "home"
+          : activeTab === "At Clinic"
+          ? "center"
+          : "online",
+    },
+  });
+};
+
   return (
     <>
       <OrientationLock variant="portrait" />
@@ -284,6 +303,7 @@ export default function Bookings() {
                 : undefined
             }
             name={item.name}
+            onViewDetails={() => handleViewDetails(item)}
             category={item.roleData?.therapist_category || "Therapist"}
             experience={item.roleData?.yearsOfExperience ?? 0}
             languages={item.roleData?.languages}

@@ -320,7 +320,7 @@ const DoctorListHeader = ({
                         Clear All
                     </Text>
                 </TouchableOpacity>
-            </ScrollView>
+                </ScrollView>
 
             {/* ------- Dropdown Modal */}
             <Modal
